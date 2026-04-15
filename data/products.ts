@@ -1,7 +1,7 @@
 import { getImageUrl, IMAGE_PATHS } from '@/lib/r2-config';
 
 export interface Product {
-  id: string;//df
+  id: string;
   name: string;
   nameEn: string;
   description: string;
