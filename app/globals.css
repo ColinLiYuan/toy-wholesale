@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  /* Minimalist Medical Tech Theme */
+  --background: #FFFFFF;
+  --foreground: #1A1A1A;
+  --accent-blue: #0056B3; /* Tech Blue */
+  --accent-green: #00A86B; /* Medical Green */
+  --surface-light: #F8F9FA;
+  --surface-white: #FFFFFF;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --text-primary: #1A1A1A;
+  --text-secondary: #6C757D;
+  --text-muted: #ADB5BD;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection Color */
+::selection {
+  background: var(--accent-blue);
+  color: white;
+}
+
+/* Clean Button Hover Effects */
+.btn-primary-hover:hover {
+  box-shadow: 0 4px 12px rgba(0, 86, 179, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* Clean Text */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
