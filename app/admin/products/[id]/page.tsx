@@ -4,8 +4,38 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { productAdminService, galleryAdminService } from '@/services';
-import type { Product, Gallery, ProductSku, Category } from '@/types';
-import { categories } from '@/lib/categories';
+import type { Product, Gallery, ProductSku, ProductSpecification } from '@/types';
+import CategorySelector from '@/components/CategorySelector';
+
+// 解析分类数据（支持 JSON 数组和斜杠分隔格式）
+const parseCategories = (categoriesData: string | string[]): string[] => {
+  try {
+    if (Array.isArray(categoriesData)) {
+      return categoriesData;
+    }
+    
+    if (typeof categoriesData === 'string') {
+      // 尝试解析 JSON 数组
+      try {
+        const jsonParsed = JSON.parse(categoriesData);
+        if (Array.isArray(jsonParsed)) {
+          return jsonParsed;
+        }
+      } catch {
+        // 如果不是 JSON，尝试斜杠分隔格式 "category/subcategory"
+        const parts = categoriesData.split('/').filter(Boolean);
+        if (parts.length > 0) {
+          return parts;
+        }
+      }
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Failed to parse categories:', error);
+    return [];
+  }
+};
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -33,10 +63,8 @@ export default function EditProductPage() {
   // SKU列表
   const [skus, setSkus] = useState<ProductSku[]>([]);
 
-  // 分类选择状态
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
-  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  // 分类选择状态（多选）
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
     if (isEditing && productId !== 'new') {
@@ -48,6 +76,33 @@ export default function EditProductPage() {
     try {
       setLoading(true);
       const data = await productAdminService.getProductById(parseInt(productId));
+      
+      // 解析features（JSON字符串 -> 对象）
+      if (data.features && typeof data.features === 'string') {
+        try {
+          data.features = JSON.parse(data.features);
+        } catch (e) {
+          console.error('Failed to parse features:', e);
+          data.features = {};
+        }
+      }
+      
+      // 解析tags（JSON字符串 -> 数组）
+      if (data.tags && typeof data.tags === 'string') {
+        try {
+          data.tags = JSON.parse(data.tags);
+        } catch (e) {
+          console.error('Failed to parse tags:', e);
+          data.tags = [];
+        }
+      }
+      
+      // 处理数值字段，确保不为 null（受控组件需要非 null 值）
+      data.currentPrice = data.currentPrice ?? 0;
+      data.minOrder = data.minOrder ?? 0;
+      data.netWeight = data.netWeight ?? undefined;
+      data.supplierId = data.supplierId ?? undefined;
+      
       setProduct(data);
       // 从产品数据中直接获取相册
       if (data.galleries) {
@@ -57,18 +112,15 @@ export default function EditProductPage() {
       if (data.productSkus) {
         setSkus(data.productSkus);
       }
-      // 恢复分类选择状态
+      // 获取规格列表（独立表）
+      if (data.specifications) {
+        setSpecifications(data.specifications);
+      }
+      // 恢复分类选择状态（支持多种数据格式）
       if (data.categories) {
-        const categoriesStr = Array.isArray(data.categories) ? data.categories[0] : data.categories;
-        if (categoriesStr && typeof categoriesStr === 'string') {
-          const parts = categoriesStr.split('/');
-          if (parts.length === 2) {
-            setSelectedCategory(parts[0]);
-            setSelectedSubcategory(parts[1]);
-          } else if (parts.length === 1) {
-            setSelectedCategory(parts[0]);
-            setSelectedSubcategory('');
-          }
+        const parsedCategories = parseCategories(data.categories);
+        if (parsedCategories.length > 0) {
+          setSelectedCategories(parsedCategories);
         }
       }
     } catch (error) {
@@ -111,19 +163,51 @@ export default function EditProductPage() {
     setLoading(true);
 
     try {
-      const productData = { 
-        ...product,
-        categories: selectedSubcategory ? `${selectedCategory}/${selectedSubcategory}` : selectedCategory,  // 保存分类路径
-        productSkus: skus,  // 包含SKU数据
-        galleries: galleries.map(g => ({
-          id: g.id,
-          productId: g.productId,
-          imageUrl: g.imageUrl,
-          alt: g.alt,
-          sortOrder: g.sortOrder,
-          isPrimary: g.isPrimary,
-        }))  // 包含相册数据
+      // 只发送后端实体中存在的字段
+      const productData: any = { 
+        name: product.name,
+        title: product.title,
+        slug: product.slug,
+        brand: product.brand,
+        status: product.status,
+        image: product.image,
+        alt: product.alt,
+        currentPrice: product.currentPrice,
+        shortDescription: product.shortDescription,
+        description: product.description,
+        categories: JSON.stringify(selectedCategories),
+        colors: typeof product.colors === 'string' ? product.colors : JSON.stringify(product.colors || []),
+        minOrder: product.minOrder,
+        material: product.material,
+        netWeight: product.netWeight,
+        supplierSku: product.supplierSku,
+        supplierId: product.supplierId,
       };
+      
+      // 处理tags（JSON数组）
+      if (product.tags) {
+        productData.tags = typeof product.tags === 'string' ? product.tags : JSON.stringify(product.tags);
+      }
+      
+      // 处理features（JSON对象 -> 字符串）
+      if (product.features && typeof product.features === 'object' && Object.keys(product.features).length > 0) {
+        productData.features = JSON.stringify(product.features);
+      }
+      
+      // 处理规格（独立表）
+      if (specifications && specifications.length > 0) {
+        productData.specifications = specifications.map(spec => ({
+          specKey: spec.specKey,
+          specValue: spec.specValue,
+        }));
+      }
+      
+      // 处理SKU列表（包含库存信息）
+      if (skus && skus.length > 0) {
+        productData.productSkus = skus;
+      }
+      
+      console.log('Submitting product data:', JSON.stringify(productData, null, 2));
       
       if (isEditing) {
         await productAdminService.updateProduct(parseInt(productId), productData);
@@ -313,6 +397,89 @@ export default function EditProductPage() {
     setSkus(updatedSkus);
   };
 
+  // 产品特性管理（JSON对象格式）
+  const [featureKey, setFeatureKey] = useState('');
+  const [featureValue, setFeatureValue] = useState('');
+  
+  // 获取解析后的features对象
+  const getFeaturesObject = (): Record<string, any> => {
+    if (!product.features) return {};
+    
+    // 如果已经是对象，直接返回
+    if (typeof product.features === 'object' && !Array.isArray(product.features)) {
+      return product.features;
+    }
+    
+    // 如果是字符串，尝试解析
+    if (typeof product.features === 'string') {
+      try {
+        const parsed = JSON.parse(product.features);
+        return typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+      } catch (e) {
+        console.error('Failed to parse features:', e);
+        return {};
+      }
+    }
+    
+    return {};
+  };
+
+  const addFeature = () => {
+    if (!featureKey.trim()) {
+      alert('请输入特性名称');
+      return;
+    }
+    
+    const features = { ...(product.features || {}) };
+    features[featureKey] = featureValue;
+    setProduct({ ...product, features });
+    setFeatureKey('');
+    setFeatureValue('');
+  };
+
+  const removeFeature = (key: string) => {
+    const features = { ...(product.features || {}) };
+    delete features[key];
+    setProduct({ ...product, features });
+  };
+
+  // 标签管理（数组格式）
+  const [newTag, setNewTag] = useState('');
+
+  const addTag = () => {
+    if (!newTag.trim()) return;
+    
+    const tags = Array.isArray(product.tags) ? [...product.tags] : (product.tags ? JSON.parse(product.tags) : []);
+    if (!tags.includes(newTag.trim())) {
+      tags.push(newTag.trim());
+      setProduct({ ...product, tags });
+    }
+    setNewTag('');
+  };
+
+  const removeTag = (index: number) => {
+    const tags = Array.isArray(product.tags) ? [...product.tags] : (product.tags ? JSON.parse(product.tags) : []);
+    tags.splice(index, 1);
+    setProduct({ ...product, tags });
+  };
+
+  // 规格管理（独立表）
+  const [specifications, setSpecifications] = useState<ProductSpecification[]>([]);
+
+  const addSpecification = () => {
+    setSpecifications([...specifications, { id: 0, specKey: '', specValue: '' }]);
+  };
+
+  const updateSpecification = (index: number, field: keyof ProductSpecification, value: any) => {
+    const updatedSpecs = [...specifications];
+    updatedSpecs[index] = { ...updatedSpecs[index], [field]: value };
+    setSpecifications(updatedSpecs);
+  };
+
+  const removeSpecification = (index: number) => {
+    setSpecifications(specifications.filter((_, i) => i !== index));
+  };
+
   if (loading && isEditing && !product.name) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -390,7 +557,7 @@ export default function EditProductPage() {
                 type="text"
                 value={product.slug}
                 onChange={(e) => setProduct({ ...product, slug: e.target.value })}
-                placeholder="例如：/female-sex-toys/clit-vibrators/the-muse"
+                placeholder="例如：realistic-tpe-torso-ws-tm-t101-2kg"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
                 required
               />
@@ -402,82 +569,11 @@ export default function EditProductPage() {
         {/* 产品分类 */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">产品分类</h2>
-          <div className="space-y-4">
-            {categories.map((category) => (
-              <div key={category.slug} className="border border-gray-200 rounded-lg">
-                {/* 一级分类 */}
-                <div
-                  className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
-                  onClick={() => {
-                    if (category.children && category.children.length > 0) {
-                      setExpandedCategories(prev =>
-                        prev.includes(category.slug)
-                          ? prev.filter(s => s !== category.slug)
-                          : [...prev, category.slug]
-                      );
-                    } else {
-                      setSelectedCategory(category.slug);
-                      setSelectedSubcategory('');
-                    }
-                  }}
-                >
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="category"
-                      value={category.slug}
-                      checked={selectedCategory === category.slug && !selectedSubcategory}
-                      onChange={() => {
-                        setSelectedCategory(category.slug);
-                        setSelectedSubcategory('');
-                      }}
-                      className="w-4 h-4 text-[#00F2FE] focus:ring-[#00F2FE]"
-                    />
-                    <span className="font-medium text-gray-900">{category.name}</span>
-                  </div>
-                  {category.children && category.children.length > 0 && (
-                    <span className="text-gray-400">
-                      {expandedCategories.includes(category.slug) ? '▼' : '▶'}
-                    </span>
-                  )}
-                </div>
-
-                {/* 二级分类 */}
-                {category.children && category.children.length > 0 && expandedCategories.includes(category.slug) && (
-                  <div className="pl-8 pr-3 pb-3 space-y-2">
-                    {category.children.map((sub) => (
-                      <div
-                        key={sub.slug}
-                        className="flex items-center space-x-2 p-2 cursor-pointer hover:bg-gray-50 rounded"
-                        onClick={() => {
-                          setSelectedCategory(category.slug);
-                          setSelectedSubcategory(sub.slug);
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="subcategory"
-                          value={sub.slug}
-                          checked={selectedSubcategory === sub.slug}
-                          onChange={() => {
-                            setSelectedCategory(category.slug);
-                            setSelectedSubcategory(sub.slug);
-                          }}
-                          className="w-4 h-4 text-[#00F2FE] focus:ring-[#00F2FE]"
-                        />
-                        <span className="text-gray-700">{sub.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-          {selectedCategory && (
-            <p className="text-xs text-gray-500 mt-2">
-              已选择: {selectedCategory}{selectedSubcategory ? ` / ${selectedSubcategory}` : ''}
-            </p>
-          )}
+          <p className="text-sm text-gray-600 mb-4">选择产品所属的分类（可多选）</p>
+          <CategorySelector
+            selectedCategories={selectedCategories}
+            onChange={setSelectedCategories}
+          />
         </div>
 
         {/* SKU 管理 */}
@@ -572,10 +668,10 @@ export default function EditProductPage() {
           )}
         </div>
 
-        {/* 价格和库存 */}
+        {/* 价格信息 */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">价格信息</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 当前价格 *
@@ -587,18 +683,6 @@ export default function EditProductPage() {
                 onChange={(e) => setProduct({ ...product, currentPrice: parseFloat(e.target.value) })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
                 required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                原价
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={product.originalPrice}
-                onChange={(e) => setProduct({ ...product, originalPrice: parseFloat(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
               />
             </div>
             <div>
@@ -616,78 +700,295 @@ export default function EditProductPage() {
           </div>
         </div>
 
-        {/* 图片和描述 */}
+        {/* 描述信息 */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">图片和描述</h2>
-          <div className="space-y-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">描述信息</h2>
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                主图
+                短描述（Short Description）
               </label>
-              
-              {/* 图片上传区域 */}
-              <div className="flex items-start space-x-4">
-                {product.image && (
-                  <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-300">
-                    <img
-                      src={product.image.startsWith('http') ? product.image : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${product.image}`}
-                      alt="预览"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/placeholder-product.svg';
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setProduct({ ...product, image: '' })}
-                      className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-                
-                <div className="flex-1 space-y-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="block w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#00F2FE] file:text-[#050505] hover:file:bg-[#00C4CC]"
-                  />
-                  <p className="text-xs text-gray-500">或输入图片 URL</p>
-                  <input
-                    type="text"
-                    value={product.image || ''}
-                    onChange={(e) => setProduct({ ...product, image: e.target.value })}
-                    placeholder="https://cdn.example.com/image.png"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                  />
-                </div>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                图片 Alt 文本
-              </label>
-              <input
-                type="text"
-                value={product.alt || ''}
-                onChange={(e) => setProduct({ ...product, alt: e.target.value })}
+              <textarea
+                value={product.shortDescription || ''}
+                onChange={(e) => setProduct({ ...product, shortDescription: e.target.value })}
+                rows={3}
+                placeholder="产品简短描述，显示在产品列表中..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                产品描述
+                详细描述（Description）
               </label>
               <textarea
                 value={product.description || ''}
                 onChange={(e) => setProduct({ ...product, description: e.target.value })}
                 rows={6}
+                placeholder="产品详细描述..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
               />
             </div>
           </div>
+        </div>
+
+        {/* 标签管理 */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">标签</h2>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                placeholder="输入标签后回车..."
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+              />
+              <button
+                type="button"
+                onClick={addTag}
+                className="px-4 py-1.5 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors"
+              >
+                + 添加
+              </button>
+            </div>
+          </div>
+          {product.tags && (() => {
+            const tagList = Array.isArray(product.tags) ? product.tags : (typeof product.tags === 'string' ? JSON.parse(product.tags) : []);
+            return tagList.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {tagList.map((tag: string, index: number) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 text-sm font-medium rounded-full"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(index)}
+                      className="ml-2 text-blue-400 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">暂无标签</p>
+            );
+          })()}
+        </div>
+
+        {/* 主图 */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">主图</h2>
+          <div className="flex items-start space-x-4">
+            {product.image && (
+              <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-300">
+                <img
+                  src={product.image.startsWith('http') ? product.image : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${product.image}`}
+                  alt="预览"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setProduct({ ...product, image: '' })}
+                  className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            
+            <div className="flex-1 space-y-2">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="block w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#00F2FE] file:text-[#050505] hover:file:bg-[#00C4CC]"
+              />
+              <p className="text-xs text-gray-500">或输入图片 URL</p>
+              <input
+                type="text"
+                value={product.image || ''}
+                onChange={(e) => setProduct({ ...product, image: e.target.value })}
+                placeholder="https://cdn.example.com/image.png"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  图片 Alt 文本
+                </label>
+                <input
+                  type="text"
+                  value={product.alt || ''}
+                  onChange={(e) => setProduct({ ...product, alt: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 产品特性（JSON对象格式） */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">产品特性（Features）</h2>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={featureKey}
+                onChange={(e) => setFeatureKey(e.target.value)}
+                placeholder="特性名"
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent w-28"
+              />
+              <input
+                type="text"
+                value={featureValue}
+                onChange={(e) => setFeatureValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
+                placeholder="值"
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent w-28"
+              />
+              <button
+                type="button"
+                onClick={addFeature}
+                className="px-4 py-1.5 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors"
+              >
+                + 添加
+              </button>
+            </div>
+          </div>
+          {(() => {
+            const featuresObj = getFeaturesObject();
+            const featureEntries = Object.entries(featuresObj);
+            
+            return featureEntries.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {featureEntries.map(([key, value]) => (
+                  <div
+                    key={key}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                  >
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-gray-700">{key}:</span>
+                      <span className="ml-2 text-sm text-gray-600">{String(value)}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFeature(key)}
+                      className="ml-3 px-2 py-1 bg-red-100 text-red-600 rounded text-xs hover:bg-red-200 transition-colors"
+                    >
+                      删除
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">暂无特性</p>
+            );
+          })()}
+        </div>
+
+        {/* B2B 外贸属性 */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">B2B 外贸属性</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                材质（Material）
+              </label>
+              <input
+                type="text"
+                value={product.material || ''}
+                onChange={(e) => setProduct({ ...product, material: e.target.value })}
+                placeholder="例如：TPE"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                净重（Net Weight, kg）
+              </label>
+              <input
+                type="number"
+                step="0.001"
+                value={product.netWeight || ''}
+                onChange={(e) => setProduct({ ...product, netWeight: parseFloat(e.target.value) || undefined })}
+                placeholder="例如：2.5"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                厂家货号（Supplier SKU）
+              </label>
+              <input
+                type="text"
+                value={product.supplierSku || ''}
+                onChange={(e) => setProduct({ ...product, supplierSku: e.target.value })}
+                placeholder="例如：S116001"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 规格（独立表） */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">规格（Specifications）</h2>
+            <button
+              type="button"
+              onClick={addSpecification}
+              className="px-4 py-2 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors"
+            >
+              + 添加规格
+            </button>
+          </div>
+          {specifications.length > 0 ? (
+            <div className="space-y-3">
+              {specifications.map((spec, index) => (
+                <div key={index} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">规格名称</label>
+                    <input
+                      type="text"
+                      value={spec.specKey}
+                      onChange={(e) => updateSpecification(index, 'specKey', e.target.value)}
+                      placeholder="例如：尺寸"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">规格值</label>
+                    <input
+                      type="text"
+                      value={spec.specValue}
+                      onChange={(e) => updateSpecification(index, 'specValue', e.target.value)}
+                      placeholder="例如：20cm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeSpecification(index)}
+                    className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors mt-5"
+                  >
+                    删除
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <p className="text-gray-500">暂无规格</p>
+              <p className="text-xs text-gray-400 mt-1">点击上方按钮添加规格</p>
+            </div>
+          )}
         </div>
 
         {/* 产品相册 */}
@@ -768,36 +1069,22 @@ export default function EditProductPage() {
           )}
         </div>
 
-        {/* 状态和标签 */}
+        {/* 状态 */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">状态和标签</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                状态
-              </label>
-              <select
-                value={product.status}
-                onChange={(e) => setProduct({ ...product, status: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              >
-                <option value="DRAFT">草稿</option>
-                <option value="ACTIVE">活跃</option>
-                <option value="INACTIVE">停用</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                徽章标签
-              </label>
-              <input
-                type="text"
-                value={product.badge || ''}
-                onChange={(e) => setProduct({ ...product, badge: e.target.value || null })}
-                placeholder="例如：NEW, HOT, SALE"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            </div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">状态</h2>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              状态
+            </label>
+            <select
+              value={product.status}
+              onChange={(e) => setProduct({ ...product, status: e.target.value as any })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+            >
+              <option value="DRAFT">草稿</option>
+              <option value="ACTIVE">活跃</option>
+              <option value="INACTIVE">停用</option>
+            </select>
           </div>
         </div>
 

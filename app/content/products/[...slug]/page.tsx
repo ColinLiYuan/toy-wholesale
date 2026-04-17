@@ -70,7 +70,7 @@ export default function ProductDetailPage() {
           features: [],
           specifications: [],
           galleries: [],
-          badge: null,
+          badge: undefined,
           status: 'ACTIVE',
           reviewCount: 0,
         } as Product);
@@ -161,13 +161,6 @@ export default function ProductDetailPage() {
             <div className="space-y-4">
               {/* Main Image */}
               <div className="relative aspect-square bg-[#F8F9FA] rounded-2xl overflow-hidden border border-gray-200">
-                {product.badge && (
-                  <div className="absolute top-6 left-6 z-10">
-                    <span className="px-4 py-2 rounded-lg text-sm font-bold bg-[#0056B3] text-white">
-                      {product.badge}
-                    </span>
-                  </div>
-                )}
                 <img
                   src={getImageUrl(galleryImages[selectedImageIndex] || product.image)}
                   alt={product.alt || product.title}
@@ -244,23 +237,33 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Features */}
-              {product.features && product.features.length > 0 && (
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">
-                    Key Features:
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {product.features.map((feature, index) => (
-                      <span
-                        key={index}
-                        className="px-4 py-2 text-sm rounded-lg bg-[#F8F9FA] text-[#1A1A1A] border border-gray-200"
-                      >
-                        {feature}
-                      </span>
-                    ))}
+              {(() => {
+                const featuresArray = product.features 
+                  ? (Array.isArray(product.features) 
+                      ? product.features 
+                      : (typeof product.features === 'string' 
+                          ? JSON.parse(product.features) 
+                          : Object.entries(product.features).map(([key, value]) => `${key}: ${value}`)))
+                  : [];
+                
+                return featuresArray.length > 0 ? (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">
+                      Key Features:
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {featuresArray.map((feature: any, index: number) => (
+                        <span
+                          key={index}
+                          className="px-4 py-2 text-sm rounded-lg bg-[#F8F9FA] text-[#1A1A1A] border border-gray-200"
+                        >
+                          {typeof feature === 'string' ? feature : `${feature.key || ''}: ${feature.value || ''}`}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : null;
+              })()}
 
               {/* Specifications */}
               {product.specifications && product.specifications.length > 0 && (

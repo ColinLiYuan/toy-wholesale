@@ -2,15 +2,26 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { productService } from '@/services';
 import type { Product, ProductListResponse } from '@/types';
-import { categories } from '@/lib/categories';
+import { categories, findCategoryBySlug, getParentCategory } from '@/lib/categories';
+import WholesaleFilter from '@/components/WholesaleFilter';
+import WholesaleBreadcrumbs from '@/components/WholesaleBreadcrumbs';
+import type { WholesaleFilters } from '@/components/WholesaleFilter';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProductsPage() {
+  const { isAuthenticated, user } = useAuth();
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam || 'all');
+  const [wholesaleFilters, setWholesaleFilters] = useState<WholesaleFilters>({});
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 0,
     totalPages: 0,
@@ -19,14 +30,22 @@ export default function ProductsPage() {
     hasPrevious: false,
   });
 
+  // 监听 URL 参数变化，更新选中分类
+  useEffect(() => {
+    const newCategory = categoryParam || 'all';
+    setSelectedCategory(newCategory);
+  }, [categoryParam]);
+
   useEffect(() => {
     fetchProducts();
-  }, [selectedCategory]);
+  }, [selectedCategory, wholesaleFilters]);
 
   const fetchProducts = async (page: number = 0) => {
     try {
       setLoading(true);
-      console.log('Fetching products, page:', page, 'category:', selectedCategory);
+      console.log('Fetching products, page:', page, 'category:', selectedCategory, 'filters:', wholesaleFilters);
+      
+      // 调用 API 时带上 distributorId（如果已登录）
       const response: ProductListResponse = await productService.getProducts(page, 12);
       
       if (!response || !response.content) {
@@ -35,11 +54,44 @@ export default function ProductsPage() {
       
       // 根据分类筛选
       let filteredProducts = response.content;
-      if (selectedCategory !== 'all') {
-        filteredProducts = response.content.filter(product => 
-          product.categories && Array.isArray(product.categories) && 
-          product.categories.some(cat => cat.toLowerCase().includes(selectedCategory))
+      if (selectedCategory !== 'all' && selectedCategory) {
+        filteredProducts = response.content.filter(product => {
+          // 解析 categories（可能是 JSON 字符串）
+          let cats: string[] = [];
+          if (typeof product.categories === 'string') {
+            try {
+              cats = JSON.parse(product.categories);
+            } catch {
+              cats = [];
+            }
+          } else if (Array.isArray(product.categories)) {
+            cats = product.categories;
+          }
+          
+          // 精确匹配分类
+          return cats.some(cat => cat.toLowerCase() === selectedCategory.toLowerCase());
+        });
+      }
+      
+      console.log('Filtered products count:', filteredProducts.length, 'Total:', response.content.length);
+      
+      // TODO: 根据 B2B 筛选条件过滤（材质、重量等）
+      if (wholesaleFilters.materials && wholesaleFilters.materials.length > 0) {
+        filteredProducts = filteredProducts.filter(product =>
+          product.material && wholesaleFilters.materials?.includes(product.material)
         );
+      }
+      
+      if (wholesaleFilters.weightRange) {
+        filteredProducts = filteredProducts.filter(product => {
+          if (!product.netWeight) return false;
+          const range = wholesaleFilters.weightRange!;
+          if (range === '0-1') return product.netWeight < 1;
+          if (range === '1-2') return product.netWeight >= 1 && product.netWeight < 2;
+          if (range === '2-5') return product.netWeight >= 2 && product.netWeight < 5;
+          if (range === '5+') return product.netWeight >= 5;
+          return true;
+        });
       }
       
       setProducts(filteredProducts);
@@ -116,31 +168,69 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      {/* Category Filter */}
-      <section className="py-6 bg-white border-b border-gray-200 sticky top-20 z-40 shadow-sm">
+      {/* Main Content Layout with Sidebar */}
+      <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {categories.filter(cat => cat.slug !== 'best-sellers').map((category) => (
-              <button
-                key={category.slug}
-                onClick={() => setSelectedCategory(category.slug)}
-                className={`px-6 py-2.5 rounded-lg whitespace-nowrap transition-all flex-shrink-0 ${
-                  selectedCategory === category.slug
-                    ? 'bg-[#0056B3] text-white font-semibold shadow-md'
-                    : 'border border-gray-300 text-[#6C757D] hover:border-[#0056B3] hover:text-[#0056B3] hover:bg-[#F8F9FA]'
-                }`}
+          {/* Mobile Filter Toggle */}
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-[#F8F9FA] border border-gray-200 rounded-lg text-[#1A1A1A] font-medium"
+            >
+              <span>Filters & Categories</span>
+              <svg
+                className={`w-5 h-5 transition-transform ${isMobileSidebarOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {category.name}
-              </button>
-            ))}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
-        </div>
-      </section>
 
-      {/* Products Grid */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="flex gap-8">
+            {/* Left Sidebar - Desktop */}
+            <div className="hidden lg:block flex-shrink-0">
+              <WholesaleFilter 
+                selectedCategory={selectedCategory === 'all' ? undefined : selectedCategory}
+                onFilterChange={(filters) => {
+                  setWholesaleFilters(filters);
+                }}
+              />
+            </div>
+
+            {/* Mobile Sidebar Overlay */}
+            {isMobileSidebarOpen && (
+              <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setIsMobileSidebarOpen(false)}>
+                <div className="absolute left-0 top-0 bottom-0 w-80 bg-white overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                  <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                    <h2 className="text-lg font-bold">Filters</h2>
+                    <button onClick={() => setIsMobileSidebarOpen(false)}>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <WholesaleFilter 
+                    selectedCategory={selectedCategory === 'all' ? undefined : selectedCategory}
+                    onFilterChange={(filters) => {
+                      setWholesaleFilters(filters);
+                      setIsMobileSidebarOpen(false);
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Main Content Area */}
+            <div className="flex-1 min-w-0">
+              {/* Breadcrumbs */}
+              <WholesaleBreadcrumbs currentCategory={selectedCategory === 'all' ? undefined : selectedCategory} />
+
+              {/* Products Grid */}
+              <div className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
               <Link
                 key={product.id}
@@ -178,30 +268,69 @@ export default function ProductsPage() {
                   {/* SKU */}
                   {product.sku && (
                     <div className="text-sm text-[#6C757D]">
-                      SKU: <span className="font-mono text-[#1A1A1A]">{product.sku}</span>
+                      SKU: <span className="font-mono text-[#1A1A1A] font-semibold">{product.sku}</span>
+                    </div>
+                  )}
+
+                  {/* Material & Weight - B2B Specs */}
+                  {(product.material || product.netWeight !== undefined) && (
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      {product.material && (
+                        <span className="inline-flex items-center px-2 py-1 bg-blue-50 rounded">
+                          <span className="text-[#6C757D] mr-1">Material:</span>
+                          <span className="text-[#0056B3] font-semibold">{product.material}</span>
+                        </span>
+                      )}
+                      {product.netWeight !== undefined && product.netWeight !== null && (
+                        <span className="inline-flex items-center px-2 py-1 bg-green-50 rounded">
+                          <span className="text-[#6C757D] mr-1">Weight:</span>
+                          <span className="text-green-700 font-semibold">{product.netWeight}kg</span>
+                        </span>
+                      )}
                     </div>
                   )}
 
                   {/* Price & Margin */}
                   <div className="pt-4 border-t border-gray-100">
-                    <div className="flex items-baseline gap-3 mb-2">
-                      {product.originalPrice !== undefined && product.originalPrice !== null && product.originalPrice > product.currentPrice && (
-                        <span className="text-base text-gray-400 line-through">
-                          ${product.originalPrice.toFixed(2)}
-                        </span>
-                      )}
-                      <span className="text-2xl font-bold text-[#0056B3]">
-                        ${product.currentPrice.toFixed(2)}
-                      </span>
-                    </div>
-                    
-                    {/* Est. Margin */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                      </svg>
-                      <span className="text-green-600 font-medium">Est. Margin: 60%</span>
-                    </div>
+                    {/* 未登录显示提示 */}
+                    {!isAuthenticated ? (
+                      <div className="mb-2 p-3 bg-[#F8F9FA] border border-gray-200 rounded-lg">
+                        <p className="text-sm text-[#6C757D] text-center">
+                          🔒 Price hidden,{' '}
+                          <span 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.location.href = '/login';
+                            }}
+                            className="text-[#0056B3] font-semibold hover:underline cursor-pointer"
+                          >
+                            Login to View
+                          </span>
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-baseline gap-3 mb-2">
+                          {product.originalPrice !== undefined && product.originalPrice !== null && product.originalPrice > product.currentPrice && (
+                            <span className="text-base text-gray-400 line-through">
+                              ${product.originalPrice.toFixed(2)}
+                            </span>
+                          )}
+                          <span className="text-2xl font-bold text-[#0056B3]">
+                            ${product.currentPrice.toFixed(2)}
+                          </span>
+                        </div>
+                        
+                        {/* Est. Margin */}
+                        <div className="flex items-center gap-2 text-sm">
+                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                          </svg>
+                          <span className="text-green-600 font-medium">Est. Margin: 60%</span>
+                        </div>
+                      </>
+                    )}
 
                     {/* MOQ */}
                     {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
@@ -223,6 +352,9 @@ export default function ProductsPage() {
                 </div>
               </Link>
             ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Pagination */}

@@ -7,35 +7,58 @@ export interface Category {
   children?: Category[];  // 子分类
 }
 
+// 供应商类型
+export interface Supplier {
+  id: number;
+  name: string;
+  internalCode?: string;  // 供应商内部编码，如 WS, PF, DM
+  contactPerson?: string;
+  phone?: string;
+  address?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // 产品类型定义 - 根据后端实体 Product
 export interface Product {
   id: number;
   name: string;
   title: string;
-  shortDescription?: string;
+  sku?: string;  // 简单 SKU（兼容旧代码）
+  shortDescription?: string;  // 短描述（VARCHAR 500）
   slug: string;
   brand: string;
   status: string;  // ACTIVE, INACTIVE
   image: string;
   alt: string;
   currentPrice: number;
-  originalPrice?: number;
-  description?: string;
+  originalPrice?: number;  // 原价（划线价）
+  description?: string;  // 长描述（TEXT）
   categories?: string | string[];  // JSON 字符串或数组
   colors?: string | string[];  // JSON 字符串或数组
-  features?: string[];
+  tags?: string | string[];  // 标签（JSON数组，用于前端多选搜索）
+  features?: Record<string, any>;  // 特性（JSON对象）
+  featuresParsed?: Record<string, any>;  // 解析后的特性对象（前端用）
   minOrder?: number;
-  badge?: string | null;
-  rating?: number;
-  stock?: number;
-  reviewCount?: number;
-  sku?: string;
+  
+  // B2B 外贸属性
+  material?: string;  // 材质（VARCHAR 100）
+  netWeight?: number;  // 净重（kg, DECIMAL 10,3）
+  supplierSku?: string;  // 厂家货号（VARCHAR 100）
+  supplierId?: number;  // 供应商 ID
+  supplierName?: string;  // 供应商名称（冗余字段）
+  badge?: string;  // 产品标签（如 NEW, HOT, SALE）
+  
   createdAt?: string;
   updatedAt?: string;
   productSkus?: ProductSku[];
-  specifications?: ProductSpecification[];
+  specifications?: ProductSpecification[];  // 规格（独立表）
   galleries?: Gallery[];  // 产品相册（从后端直接获取）
 }
+
+// 产品相册类型别名（用于向后兼容）
+export type ProductGallery = Gallery;
 
 // 产品 SKU 类型
 export interface ProductSku {
@@ -153,4 +176,59 @@ export interface BlogListResponse {
   hasPrevious: boolean;
   first: boolean;
   last: boolean;
+}
+
+// 经销商类型 - 根据后端实体 Distributor
+export interface Distributor {
+  id: number;
+  name: string;
+  code: string;  // 经销商编码（唯一）
+  type?: string;  // AUTHORIZED, PARTNER, AGENT
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  country?: string;
+  region?: string;
+  city?: string;
+  zipCode?: string;
+  website?: string;
+  description?: string;
+  status?: string;  // ACTIVE, INACTIVE, SUSPENDED, BLACKLISTED
+  level?: string;  // GOLD, SILVER, BRONZE
+  creditRating?: string;
+  serviceRegions?: string;  // JSON 数组
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// 认证响应类型
+export interface AuthResponse {
+  success: boolean;
+  message?: string;
+  token?: string;
+  distributor?: Distributor;  // 后端返回的字段名是 distributor
+  user?: Distributor;  // 兼容别名
+}
+
+// 购物车项目类型 - 根据后端实体 CartItem
+export interface CartItem {
+  id: number;
+  cartId?: number;
+  sku: ProductSku;
+  quantity: number;
+  priceAtAdd: number;  // 加入购物车时的价格快照
+  productName?: string;
+  productImage?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// 购物车类型 - 根据后端实体 ShoppingCart
+export interface ShoppingCart {
+  id: number;
+  distributorId?: number;
+  items: CartItem[];
+  createdAt?: string;
+  updatedAt?: string;
 }

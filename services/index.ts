@@ -1,6 +1,6 @@
 import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api-config';
-import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse } from '@/types';
+import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse } from '@/types';
 
 // 防伪验证服务
 export const antiCounterfeitService = {
@@ -14,6 +14,117 @@ export const antiCounterfeitService = {
       return response.data.data;
     } catch (error) {
       console.error('Verification failed:', error);
+      throw error;
+    }
+  },
+};
+
+// 供应商服务
+export const supplierService = {
+  // 获取所有活跃供应商 - GET /v1/suppliers
+  async getAllSuppliers(): Promise<Supplier[]> {
+    try {
+      const apiResult: UnwrappedAxiosResponse<ApiResult<Supplier[]>> = await apiClient.get(
+        '/v1/suppliers',
+        { params: { isActive: true } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        console.warn('Supplier API returned error, using fallback data');
+        return getFallbackSuppliers();
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      // API 尚未部署或网络错误，静默使用模拟数据
+      console.log('Supplier API not available, using fallback data');
+      return getFallbackSuppliers();
+    }
+  },
+};
+
+// 模拟供应商数据（开发环境使用）
+function getFallbackSuppliers(): Supplier[] {
+  return [
+    { id: 1, name: '东莞沃色', internalCode: 'WS', isActive: true },
+    { id: 2, name: 'Premium Factory B', internalCode: 'PF', isActive: true },
+    { id: 3, name: 'Direct Manufacturer C', internalCode: 'DM', isActive: true },
+  ];
+}
+
+// 认证服务
+export const authService = {
+  // 经销商登录 - POST /api/v1/auth/login
+  async login(email: string, password: string): Promise<AuthResponse> {
+    try {
+      // 注意：apiClient 的响应拦截器已经返回 response.data
+      // 所以这里的 response 实际上是 ApiResult 对象 {code, message, data}
+      const apiResult = await apiClient.post<ApiResult<any>>(
+        '/v1/auth/login',
+        { email, password }
+      );
+      
+      console.log('API Result:', apiResult); // 调试日志
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Login failed');
+      }
+      
+      // apiResult.data 就是 AuthResponse 结构 {success, token, distributor}
+      const authData = apiResult.data as AuthResponse;
+      console.log('Auth data:', authData); // 调试日志
+      
+      // 后端返回的是 distributor 字段，不是 user
+      if (!authData || !authData.token || !authData.distributor) {
+        console.error('Missing required fields in auth data:', authData);
+        throw new Error('Login failed: Missing token or distributor info');
+      }
+      
+      return authData;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  },
+
+  // 经销商注册 - POST /api/v1/auth/register
+  async register(distributor: Partial<Distributor>): Promise<AuthResponse> {
+    try {
+      const response = await apiClient.post<ApiResult<AuthResponse>>(
+        '/v1/auth/register',
+        distributor
+      );
+      
+      if (response.code !== 200 || !response.data) {
+        throw new Error(response.message || 'Registration failed');
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
+  },
+
+  // 获取当前用户信息 - GET /api/v1/auth/me
+  async getCurrentUser(token: string): Promise<Distributor> {
+    try {
+      const response = await apiClient.get<ApiResult<Distributor>>(
+        '/v1/auth/me',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      if (response.code !== 200 || !response.data) {
+        throw new Error(response.message || 'Failed to fetch user info');
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
       throw error;
     }
   },
@@ -159,17 +270,36 @@ export const productAdminService = {
   async updateProduct(id: number, product: Partial<Product>): Promise<Product> {
     try {
       const url = `${API_ENDPOINTS.ADMIN_UPDATE_PRODUCT}/${id}`;
+      const requestBody = JSON.stringify(product);
+      
       console.log('updateProduct API call:', {
-        url,
-        product,
-        fullUrl: `http://localhost:3000/api${url}`,
+        url: `/api${url}`,
+        method: 'PUT',
+        contentType: 'application/json; charset=UTF-8',
+        bodySize: requestBody.length,
+        bodyPreview: requestBody.substring(0, 200),
       });
       
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Product>> = await apiClient.put(
-        url,
-        product
-      );
+      // 尝试直接使用 fetch 并明确设置 charset
+      const response = await fetch(`/api${url}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+        },
+        body: requestBody,
+      });
       
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response body:', errorText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const apiResult = await response.json();
       console.log('updateProduct response:', apiResult);
       
       if (apiResult.code !== 200 || !apiResult.data) {
@@ -177,7 +307,7 @@ export const productAdminService = {
       }
       
       return apiResult.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update product:', error);
       throw error;
     }

@@ -44,7 +44,24 @@ apiClient.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    console.error('API Error:', error);
+    // 处理 401 未授权错误（token 过期或无效）
+    if (error.response && error.response.status === 401) {
+      console.warn('Authentication failed, redirecting to login...');
+      
+      // 清除本地存储的 token 和用户信息
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // 如果不是已经在登录页，则跳转到登录页
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+      }
+    } else {
+      console.error('API Error:', error);
+    }
+    
     return Promise.reject(error);
   }
 );
