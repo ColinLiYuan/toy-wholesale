@@ -33,15 +33,12 @@ export async function GET() {
 
     // 生成 XML
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  ${blogs.map((blog: BlogPost) => `
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${blogs.map(blog => `
   <url>
-    <loc>${baseUrl}/en/blog/${blog.slug}</loc>
-    <lastmod>${new Date(blog.updatedAt || blog.publishedAt || new Date().toISOString()).toISOString()}</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>${baseUrl}/blog/${blog.slug}</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-    ${locales.map(locale => `
-    <xhtml:link rel="alternate" hreflang="${locale}" href="${baseUrl}/${locale}/blog/${blog.slug}"/>`).join('')}
   </url>
   `).join('')}
 </urlset>`
