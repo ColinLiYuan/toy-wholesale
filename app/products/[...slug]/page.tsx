@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { productService } from '@/services';
 import type { Product } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import apiClient from '@/lib/api-client';
+import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
 import Head from 'next/head';
 
 export default function ProductDetailPage() {
@@ -211,7 +211,7 @@ export default function ProductDetailPage() {
 
     try {
       setAddingToCart(true);
-      const response = await apiClient.post('/v1/cart/add', {
+      const response: UnwrappedAxiosResponse<any> = await apiClient.post('/v1/cart/add', {
         skuId: sku.id,
         quantity: quantity,
       });

@@ -72,9 +72,9 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
         console.error('API failed, using fallback suppliers:', error);
         // 强制兜底数据，确保下拉框一定有选项
         setSuppliers([
-          { id: 1, name: '东莞沃色', code: 'DWS', contactName: 'Admin', isActive: true },
-          { id: 2, name: 'Premium Factory B', code: 'PF', contactName: 'Jane Smith', isActive: true },
-          { id: 3, name: 'Direct Manufacturer C', code: 'DM', contactName: 'Mike Johnson', isActive: true },
+          { id: 1, name: '东莞沃色', code: 'DWS', internalCode: 'DWS', contactPerson: 'Admin', isActive: true },
+          { id: 2, name: 'Premium Factory B', code: 'PF', internalCode: 'PF', contactPerson: 'Jane Smith', isActive: true },
+          { id: 3, name: 'Direct Manufacturer C', code: 'DM', internalCode: 'DM', contactPerson: 'Mike Johnson', isActive: true },
         ]);
       } finally {
         setLoading(false);
@@ -86,7 +86,7 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
   // 同步外部传入的 supplierId
   useEffect(() => {
     if (currentSupplierId && !selectedSupplierId) {
-      setSelectedSupplierId(currentSupplierId);
+      setSelectedSupplierId(String(currentSupplierId));
     }
   }, [currentSupplierId]);
 
@@ -107,7 +107,7 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
       // 尝试匹配供应商
       const supplierPart = parts[0];
       const matched = currentSuppliers.find(s => s.code === supplierPart || s.name === supplierPart);
-      if (matched) setSelectedSupplierId(matched.id);
+      if (matched) setSelectedSupplierId(String(matched.id));
       
       setCategory(parts[1]);
       setMaterial(parts[2]);

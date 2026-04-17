@@ -11,6 +11,7 @@ export interface Category {
 export interface Supplier {
   id: number;
   name: string;
+  code?: string;  // 供应商编码（用于SKU生成）
   internalCode?: string;  // 供应商内部编码，如 WS, PF, DM
   contactPerson?: string;
   phone?: string;
@@ -40,6 +41,12 @@ export interface Product {
   tags?: string | string[];  // 标签（JSON数组，用于前端多选搜索）
   features?: Record<string, any>;  // 特性（JSON对象）
   featuresParsed?: Record<string, any>;  // 解析后的特性对象（前端用）
+  
+  // SEO 字段
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  
   minOrder?: number;
   
   // B2B 外贸属性

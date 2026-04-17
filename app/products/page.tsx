@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { productService } from '@/services';
@@ -11,7 +11,8 @@ import WholesaleBreadcrumbs from '@/components/WholesaleBreadcrumbs';
 import type { WholesaleFilters } from '@/components/WholesaleFilter';
 import { useAuth } from '@/contexts/AuthContext';
 
-export default function ProductsPage() {
+// 内部组件，使用 useSearchParams
+function ProductsContent() {
   const { isAuthenticated, user } = useAuth();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
@@ -420,5 +421,21 @@ export default function ProductsPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+// 主页面组件，用 Suspense 包裹
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#0056B3] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }

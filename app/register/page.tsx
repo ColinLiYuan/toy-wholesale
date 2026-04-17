@@ -6,11 +6,20 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Distributor } from '@/types';
 
+interface RegisterFormData {
+  name: string;
+  contactPerson: string;
+  phone: string;
+  email: string;
+  country: string;
+  password: string;
+}
+
 export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
   
-  const [formData, setFormData] = useState<Partial<Distributor>>({
+  const [formData, setFormData] = useState<RegisterFormData>({
     name: '',
     contactPerson: '',
     phone: '',

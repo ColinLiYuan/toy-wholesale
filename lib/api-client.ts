@@ -66,7 +66,11 @@ apiClient.interceptors.response.use(
   }
 );
 
-// 自定义类型，表示已经解包的响应
-export type UnwrappedAxiosResponse<T = any> = T;
+// 自定义类型，表示已经解包的响应（拦截器返回 response.data，即 ApiResult 结构）
+export type UnwrappedAxiosResponse<T = any> = {
+  code: number;
+  message: string;
+  data: T;
+};
 
-export default apiClient;
+export default apiClient as any;

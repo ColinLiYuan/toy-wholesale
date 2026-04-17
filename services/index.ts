@@ -7,11 +7,11 @@ export const antiCounterfeitService = {
   // 验证防伪码
   async verifyCode(code: string): Promise<VerifyResult> {
     try {
-      const response = await apiClient.post<ApiResult<VerifyResult>>(
+      const response: ApiResult<VerifyResult> = await apiClient.post(
         API_ENDPOINTS.VERIFY_CODE,
         { code } as VerifyRequest
       );
-      return response.data.data;
+      return response.data;
     } catch (error) {
       console.error('Verification failed:', error);
       throw error;
@@ -24,7 +24,7 @@ export const supplierService = {
   // 获取所有活跃供应商 - GET /v1/suppliers
   async getAllSuppliers(): Promise<Supplier[]> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Supplier[]>> = await apiClient.get(
+      const apiResult: ApiResult<Supplier[]> = await apiClient.get(
         '/v1/suppliers',
         { params: { isActive: true } }
       );
@@ -34,7 +34,7 @@ export const supplierService = {
         return getFallbackSuppliers();
       }
       
-      return apiResult.data;
+      return apiResult.data || [];
     } catch (error) {
       // API 尚未部署或网络错误，静默使用模拟数据
       console.log('Supplier API not available, using fallback data');
@@ -46,9 +46,9 @@ export const supplierService = {
 // 模拟供应商数据（开发环境使用）
 function getFallbackSuppliers(): Supplier[] {
   return [
-    { id: 1, name: '东莞沃色', internalCode: 'WS', isActive: true },
-    { id: 2, name: 'Premium Factory B', internalCode: 'PF', isActive: true },
-    { id: 3, name: 'Direct Manufacturer C', internalCode: 'DM', isActive: true },
+    { id: 1, name: '东莞沃色', code: 'DWS', internalCode: 'WS', isActive: true },
+    { id: 2, name: 'Premium Factory B', code: 'PF', internalCode: 'PF', isActive: true },
+    { id: 3, name: 'Direct Manufacturer C', code: 'DM', internalCode: 'DM', isActive: true },
   ];
 }
 
@@ -57,9 +57,7 @@ export const authService = {
   // 经销商登录 - POST /api/v1/auth/login
   async login(email: string, password: string): Promise<AuthResponse> {
     try {
-      // 注意：apiClient 的响应拦截器已经返回 response.data
-      // 所以这里的 response 实际上是 ApiResult 对象 {code, message, data}
-      const apiResult = await apiClient.post<ApiResult<any>>(
+      const apiResult: ApiResult<any> = await apiClient.post(
         '/v1/auth/login',
         { email, password }
       );
@@ -90,7 +88,7 @@ export const authService = {
   // 经销商注册 - POST /api/v1/auth/register
   async register(distributor: Partial<Distributor>): Promise<AuthResponse> {
     try {
-      const response = await apiClient.post<ApiResult<AuthResponse>>(
+      const response: ApiResult<AuthResponse> = await apiClient.post(
         '/v1/auth/register',
         distributor
       );
@@ -109,7 +107,7 @@ export const authService = {
   // 获取当前用户信息 - GET /api/v1/auth/me
   async getCurrentUser(token: string): Promise<Distributor> {
     try {
-      const response = await apiClient.get<ApiResult<Distributor>>(
+      const response: ApiResult<Distributor> = await apiClient.get(
         '/v1/auth/me',
         {
           headers: {
@@ -135,7 +133,7 @@ export const productService = {
   // 获取产品列表（支持分页）- GET /v1/products
   async getProducts(page: number = 0, size: number = 12, sortBy = 'createdAt', direction = 'DESC'): Promise<ProductListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<ProductListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<ProductListResponse> = await apiClient.get(
         API_ENDPOINTS.PRODUCTS,
         { params: { page, size, sortBy, direction } }
       );
@@ -154,7 +152,7 @@ export const productService = {
   // 根据 slug 查询产品详情 - GET /v1/products/{slug}
   async getProductDetail(slug: string): Promise<Product> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Product>> = await apiClient.get(
+      const apiResult: ApiResult<Product> = await apiClient.get(
         `${API_ENDPOINTS.PRODUCT_DETAIL}/${slug}`
       );
       
@@ -172,7 +170,7 @@ export const productService = {
   // 根据分类查询产品 - GET /v1/products/category/{category}
   async getProductsByCategory(category: string, page: number = 0, size: number = 12): Promise<ProductListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<ProductListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<ProductListResponse> = await apiClient.get(
         `${API_ENDPOINTS.PRODUCTS}/category/${category}`,
         { params: { page, size } }
       );
@@ -191,7 +189,7 @@ export const productService = {
   // 搜索产品 - GET /v1/products/search
   async searchProducts(keyword: string, page: number = 0, size: number = 12): Promise<ProductListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<ProductListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<ProductListResponse> = await apiClient.get(
         `${API_ENDPOINTS.PRODUCTS}/search`,
         { params: { keyword, page, size } }
       );
@@ -213,7 +211,7 @@ export const productAdminService = {
   // 获取所有产品（管理）- GET /v1/products/admin/list
   async getAllProducts(page: number = 0, size: number = 20, sortBy = 'id', direction = 'DESC'): Promise<ProductListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<ProductListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<ProductListResponse> = await apiClient.get(
         API_ENDPOINTS.ADMIN_PRODUCTS,
         { params: { page, size, sortBy, direction } }
       );
@@ -232,7 +230,7 @@ export const productAdminService = {
   // 根据 ID 查询产品（管理）- GET /v1/products/admin/{id}
   async getProductById(id: number): Promise<Product> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Product>> = await apiClient.get(
+      const apiResult: ApiResult<Product> = await apiClient.get(
         `${API_ENDPOINTS.ADMIN_PRODUCT_DETAIL}/${id}`
       );
       
@@ -250,7 +248,7 @@ export const productAdminService = {
   // 创建产品 - POST /v1/products/admin
   async createProduct(product: Partial<Product>): Promise<Product> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Product>> = await apiClient.post(
+      const apiResult: ApiResult<Product> = await apiClient.post(
         API_ENDPOINTS.ADMIN_CREATE_PRODUCT,
         product
       );
@@ -316,7 +314,7 @@ export const productAdminService = {
   // 删除产品 - DELETE /v1/products/admin/{id}
   async deleteProduct(id: number): Promise<void> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<void>> = await apiClient.delete(
+      const apiResult: ApiResult<void> = await apiClient.delete(
         `${API_ENDPOINTS.ADMIN_DELETE_PRODUCT}/${id}`
       );
       
@@ -332,7 +330,7 @@ export const productAdminService = {
   // 切换产品状态 - PATCH /v1/products/admin/{id}/status
   async toggleProductStatus(id: number, status: string): Promise<Product> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Product>> = await apiClient.patch(
+      const apiResult: ApiResult<Product> = await apiClient.patch(
         `${API_ENDPOINTS.ADMIN_TOGGLE_STATUS}/${id}/status`,
         null,
         { params: { status } }
@@ -355,7 +353,7 @@ export const galleryAdminService = {
   // 获取产品相册列表 - GET /v1/products/{productId}/galleries
   async getProductGalleries(productId: number): Promise<Gallery[]> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Gallery[]>> = await apiClient.get(
+      const apiResult: ApiResult<Gallery[]> = await apiClient.get(
         `${API_ENDPOINTS.ADMIN_PRODUCT_GALLERIES}/${productId}/galleries`
       );
       
@@ -373,7 +371,7 @@ export const galleryAdminService = {
   // 获取产品主图 - GET /v1/products/{productId}/primary-image
   async getProductPrimaryImage(productId: number): Promise<Gallery | null> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Gallery>> = await apiClient.get(
+      const apiResult: ApiResult<Gallery> = await apiClient.get(
         `${API_ENDPOINTS.ADMIN_PRODUCT_GALLERIES}/${productId}/primary-image`
       );
       
@@ -391,7 +389,7 @@ export const galleryAdminService = {
   // 添加单张相册图片 - POST /v1/products/admin/{productId}/galleries
   async addGalleryImage(productId: number, gallery: Partial<Gallery>): Promise<Gallery> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Gallery>> = await apiClient.post(
+      const apiResult: ApiResult<Gallery> = await apiClient.post(
         `${API_ENDPOINTS.ADMIN_GALLERIES}/${productId}/galleries`,
         gallery
       );
@@ -410,7 +408,7 @@ export const galleryAdminService = {
   // 批量添加相册图片 - POST /v1/products/admin/{productId}/galleries/batch
   async batchAddGalleryImages(productId: number, galleries: Partial<Gallery>[]): Promise<Gallery[]> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Gallery[]>> = await apiClient.post(
+      const apiResult: ApiResult<Gallery[]> = await apiClient.post(
         `${API_ENDPOINTS.ADMIN_GALLERIES_BATCH}/${productId}/galleries/batch`,
         galleries
       );
@@ -429,7 +427,7 @@ export const galleryAdminService = {
   // 更新相册信息 - PUT /v1/products/admin/galleries/{id}
   async updateGallery(id: number, gallery: Partial<Gallery>): Promise<Gallery> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<Gallery>> = await apiClient.put(
+      const apiResult: ApiResult<Gallery> = await apiClient.put(
         `${API_ENDPOINTS.ADMIN_GALLERY_DETAIL}/${id}`,
         gallery
       );
@@ -517,7 +515,7 @@ export const blogService = {
   // 获取已发布博客列表 - GET /v1/blog/posts
   async getPublishedBlogs(page: number = 0, size: number = 10, sortBy = 'publishedAt', direction = 'DESC'): Promise<BlogListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<BlogListResponse> = await apiClient.get(
         API_ENDPOINTS.BLOG_POSTS,
         { params: { page, size, sortBy, direction } }
       );
@@ -536,7 +534,7 @@ export const blogService = {
   // 根据分类获取博客 - GET /v1/blog/posts/category/{category}
   async getBlogsByCategory(category: string, page: number = 0, size: number = 10): Promise<BlogListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<BlogListResponse> = await apiClient.get(
         `${API_ENDPOINTS.BLOG_POSTS_BY_CATEGORY}/${category}`,
         { params: { page, size } }
       );
@@ -555,7 +553,7 @@ export const blogService = {
   // 搜索博客 - GET /v1/blog/posts/search
   async searchBlogs(keyword: string, page: number = 0, size: number = 10): Promise<BlogListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<BlogListResponse> = await apiClient.get(
         API_ENDPOINTS.BLOG_POSTS_SEARCH,
         { params: { keyword, page, size } }
       );
@@ -574,7 +572,7 @@ export const blogService = {
   // 获取博客详情（通过slug） - GET /v1/blog/posts/{slug}
   async getBlogBySlug(slug: string): Promise<BlogPost> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogPost>> = await apiClient.get(
+      const apiResult: ApiResult<BlogPost> = await apiClient.get(
         `${API_ENDPOINTS.BLOG_POST_DETAIL}/${slug}`
       );
       
@@ -592,7 +590,7 @@ export const blogService = {
   // 获取最新文章 - GET /v1/blog/posts/latest
   async getLatestBlogs(limit: number = 5): Promise<BlogPost[]> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogPost[]>> = await apiClient.get(
+      const apiResult: ApiResult<BlogPost[]> = await apiClient.get(
         API_ENDPOINTS.BLOG_POSTS_LATEST,
         { params: { limit } }
       );
@@ -611,7 +609,7 @@ export const blogService = {
   // 获取热门文章 - GET /v1/blog/posts/popular
   async getPopularBlogs(limit: number = 5): Promise<BlogPost[]> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogPost[]>> = await apiClient.get(
+      const apiResult: ApiResult<BlogPost[]> = await apiClient.get(
         API_ENDPOINTS.BLOG_POSTS_POPULAR,
         { params: { limit } }
       );
@@ -633,7 +631,7 @@ export const blogAdminService = {
   // 获取所有博客（管理） - GET /v1/blog/admin/list
   async getAllBlogs(page: number = 0, size: number = 20, sortBy = 'createdAt', direction = 'DESC'): Promise<BlogListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<BlogListResponse> = await apiClient.get(
         API_ENDPOINTS.ADMIN_BLOG_LIST,
         { params: { page, size, sortBy, direction } }
       );
@@ -658,7 +656,7 @@ export const blogAdminService = {
     direction = 'DESC'
   ): Promise<BlogListResponse> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogListResponse>> = await apiClient.get(
+      const apiResult: ApiResult<BlogListResponse> = await apiClient.get(
         `${API_ENDPOINTS.ADMIN_BLOG_LIST}/by-status`,
         { params: { isPublished, page, size, sortBy, direction } }
       );
@@ -677,7 +675,7 @@ export const blogAdminService = {
   // 根据 ID 查询博客（管理） - GET /v1/blog/admin/{id}
   async getBlogById(id: number): Promise<BlogPost> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogPost>> = await apiClient.get(
+      const apiResult: ApiResult<BlogPost> = await apiClient.get(
         `${API_ENDPOINTS.ADMIN_BLOG_BY_ID}/${id}`
       );
       
@@ -695,7 +693,7 @@ export const blogAdminService = {
   // 创建博客 - POST /v1/blog/posts
   async createBlog(blog: Partial<BlogPost>): Promise<BlogPost> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogPost>> = await apiClient.post(
+      const apiResult: ApiResult<BlogPost> = await apiClient.post(
         API_ENDPOINTS.ADMIN_BLOG_CREATE,
         blog
       );
@@ -714,7 +712,7 @@ export const blogAdminService = {
   // 更新博客 - PUT /v1/blog/posts/{id}
   async updateBlog(id: number, blog: Partial<BlogPost>): Promise<BlogPost> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogPost>> = await apiClient.put(
+      const apiResult: ApiResult<BlogPost> = await apiClient.put(
         `${API_ENDPOINTS.ADMIN_BLOG_UPDATE}/${id}`,
         blog
       );
@@ -733,7 +731,7 @@ export const blogAdminService = {
   // 删除博客 - DELETE /v1/blog/posts/{id}
   async deleteBlog(id: number): Promise<void> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<void>> = await apiClient.delete(
+      const apiResult: ApiResult<void> = await apiClient.delete(
         `${API_ENDPOINTS.ADMIN_BLOG_DELETE}/${id}`
       );
       
@@ -749,7 +747,7 @@ export const blogAdminService = {
   // 发布博客 - POST /v1/blog/posts/{id}/publish
   async publishBlog(id: number): Promise<BlogPost> {
     try {
-      const apiResult: UnwrappedAxiosResponse<ApiResult<BlogPost>> = await apiClient.post(
+      const apiResult: ApiResult<BlogPost> = await apiClient.post(
         `${API_ENDPOINTS.ADMIN_BLOG_PUBLISH}/${id}/publish`
       );
       

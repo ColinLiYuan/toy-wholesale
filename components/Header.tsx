@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import apiClient from '@/lib/api-client';
+import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
 
 interface HeaderProps {
   translations: any;
@@ -25,7 +25,7 @@ export default function Header({ translations }: HeaderProps) {
 
   const fetchCartCount = async () => {
     try {
-      const response = await apiClient.get('/v1/cart');
+      const response: UnwrappedAxiosResponse<any> = await apiClient.get('/v1/cart');
       if (response.code === 200 && response.data?.items) {
         const count = response.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
         setCartCount(count);
