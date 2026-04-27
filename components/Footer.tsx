@@ -14,17 +14,15 @@ export default function Footer({ translations }: FooterProps) {
           {/* Company Info */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-3 mb-6 group">
-              <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br from-[#D4AF37] to-[#C084FC] p-[2px]">
-                <div className="w-full h-full bg-[#0A0A0A] rounded-lg flex items-center justify-center">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-[#C084FC] font-bold text-xl">L</span>
-                </div>
+              <div className="w-10 h-10 bg-[#0056B3] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xl">S</span>
               </div>
               <span className="text-lg font-semibold text-[#1A1A1A] group-hover:text-[#0056B3] transition-colors">
-                LuxeAdult
+                Silvibe
               </span>
             </Link>
             <p className="text-[#6C757D] text-sm leading-relaxed mb-6">
-              {translations.hero.subtitle}
+              Certified medical-grade silicone adult toys from Dongguan. Low MOQ for global retailers.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="w-10 h-10 rounded-lg bg-[#F8F9FA] flex items-center justify-center text-[#6C757D] hover:text-[#0056B3] hover:bg-[#E9ECEF] transition-all">
@@ -61,7 +59,17 @@ export default function Footer({ translations }: FooterProps) {
               </li>
               <li>
                 <Link href="/products" className="text-[#6C757D] hover:text-[#0056B3] transition-colors text-sm">
-                  Shop Wholesale
+                  Bulk Orders
+                </Link>
+              </li>
+              <li>
+                <Link href="/showroom" className="text-[#6C757D] hover:text-[#0056B3] transition-colors text-sm">
+                  Showroom
+                </Link>
+              </li>
+              <li>
+                <Link href="/oem-odm" className="text-[#6C757D] hover:text-[#0056B3] transition-colors text-sm">
+                  OEM/ODM Service
                 </Link>
               </li>
               <li>
@@ -118,7 +126,7 @@ export default function Footer({ translations }: FooterProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="text-[#6C757D] text-sm">{translations.footer.address}: Shenzhen, China</span>
+                <span className="text-[#6C757D] text-sm">Dongguan, Guangdong, China</span>
               </li>
               <li className="flex items-center space-x-3">
                 <svg className="w-5 h-5 text-[#0056B3] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +151,7 @@ export default function Footer({ translations }: FooterProps) {
         {/* Bottom Bar */}
         <div className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-[#6C757D] text-sm">
-            © 2026 LuxeAdult Wholesale. {translations.footer.rights}.
+            © 2026 Silvibe. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="/privacy" className="text-[#6C757D] hover:text-[#0056B3] text-sm transition-colors">

@@ -233,9 +233,8 @@ function ProductsContent() {
               <div className="mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
-              <Link
+              <div
                 key={product.id}
-                href={`/products/${product.slug}`}
                 className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
               >
                 {/* Badge */}
@@ -248,7 +247,7 @@ function ProductsContent() {
                 )}
 
                 {/* Product Image - 占 70% 面积 */}
-                <div className="relative aspect-[4/3] bg-[#F8F9FA] overflow-hidden">
+                <Link href={`/products/${product.slug}`} className="block relative aspect-[4/3] bg-[#F8F9FA] overflow-hidden">
                   <img
                     src={getImageUrl(product.image)}
                     alt={product.alt || product.title}
@@ -257,14 +256,16 @@ function ProductsContent() {
                       (e.target as HTMLImageElement).src = '/placeholder-product.svg';
                     }}
                   />
-                </div>
+                </Link>
 
                 {/* Product Info */}
                 <div className="p-6 space-y-4">
                   {/* Title */}
-                  <h3 className="text-lg font-bold text-[#1A1A1A] group-hover:text-[#0056B3] transition-colors line-clamp-2 min-h-[56px] leading-tight">
-                    {product.title}
-                  </h3>
+                  <Link href={`/products/${product.slug}`} className="block">
+                    <h3 className="text-lg font-bold text-[#1A1A1A] group-hover:text-[#0056B3] transition-colors leading-tight">
+                      {product.title}
+                    </h3>
+                  </Link>
 
                   {/* SKU */}
                   {product.sku && (
@@ -291,47 +292,13 @@ function ProductsContent() {
                     </div>
                   )}
 
-                  {/* Price & Margin */}
+                  {/* Inquiry CTA */}
                   <div className="pt-4 border-t border-gray-100">
-                    {/* 未登录显示提示 */}
-                    {!isAuthenticated ? (
-                      <div className="mb-2 p-3 bg-[#F8F9FA] border border-gray-200 rounded-lg">
-                        <p className="text-sm text-[#6C757D] text-center">
-                          🔒 Price hidden,{' '}
-                          <span 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              window.location.href = '/login';
-                            }}
-                            className="text-[#0056B3] font-semibold hover:underline cursor-pointer"
-                          >
-                            Login to View
-                          </span>
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex items-baseline gap-3 mb-2">
-                          {product.originalPrice !== undefined && product.originalPrice !== null && product.originalPrice > product.currentPrice && (
-                            <span className="text-base text-gray-400 line-through">
-                              ${product.originalPrice.toFixed(2)}
-                            </span>
-                          )}
-                          <span className="text-2xl font-bold text-[#0056B3]">
-                            ${product.currentPrice.toFixed(2)}
-                          </span>
-                        </div>
-                        
-                        {/* Est. Margin */}
-                        <div className="flex items-center gap-2 text-sm">
-                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                          </svg>
-                          <span className="text-green-600 font-medium">Est. Margin: 60%</span>
-                        </div>
-                      </>
-                    )}
+                    <div className="mb-2 p-3 bg-[#F8F9FA] border border-gray-200 rounded-lg">
+                      <p className="text-sm text-[#6C757D] text-center">
+                        📩 Contact us for wholesale pricing
+                      </p>
+                    </div>
 
                     {/* MOQ */}
                     {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
@@ -347,11 +314,14 @@ function ProductsContent() {
                   </div>
 
                   {/* CTA Button */}
-                  <button className="w-full py-3 rounded-lg bg-[#0056B3] text-white font-semibold hover:bg-[#004494] transition-colors duration-200">
+                  <Link
+                    href={`/products/${product.slug}`}
+                    className="block w-full py-3 rounded-lg bg-[#0056B3] text-white font-semibold text-center hover:bg-[#004494] transition-colors duration-200"
+                  >
                     Request Quote
-                  </button>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
                 </div>
               </div>

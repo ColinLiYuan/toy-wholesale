@@ -22,9 +22,36 @@ export async function generateMetadata({ params }: BlogDetailPageProps) {
   
   try {
     const blog = await blogService.getBlogBySlug(slug);
+    
+    // 处理 tags：支持字符串和数组
+    let keywords: string[] = [];
+    if (blog.tags) {
+      const tags = blog.tags as any;
+      if (typeof tags === 'string') {
+        keywords = tags.split(',').map((t: string) => t.trim());
+      } else if (Array.isArray(tags)) {
+        keywords = tags;
+      }
+    }
+    
     return {
-      title: `${blog.title} | LuxeAdult Wholesale`,
-      description: blog.excerpt,
+      title: `${blog.seoTitle || blog.title} | LuxeAdult Wholesale`,
+      description: blog.seoDescription || blog.excerpt,
+      keywords,
+      openGraph: {
+        title: blog.seoTitle || blog.title,
+        description: blog.seoDescription || blog.excerpt,
+        images: blog.coverImage ? [{ url: blog.coverImage.startsWith('http') ? blog.coverImage : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${blog.coverImage}`, alt: blog.title }] : [],
+        type: 'article',
+        publishedTime: blog.publishedAt,
+        authors: blog.authorName ? [blog.authorName] : [],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: blog.seoTitle || blog.title,
+        description: blog.seoDescription || blog.excerpt,
+        images: blog.coverImage ? [blog.coverImage.startsWith('http') ? blog.coverImage : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${blog.coverImage}`] : [],
+      },
     };
   } catch {
     return {

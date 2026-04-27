@@ -98,7 +98,8 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-medium text-[#1A1A1A] mb-1">Location</h3>
-                    <p className="text-[#6C757D] text-sm">Shenzhen, Guangdong, China</p>
+                    <p className="text-[#6C757D] text-sm">Dongguan, Guangdong, China</p>
+                    <p className="text-[#6C757D] text-xs mt-1">Supply chain hub with direct factory access</p>
                   </div>
                 </div>
               </div>

@@ -37,7 +37,9 @@ export default function Header({ translations }: HeaderProps) {
 
   const navItems = [
     { href: '/', label: 'Home' },
-    { href: '/products', label: 'Shop Wholesale' },
+    { href: '/products', label: 'Bulk Orders' },
+    { href: '/showroom', label: 'Showroom' },
+    { href: '/oem-odm', label: 'OEM/ODM Service' },
     { href: '/about', label: 'About Us' },
     { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact Us' },
@@ -50,9 +52,9 @@ export default function Header({ translations }: HeaderProps) {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="w-8 h-8 bg-[#0056B3] rounded flex items-center justify-center">
-              <span className="text-white font-bold">L</span>
+              <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="font-semibold text-gray-900 hidden sm:block">LuxeAdult</span>
+            <span className="font-semibold text-gray-900 hidden sm:block">Silvibe</span>
           </Link>
 
           {/* Desktop Navigation */}
