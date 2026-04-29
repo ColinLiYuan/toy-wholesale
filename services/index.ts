@@ -1,6 +1,6 @@
 import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api-config';
-import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse } from '@/types';
+import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, SocialMediaAccount, SocialMediaAccountListResponse } from '@/types';
 
 // 防伪验证服务
 export const antiCounterfeitService = {
@@ -758,6 +758,485 @@ export const blogAdminService = {
       return apiResult.data;
     } catch (error) {
       console.error('Failed to publish blog:', error);
+      throw error;
+    }
+  },
+};
+
+// 潜客管理服务（后台管理接口）
+export const leadAdminService = {
+  // 获取所有潜客列表 - GET /api/v1/leads
+  async getAllLeads(page: number = 0, size: number = 20): Promise<LeadListResponse> {
+    try {
+      const apiResult: ApiResult<LeadListResponse> = await apiClient.get(
+        '/v1/leads',
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch leads');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch leads:', error);
+      throw error;
+    }
+  },
+
+  // 根据ID查询潜客详情 - GET /api/v1/leads/{id}
+  async getLeadById(id: number): Promise<Lead> {
+    try {
+      const apiResult: ApiResult<Lead> = await apiClient.get(
+        `/v1/leads/${id}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch lead');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch lead:', error);
+      throw error;
+    }
+  },
+
+  // 创建潜客 - POST /api/v1/leads
+  async createLead(lead: Partial<Lead>): Promise<Lead> {
+    try {
+      const apiResult: ApiResult<Lead> = await apiClient.post(
+        '/v1/leads',
+        lead
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create lead');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create lead:', error);
+      throw error;
+    }
+  },
+
+  // 更新潜客 - PUT /api/v1/leads/{id}
+  async updateLead(id: number, lead: Partial<Lead>): Promise<Lead> {
+    try {
+      const apiResult: ApiResult<Lead> = await apiClient.put(
+        `/v1/leads/${id}`,
+        lead
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update lead');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update lead:', error);
+      throw error;
+    }
+  },
+
+  // 删除潜客 - DELETE /api/v1/leads/{id}
+  async deleteLead(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/leads/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete lead');
+      }
+    } catch (error) {
+      console.error('Failed to delete lead:', error);
+      throw error;
+    }
+  },
+
+  // 根据状态查询潜客 - GET /api/v1/leads/status/{status}
+  async getLeadsByStatus(status: string, page: number = 0, size: number = 20): Promise<LeadListResponse> {
+    try {
+      const apiResult: ApiResult<LeadListResponse> = await apiClient.get(
+        `/v1/leads/status/${status}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch leads by status');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch leads by status:', error);
+      throw error;
+    }
+  },
+
+  // 搜索潜客 - GET /api/v1/leads/search
+  async searchLeads(keyword: string, page: number = 0, size: number = 20): Promise<LeadListResponse> {
+    try {
+      const apiResult: ApiResult<LeadListResponse> = await apiClient.get(
+        '/v1/leads/search',
+        { params: { keyword, page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Search failed');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Search failed:', error);
+      throw error;
+    }
+  },
+
+  // 添加跟进记录 - POST /api/v1/leads/{id}/follow-ups
+  async addFollowUp(leadId: number, followUpRecord: Partial<FollowUpRecord>): Promise<FollowUpRecord> {
+    try {
+      const apiResult: ApiResult<FollowUpRecord> = await apiClient.post(
+        `/v1/leads/${leadId}/follow-ups`,
+        followUpRecord
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to add follow-up record');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to add follow-up record:', error);
+      throw error;
+    }
+  },
+
+  // 获取潜客的跟进记录 - GET /api/v1/leads/{id}/follow-ups
+  async getFollowUpRecords(leadId: number, page: number = 0, size: number = 20): Promise<FollowUpRecordListResponse> {
+    try {
+      const apiResult: ApiResult<FollowUpRecordListResponse> = await apiClient.get(
+        `/v1/leads/${leadId}/follow-ups`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch follow-up records');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch follow-up records:', error);
+      throw error;
+    }
+  },
+
+  // 获取需要跟进的潜客 - GET /api/v1/leads/need-follow-up
+  async getLeadsNeedFollowUp(): Promise<Lead[]> {
+    try {
+      const apiResult: ApiResult<Lead[]> = await apiClient.get(
+        '/v1/leads/need-follow-up'
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch leads need follow-up');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch leads need follow-up:', error);
+      throw error;
+    }
+  },
+
+  // 获取长时间未跟进的潜客 - GET /api/v1/leads/without-follow-up
+  async getLeadsWithoutFollowUp(days: number = 7): Promise<Lead[]> {
+    try {
+      const apiResult: ApiResult<Lead[]> = await apiClient.get(
+        '/v1/leads/without-follow-up',
+        { params: { days } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch leads without follow-up');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch leads without follow-up:', error);
+      throw error;
+    }
+  },
+
+  // 转化为经销商 - POST /api/v1/leads/{id}/convert
+  async convertToDistributor(leadId: number, distributorId: number): Promise<Lead> {
+    try {
+      const apiResult: ApiResult<Lead> = await apiClient.post(
+        `/v1/leads/${leadId}/convert`,
+        { distributorId }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to convert to distributor');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to convert to distributor:', error);
+      throw error;
+    }
+  },
+
+  // 获取统计数据 - GET /api/v1/leads/statistics
+  async getStatistics(): Promise<Record<string, any>> {
+    try {
+      const apiResult: ApiResult<Record<string, any>> = await apiClient.get(
+        '/v1/leads/statistics'
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch statistics');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch statistics:', error);
+      throw error;
+    }
+  },
+};
+
+// 社交媒体账号服务（后台管理接口）
+export const socialMediaAccountService = {
+  // 创建账号 - POST /api/v1/social-accounts
+  async createAccount(account: Partial<SocialMediaAccount>): Promise<SocialMediaAccount> {
+    try {
+      const apiResult: ApiResult<SocialMediaAccount> = await apiClient.post(
+        '/v1/social-accounts',
+        account
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create account');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create account:', error);
+      throw error;
+    }
+  },
+
+  // 更新账号 - PUT /api/v1/social-accounts/{id}
+  async updateAccount(id: number, account: Partial<SocialMediaAccount>): Promise<SocialMediaAccount> {
+    try {
+      const apiResult: ApiResult<SocialMediaAccount> = await apiClient.put(
+        `/v1/social-accounts/${id}`,
+        account
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update account');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update account:', error);
+      throw error;
+    }
+  },
+
+  // 获取所有账号（分页） - GET /api/v1/social-accounts
+  async getAllAccounts(page: number = 0, size: number = 20): Promise<SocialMediaAccountListResponse> {
+    try {
+      const apiResult: ApiResult<SocialMediaAccountListResponse> = await apiClient.get(
+        '/v1/social-accounts',
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch accounts');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch accounts:', error);
+      throw error;
+    }
+  },
+
+  // 根据ID查询账号 - GET /api/v1/social-accounts/{id}
+  async getAccountById(id: number): Promise<SocialMediaAccount> {
+    try {
+      const apiResult: ApiResult<SocialMediaAccount> = await apiClient.get(
+        `/v1/social-accounts/${id}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch account');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch account:', error);
+      throw error;
+    }
+  },
+
+  // 根据平台查询账号 - GET /api/v1/social-accounts/platform/{platform}
+  async getAccountsByPlatform(platform: string): Promise<SocialMediaAccount[]> {
+    try {
+      const apiResult: ApiResult<SocialMediaAccount[]> = await apiClient.get(
+        `/v1/social-accounts/platform/${platform}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch accounts');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch accounts:', error);
+      throw error;
+    }
+  },
+
+  // 根据状态查询账号 - GET /api/v1/social-accounts/status/{status}
+  async getAccountsByStatus(status: string, page: number = 0, size: number = 20): Promise<SocialMediaAccountListResponse> {
+    try {
+      const apiResult: ApiResult<SocialMediaAccountListResponse> = await apiClient.get(
+        `/v1/social-accounts/status/${status}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch accounts');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch accounts:', error);
+      throw error;
+    }
+  },
+
+  // 搜索账号 - GET /api/v1/social-accounts/search
+  async searchAccounts(keyword: string, page: number = 0, size: number = 20): Promise<SocialMediaAccountListResponse> {
+    try {
+      const apiResult: ApiResult<SocialMediaAccountListResponse> = await apiClient.get(
+        '/v1/social-accounts/search',
+        { params: { keyword, page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Search failed');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Search failed:', error);
+      throw error;
+    }
+  },
+
+  // 删除账号 - DELETE /api/v1/social-accounts/{id}
+  async deleteAccount(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/social-accounts/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete account');
+      }
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+      throw error;
+    }
+  },
+
+  // 更新最后登录时间 - POST /api/v1/social-accounts/{id}/login
+  async updateLastLogin(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.post(
+        `/v1/social-accounts/${id}/login`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to update login time');
+      }
+    } catch (error) {
+      console.error('Failed to update login time:', error);
+      throw error;
+    }
+  },
+
+  // 更新最后活跃时间 - POST /api/v1/social-accounts/{id}/active
+  async updateLastActive(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.post(
+        `/v1/social-accounts/${id}/active`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to update active time');
+      }
+    } catch (error) {
+      console.error('Failed to update active time:', error);
+      throw error;
+    }
+  },
+
+  // 获取平台统计数据 - GET /api/v1/social-accounts/statistics/platform
+  async getPlatformStatistics(): Promise<Record<string, any>> {
+    try {
+      const apiResult: ApiResult<Record<string, any>> = await apiClient.get(
+        '/v1/social-accounts/statistics/platform'
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch statistics');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch statistics:', error);
+      throw error;
+    }
+  },
+
+  // 获取状态统计数据 - GET /api/v1/social-accounts/statistics/status
+  async getStatusStatistics(): Promise<Record<string, any>> {
+    try {
+      const apiResult: ApiResult<Record<string, any>> = await apiClient.get(
+        '/v1/social-accounts/statistics/status'
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch statistics');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch statistics:', error);
+      throw error;
+    }
+  },
+
+  // 批量更新状态 - PUT /api/v1/social-accounts/batch/status
+  async batchUpdateStatus(ids: number[], status: string): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.put(
+        '/v1/social-accounts/batch/status',
+        { ids, status }
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to batch update status');
+      }
+    } catch (error) {
+      console.error('Failed to batch update status:', error);
       throw error;
     }
   },

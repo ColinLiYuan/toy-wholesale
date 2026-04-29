@@ -239,3 +239,111 @@ export interface ShoppingCart {
   createdAt?: string;
   updatedAt?: string;
 }
+
+// 潜在客户类型 - 根据后端实体 Lead
+export interface Lead {
+  id: number;
+  companyName?: string;
+  contactPerson?: string;
+  position?: string;
+  email?: string;
+  phone?: string;
+  imAccount?: string;  // WhatsApp/微信等即时通讯工具
+  country?: string;
+  region?: string;
+  city?: string;
+  website?: string;
+  source?: string;  // EMAIL-邮件开发, EXHIBITION-展会, WEBSITE-网站询盘, REFERRAL-推荐, COLD_CALL-电话开发
+  status?: string;  // NEW-新线索, CONTACTED-已联系, INTERESTED-有意向, QUOTED-已报价, NEGOTIATING-谈判中, CONVERTED-已成交, INVALID-无效
+  priority?: string;  // HIGH-高, MEDIUM-中, LOW-低
+  interestedCategories?: string;  // JSON数组字符串
+  estimatedQuantity?: number;
+  budgetRange?: string;
+  lastFollowUpAt?: string;
+  nextFollowUpAt?: string;
+  followUpCount?: number;
+  notes?: string;
+  isConverted?: boolean;
+  convertedDistributorId?: number;
+  convertedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  followUpRecords?: FollowUpRecord[];
+}
+
+// 跟进记录类型 - 根据后端实体 FollowUpRecord
+export interface FollowUpRecord {
+  id: number;
+  leadId?: number;
+  followUpType?: string;  // EMAIL-邮件, PHONE-电话, MEETING-会议, IM-即时通讯, OTHER-其他
+  content?: string;
+  result?: string;  // NO_RESPONSE-无回复, INTERESTED-有兴趣, REQUEST_QUOTE-要求报价, NEGOTIATING-谈判中, REJECTED-拒绝
+  nextAction?: string;
+  attachments?: string;  // JSON数组字符串
+  followUpBy?: string;
+  createdAt?: string;
+}
+
+// 潜客列表响应
+export interface LeadListResponse {
+  content: Lead[];
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  first: boolean;
+  last: boolean;
+}
+
+// 跟进记录列表响应
+export interface FollowUpRecordListResponse {
+  content: FollowUpRecord[];
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  first: boolean;
+  last: boolean;
+}
+
+// 社交媒体账号类型 - 根据后端实体 SocialMediaAccount
+export interface SocialMediaAccount {
+  id?: number;
+  platform?: string;  // LINKEDIN, FACEBOOK, INSTAGRAM, TWITTER, TIKTOK, WHATSAPP, WECHAT, OTHER
+  username?: string;
+  displayName?: string;
+  profileUrl?: string;
+  email?: string;
+  password?: string;
+  avatarUrl?: string;
+  followersCount?: number;
+  status?: string;  // ACTIVE, INACTIVE, BANNED, SUSPENDED
+  purpose?: string;  // MARKETING, CUSTOMER_SERVICE, SALES, BRANDING
+  leadId?: number;
+  projectName?: string;
+  notes?: string;
+  lastLoginAt?: string;
+  lastActiveAt?: string;
+  securityScore?: number;
+  twoFactorEnabled?: boolean;
+  phoneNumber?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// 社交媒体账号列表响应
+export interface SocialMediaAccountListResponse {
+  content: SocialMediaAccount[];
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  first: boolean;
+  last: boolean;
+}

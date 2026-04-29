@@ -7,7 +7,11 @@ import { usePathname } from 'next/navigation';
 const navigation = [
   { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
   { name: '产品管理', href: '/admin/products', icon: '📦' },
+  { name: '潜客管理', href: '/admin/leads', icon: '👥' },
   { name: '博客管理', href: '/admin/blog', icon: '📝' },
+  { name: '社交媒体账号', href: '/admin/social-accounts', icon: '🌐' },
+  { name: '报价计算器', href: '/admin/quotation-calculator', icon: '💰' },
+  { name: '外贸知识库', href: '/admin/trade-knowledge', icon: '📚' },
 ];
 
 export default function AdminLayout({
