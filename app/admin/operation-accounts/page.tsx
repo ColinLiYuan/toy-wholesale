@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { socialMediaAccountService } from '@/services';
-import type { SocialMediaAccount, SocialMediaAccountListResponse } from '@/types';
+import { operationAccountService } from '@/services';
+import type { OperationAccount, OperationAccountListResponse } from '@/types';
 
 export default function SocialMediaAccountsPage() {
-  const [accounts, setAccounts] = useState<SocialMediaAccount[]>([]);
+  const [accounts, setAccounts] = useState<OperationAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     currentPage: 0,
@@ -14,27 +14,27 @@ export default function SocialMediaAccountsPage() {
     totalElements: 0,
   });
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedPlatform, setSelectedPlatform] = useState<string>('');
+  const [selectedAccountType, setSelectedAccountType] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [visiblePasswords, setVisiblePasswords] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchAccounts();
-  }, [pagination.currentPage, selectedPlatform, selectedStatus]);
+  }, [pagination.currentPage, selectedAccountType, selectedStatus]);
 
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      let response: SocialMediaAccountListResponse;
+      let response: OperationAccountListResponse;
 
       if (searchKeyword) {
-        response = await socialMediaAccountService.searchAccounts(
+        response = await operationAccountService.searchAccounts(
           searchKeyword,
           pagination.currentPage,
           20
         );
-      } else if (selectedPlatform) {
-        const data = await socialMediaAccountService.getAccountsByPlatform(selectedPlatform);
+      } else if (selectedAccountType) {
+        const data = await operationAccountService.getAccountsByType(selectedAccountType);
         response = {
           content: data,
           currentPage: 0,
@@ -47,13 +47,13 @@ export default function SocialMediaAccountsPage() {
           pageSize: 20,
         };
       } else if (selectedStatus) {
-        response = await socialMediaAccountService.getAccountsByStatus(
-          selectedStatus,
+        response = await operationAccountService.getAllAccounts(
           pagination.currentPage,
           20
         );
+        response.content = response.content.filter(acc => acc.status === selectedStatus);
       } else {
-        response = await socialMediaAccountService.getAllAccounts(
+        response = await operationAccountService.getAllAccounts(
           pagination.currentPage,
           20
         );
@@ -78,14 +78,15 @@ export default function SocialMediaAccountsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this account?')) return;
+    if (!confirm('确定要删除此账号吗？')) return;
 
     try {
-      await socialMediaAccountService.deleteAccount(id);
+      await operationAccountService.deleteAccount(id);
       fetchAccounts();
+      alert('删除成功');
     } catch (error) {
       console.error('Failed to delete account:', error);
-      alert('Failed to delete account');
+      alert('删除失败');
     }
   };
 
@@ -101,18 +102,122 @@ export default function SocialMediaAccountsPage() {
     });
   };
 
+  const getAccountTypeIcon = (accountType?: string) => {
+    const icons: Record<string, string> = {
+      SOCIAL_MEDIA: '🌐',
+      EMAIL: '📧',
+      PAYMENT: '💳',
+      OTHER: '📦',
+    };
+    return icons[accountType || 'OTHER'] || '📦';
+  };
+
+  const getAccountTypeText = (accountType?: string) => {
+    const typeMap: Record<string, string> = {
+      SOCIAL_MEDIA: '社交媒体',
+      EMAIL: '邮箱',
+      PAYMENT: '支付账号',
+      OTHER: '其他',
+    };
+    return typeMap[accountType || 'OTHER'] || accountType || '其他';
+  };
+
+  const getBusinessLineText = (businessLine?: string) => {
+    const lineMap: Record<string, string> = {
+      MYTH_TOY: 'MythToy零售',
+      ADULT_PRODUCTS: '成人用品外贸',
+      ANTI_FAKE: '防伪标签外贸',
+      GENERAL: '通用',
+    };
+    return lineMap[businessLine || 'GENERAL'] || businessLine || '通用';
+  };
+
   const getPlatformIcon = (platform?: string) => {
     const icons: Record<string, string> = {
+      // 社交媒体
       LINKEDIN: '💼',
       FACEBOOK: '📘',
       INSTAGRAM: '📷',
       TWITTER: '🐦',
       TIKTOK: '🎵',
       WHATSAPP: '💬',
-      WECHAT: '💚',
-      OTHER: '🌐',
+      REDDIT: '🔴',
+      // 邮箱
+      GMAIL: '📧',
+      OUTLOOK: '📧',
+      YAHOO: '📧',
+      '163': '📧',
+      QQ: '📧',
+      ALIYUN: '📧',
+      ZOHO: '📧',
+      YANDEX: '📧',
+      // 支付
+      PAYPAL: '💳',
+      STRIPE: '💳',
+      WISE: '💳',
     };
-    return icons[platform || 'OTHER'] || '🌐';
+    return icons[platform || ''] || '🌐';
+  };
+
+  const getPlatformText = (platform?: string) => {
+    const platformMap: Record<string, string> = {
+      // 社交媒体
+      LINKEDIN: 'LinkedIn',
+      FACEBOOK: 'Facebook',
+      INSTAGRAM: 'Instagram',
+      TWITTER: 'Twitter',
+      TIKTOK: 'TikTok',
+      WHATSAPP: 'WhatsApp',
+      REDDIT: 'Reddit',
+      // 邮箱
+      GMAIL: 'Gmail',
+      OUTLOOK: 'Outlook',
+      YAHOO: 'Yahoo',
+      '163': '网易163',
+      QQ: 'QQ邮箱',
+      ALIYUN: '阿里云邮箱',
+      ZOHO: 'Zoho',
+      YANDEX: 'Yandex',
+      // 支付
+      PAYPAL: 'PayPal',
+      STRIPE: 'Stripe',
+      WISE: 'Wise',
+    };
+    return platformMap[platform || ''] || platform || '-';
+  };
+
+  const getStatusText = (status?: string) => {
+    const statusMap: Record<string, string> = {
+      ACTIVE: '正常',
+      INACTIVE: '未激活',
+      BANNED: '已封禁',
+      SUSPENDED: '已暂停',
+    };
+    return statusMap[status || 'ACTIVE'] || status || '正常';
+  };
+
+  const getPurposeText = (purpose?: string) => {
+    const purposeMap: Record<string, string> = {
+      MARKETING: '营销',
+      CUSTOMER_SERVICE: '客服',
+      SALES: '销售',
+      BRANDING: '品牌',
+    };
+    return purposeMap[purpose || ''] || purpose || '-';
+  };
+
+  const getEmailProviderText = (provider?: string) => {
+    const providerMap: Record<string, string> = {
+      GMAIL: 'Gmail',
+      OUTLOOK: 'Outlook/Hotmail',
+      YAHOO: 'Yahoo',
+      '163': '网易163',
+      QQ: 'QQ邮箱',
+      ALIYUN: '阿里云邮箱',
+      ZOHO: 'Zoho',
+      OTHER: '其他',
+    };
+    return providerMap[provider || ''] || provider || '-';
   };
 
   const getStatusColor = (status?: string) => {
@@ -130,7 +235,7 @@ export default function SocialMediaAccountsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gray-800 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading accounts...</p>
+          <p className="text-gray-600 text-lg">加载中...</p>
         </div>
       </div>
     );
@@ -143,17 +248,17 @@ export default function SocialMediaAccountsPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Social Media Accounts</h1>
-              <p className="mt-2 text-sm text-gray-600">Manage your social media accounts</p>
+              <h1 className="text-3xl font-bold text-gray-900">运营账号</h1>
+              <p className="mt-2 text-sm text-gray-600">管理所有业务线的运营账号，包括社交媒体、邮箱、支付账号等</p>
             </div>
             <Link
-              href="/admin/social-accounts/new"
+              href="/admin/operation-accounts/new"
               className="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Account
+              添加账号
             </Link>
           </div>
         </div>
@@ -166,7 +271,7 @@ export default function SocialMediaAccountsPage() {
             <div>
               <input
                 type="text"
-                placeholder="Search accounts..."
+                placeholder="搜索账号..."
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -175,18 +280,15 @@ export default function SocialMediaAccountsPage() {
             </div>
             <div>
               <select
-                value={selectedPlatform}
-                onChange={(e) => setSelectedPlatform(e.target.value)}
+                value={selectedAccountType}
+                onChange={(e) => setSelectedAccountType(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
               >
-                <option value="">All Platforms</option>
-                <option value="LINKEDIN">LinkedIn</option>
-                <option value="FACEBOOK">Facebook</option>
-                <option value="INSTAGRAM">Instagram</option>
-                <option value="TWITTER">Twitter</option>
-                <option value="TIKTOK">TikTok</option>
-                <option value="WHATSAPP">WhatsApp</option>
-                <option value="WECHAT">WeChat</option>
+                <option value="">所有账号类型</option>
+                <option value="SOCIAL_MEDIA">🌐 社交媒体</option>
+                <option value="EMAIL">📧 邮箱</option>
+                <option value="PAYMENT">💳 支付账号</option>
+                <option value="OTHER">📦 其他</option>
               </select>
             </div>
             <div>
@@ -195,11 +297,11 @@ export default function SocialMediaAccountsPage() {
                 onChange={(e) => setSelectedStatus(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
               >
-                <option value="">All Status</option>
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
-                <option value="BANNED">Banned</option>
-                <option value="SUSPENDED">Suspended</option>
+                <option value="">所有状态</option>
+                <option value="ACTIVE">正常</option>
+                <option value="INACTIVE">未激活</option>
+                <option value="BANNED">已封禁</option>
+                <option value="SUSPENDED">已暂停</option>
               </select>
             </div>
             <div>
@@ -207,7 +309,7 @@ export default function SocialMediaAccountsPage() {
                 onClick={handleSearch}
                 className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
               >
-                Search
+                搜索
               </button>
             </div>
           </div>
@@ -217,7 +319,7 @@ export default function SocialMediaAccountsPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           {accounts.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-500 text-lg">No accounts found</p>
+              <p className="text-gray-500 text-lg">没有找到账号</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -225,22 +327,31 @@ export default function SocialMediaAccountsPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Platform
+                      账号类型
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Account
+                      业务线
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
+                      平台/服务商
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Purpose
+                      账号标识
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Followers
+                      显示名称
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      密码
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      状态
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      用途
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      操作
                     </th>
                   </tr>
                 </thead>
@@ -249,18 +360,34 @@ export default function SocialMediaAccountsPage() {
                     <tr key={account.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <span className="text-2xl mr-2">{getPlatformIcon(account.platform)}</span>
+                          <span className="text-2xl mr-2">{getAccountTypeIcon(account.accountType)}</span>
                           <span className="text-sm font-medium text-gray-900">
-                            {account.platform}
+                            {getAccountTypeText(account.accountType)}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">{account.displayName}</div>
-                        <div className="text-sm text-gray-500">@{account.username}</div>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">
+                          {getBusinessLineText(account.businessLine)}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {account.email || '-'}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <span className="text-lg mr-2">{getPlatformIcon(account.platform)}</span>
+                          <span className="text-sm font-medium text-gray-900">
+                            {getPlatformText(account.platform)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900 font-mono">
+                          {account.accountIdentifier || '-'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-600">
+                          {account.displayName || '-'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {account.password ? (
@@ -271,7 +398,7 @@ export default function SocialMediaAccountsPage() {
                             <button
                               onClick={() => account.id && togglePasswordVisibility(account.id)}
                               className="text-gray-500 hover:text-gray-700 transition-colors"
-                              title={visiblePasswords.has(account.id!) ? 'Hide password' : 'Show password'}
+                              title={visiblePasswords.has(account.id!) ? '隐藏密码' : '显示密码'}
                             >
                               {visiblePasswords.has(account.id!) ? (
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,32 +413,29 @@ export default function SocialMediaAccountsPage() {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-sm text-gray-400">Not set</span>
+                          <span className="text-sm text-gray-400">未设置</span>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(account.status)}`}>
-                          {account.status}
+                          {getStatusText(account.status)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {account.purpose}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {account.followersCount?.toLocaleString() || 0}
+                        {getPurposeText(account.purpose)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
-                          href={`/admin/social-accounts/${account.id}`}
+                          href={`/admin/operation-accounts/${account.id}`}
                           className="text-gray-600 hover:text-gray-900 mr-4"
                         >
-                          Edit
+                          编辑
                         </Link>
                         <button
                           onClick={() => account.id && handleDelete(account.id)}
                           className="text-red-600 hover:text-red-900"
                         >
-                          Delete
+                          删除
                         </button>
                       </td>
                     </tr>
@@ -325,7 +449,7 @@ export default function SocialMediaAccountsPage() {
           {pagination.totalPages > 1 && (
             <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
               <div className="text-sm text-gray-700">
-                Showing {accounts.length} of {pagination.totalElements} accounts
+                显示 {accounts.length} 条，共 {pagination.totalElements} 条
               </div>
               <div className="flex space-x-2">
                 <button
@@ -333,14 +457,14 @@ export default function SocialMediaAccountsPage() {
                   disabled={pagination.currentPage === 0}
                   className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
                 >
-                  Previous
+                  上一页
                 </button>
                 <button
                   onClick={() => setPagination({ ...pagination, currentPage: pagination.currentPage + 1 })}
                   disabled={pagination.currentPage >= pagination.totalPages - 1}
                   className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
                 >
-                  Next
+                  下一页
                 </button>
               </div>
             </div>

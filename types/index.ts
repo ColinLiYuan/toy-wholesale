@@ -253,7 +253,7 @@ export interface Lead {
   region?: string;
   city?: string;
   website?: string;
-  source?: string;  // EMAIL-邮件开发, EXHIBITION-展会, WEBSITE-网站询盘, REFERRAL-推荐, COLD_CALL-电话开发
+  source?: string;  // EMAIL-邮件开发, EXHIBITION-展会, WEBSITE-网站询盘, REFERRAL-推荐, COLD_CALL-电话开发, MYTH_TOY-MythToy
   status?: string;  // NEW-新线索, CONTACTED-已联系, INTERESTED-有意向, QUOTED-已报价, NEGOTIATING-谈判中, CONVERTED-已成交, INVALID-无效
   priority?: string;  // HIGH-高, MEDIUM-中, LOW-低
   interestedCategories?: string;  // JSON数组字符串
@@ -310,34 +310,35 @@ export interface FollowUpRecordListResponse {
   last: boolean;
 }
 
-// 社交媒体账号类型 - 根据后端实体 SocialMediaAccount
-export interface SocialMediaAccount {
+// 运营账号类型 - 根据后端实体 OperationAccount
+// 统一管理所有业务线的运营账号，包括：社交媒体、邮箱、支付账号等
+export interface OperationAccount {
   id?: number;
-  platform?: string;  // LINKEDIN, FACEBOOK, INSTAGRAM, TWITTER, TIKTOK, WHATSAPP, WECHAT, OTHER
-  username?: string;
-  displayName?: string;
-  profileUrl?: string;
-  email?: string;
+  accountType?: string;  // SOCIAL_MEDIA-社交媒体, EMAIL-邮箱, PAYMENT-支付账号, OTHER-其他
+  businessLine?: string;  // MYTH_TOY-MythToy零售, ADULT_PRODUCTS-成人用品外贸, ANTI_FAKE-防伪标签外贸, GENERAL-通用
+  platform?: string;  // 平台/服务商
+  accountIdentifier?: string;  // 账号标识（用户名/邮箱/账号ID）
+  displayName?: string;  // 显示名称/备注名
   password?: string;
-  avatarUrl?: string;
-  followersCount?: number;
-  status?: string;  // ACTIVE, INACTIVE, BANNED, SUSPENDED
-  purpose?: string;  // MARKETING, CUSTOMER_SERVICE, SALES, BRANDING
-  leadId?: number;
+  purpose?: string;  // MARKETING-营销推广, CUSTOMER_SERVICE-客户服务, SALES-销售开发, NOTIFICATION-通知接收, REGISTER-注册账号, PAYMENT-收款, OTHER-其他
   projectName?: string;
-  notes?: string;
+  leadId?: number;
+  status?: string;  // ACTIVE-活跃, INACTIVE-不活跃, BANNED-被封禁, SUSPENDED-暂停
+  backupContact?: string;  // 备用联系方式
+  phoneNumber?: string;
+  twoFactorEnabled?: boolean;
   lastLoginAt?: string;
   lastActiveAt?: string;
-  securityScore?: number;
-  twoFactorEnabled?: boolean;
-  phoneNumber?: string;
+  followersCount?: number;  // 粉丝数/关注人数（社交媒体）
+  profileUrl?: string;  // 账号主页URL
+  notes?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
-// 社交媒体账号列表响应
-export interface SocialMediaAccountListResponse {
-  content: SocialMediaAccount[];
+// 运营账号列表响应
+export interface OperationAccountListResponse {
+  content: OperationAccount[];
   currentPage: number;
   pageSize: number;
   totalElements: number;

@@ -58,6 +58,18 @@ export default function LeadsPage() {
     }
   };
 
+  const handleStatusChange = async (leadId: number, newStatus: string) => {
+    try {
+      await leadAdminService.updateLeadStatus(leadId, newStatus);
+      fetchLeads();
+      fetchStatistics();
+      alert('状态更新成功');
+    } catch (error: any) {
+      console.error('Failed to update status:', error);
+      alert('状态更新失败：' + error.message);
+    }
+  };
+
   const getStatusText = (status: string) => {
     const statusMap: Record<string, string> = {
       NEW: '新线索',
@@ -100,6 +112,22 @@ export default function LeadsPage() {
       LOW: 'bg-green-100 text-green-800',
     };
     return colorMap[priority] || 'bg-gray-100 text-gray-800';
+  };
+
+  // 定义状态流转规则
+  const statusTransitions: Record<string, string[]> = {
+    NEW: ['CONTACTED', 'INVALID'],
+    CONTACTED: ['INTERESTED', 'INVALID'],
+    INTERESTED: ['QUOTED', 'INVALID'],
+    QUOTED: ['NEGOTIATING', 'INVALID'],
+    NEGOTIATING: ['CONVERTED', 'INVALID'],
+    CONVERTED: [],
+    INVALID: [],
+  };
+
+  // 获取当前状态可流转的下一个状态
+  const getNextStatusOptions = (currentStatus: string) => {
+    return statusTransitions[currentStatus] || [];
   };
 
   const filteredLeads = leads.filter(lead => {
@@ -254,9 +282,25 @@ export default function LeadsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex px-3 py-1 text-xs rounded-full font-medium ${getStatusColor(lead.status || 'NEW')}`}>
-                          {getStatusText(lead.status || 'NEW')}
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <span className={`inline-flex px-3 py-1 text-xs rounded-full font-medium ${getStatusColor(lead.status || 'NEW')}`}>
+                            {getStatusText(lead.status || 'NEW')}
+                          </span>
+                          {getNextStatusOptions(lead.status || 'NEW').length > 0 && (
+                            <select
+                              value=""
+                              onChange={(e) => e.target.value && handleStatusChange(lead.id, e.target.value)}
+                              className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                            >
+                              <option value="">切换状态</option>
+                              {getNextStatusOptions(lead.status || 'NEW').map(status => (
+                                <option key={status} value={status}>
+                                  {getStatusText(status)}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex px-3 py-1 text-xs rounded-full font-medium ${getPriorityColor(lead.priority || 'MEDIUM')}`}>

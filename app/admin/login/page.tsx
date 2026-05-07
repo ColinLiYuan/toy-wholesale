@@ -23,7 +23,8 @@ export default function LoginPage() {
       
       // 临时直接跳转（后续需要实现真实认证）
       setTimeout(() => {
-        router.push('/admin/dashboard');
+        // 添加访问密钥参数到URL
+        router.push('/admin/dashboard?admin_access_key=luxe-admin-2024-secret');
       }, 1000);
     } catch (err) {
       setError('邮箱或密码错误');

@@ -1,6 +1,6 @@
 import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api-config';
-import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, SocialMediaAccount, SocialMediaAccountListResponse } from '@/types';
+import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, OperationAccount, OperationAccountListResponse } from '@/types';
 
 // 防伪验证服务
 export const antiCounterfeitService = {
@@ -1005,15 +1005,86 @@ export const leadAdminService = {
       throw error;
     }
   },
+
+  // 更新潜客状态（带状态流转验证） - PATCH /api/v1/leads/{id}/status
+  async updateLeadStatus(
+    id: number,
+    status: string,
+    changeReason: string = '',
+    operator: string = 'admin'
+  ): Promise<Lead> {
+    try {
+      const apiResult: ApiResult<Lead> = await apiClient.patch(
+        `/v1/leads/${id}/status`,
+        { status, changeReason, operator }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update lead status');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update lead status:', error);
+      throw error;
+    }
+  },
+
+  // 批量更新潜客状态 - PATCH /api/v1/leads/batch/status
+  async batchUpdateLeadStatus(
+    leadIds: number[],
+    status: string,
+    changeReason: string = '',
+    operator: string = 'admin'
+  ): Promise<Record<string, any>> {
+    try {
+      const apiResult: ApiResult<Record<string, any>> = await apiClient.patch(
+        '/v1/leads/batch/status',
+        { leadIds, status, changeReason, operator }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to batch update lead status');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to batch update lead status:', error);
+      throw error;
+    }
+  },
+
+  // 获取潜客的状态变更历史 - GET /api/v1/leads/{id}/status-history
+  async getStatusHistory(
+    leadId: number,
+    page: number = 0,
+    size: number = 20
+  ): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        `/v1/leads/${leadId}/status-history`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch status history');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch status history:', error);
+      throw error;
+    }
+  },
 };
 
-// 社交媒体账号服务（后台管理接口）
-export const socialMediaAccountService = {
-  // 创建账号 - POST /api/v1/social-accounts
-  async createAccount(account: Partial<SocialMediaAccount>): Promise<SocialMediaAccount> {
+// 运营账号服务（后台管理接口）
+export const operationAccountService = {
+  // 创建账号 - POST /api/v1/operation-accounts
+  async createAccount(account: Partial<OperationAccount>): Promise<OperationAccount> {
     try {
-      const apiResult: ApiResult<SocialMediaAccount> = await apiClient.post(
-        '/v1/social-accounts',
+      const apiResult: ApiResult<OperationAccount> = await apiClient.post(
+        '/v1/operation-accounts',
         account
       );
       
@@ -1028,11 +1099,11 @@ export const socialMediaAccountService = {
     }
   },
 
-  // 更新账号 - PUT /api/v1/social-accounts/{id}
-  async updateAccount(id: number, account: Partial<SocialMediaAccount>): Promise<SocialMediaAccount> {
+  // 更新账号 - PUT /api/v1/operation-accounts/{id}
+  async updateAccount(id: number, account: Partial<OperationAccount>): Promise<OperationAccount> {
     try {
-      const apiResult: ApiResult<SocialMediaAccount> = await apiClient.put(
-        `/v1/social-accounts/${id}`,
+      const apiResult: ApiResult<OperationAccount> = await apiClient.put(
+        `/v1/operation-accounts/${id}`,
         account
       );
       
@@ -1047,11 +1118,11 @@ export const socialMediaAccountService = {
     }
   },
 
-  // 获取所有账号（分页） - GET /api/v1/social-accounts
-  async getAllAccounts(page: number = 0, size: number = 20): Promise<SocialMediaAccountListResponse> {
+  // 获取所有账号（分页） - GET /api/v1/operation-accounts
+  async getAllAccounts(page: number = 0, size: number = 20): Promise<OperationAccountListResponse> {
     try {
-      const apiResult: ApiResult<SocialMediaAccountListResponse> = await apiClient.get(
-        '/v1/social-accounts',
+      const apiResult: ApiResult<OperationAccountListResponse> = await apiClient.get(
+        '/v1/operation-accounts',
         { params: { page, size } }
       );
       
@@ -1066,11 +1137,11 @@ export const socialMediaAccountService = {
     }
   },
 
-  // 根据ID查询账号 - GET /api/v1/social-accounts/{id}
-  async getAccountById(id: number): Promise<SocialMediaAccount> {
+  // 根据ID查询账号 - GET /api/v1/operation-accounts/{id}
+  async getAccountById(id: number): Promise<OperationAccount> {
     try {
-      const apiResult: ApiResult<SocialMediaAccount> = await apiClient.get(
-        `/v1/social-accounts/${id}`
+      const apiResult: ApiResult<OperationAccount> = await apiClient.get(
+        `/v1/operation-accounts/${id}`
       );
       
       if (apiResult.code !== 200 || !apiResult.data) {
@@ -1084,11 +1155,11 @@ export const socialMediaAccountService = {
     }
   },
 
-  // 根据平台查询账号 - GET /api/v1/social-accounts/platform/{platform}
-  async getAccountsByPlatform(platform: string): Promise<SocialMediaAccount[]> {
+  // 根据业务线查询账号 - GET /api/v1/operation-accounts/business-line/{businessLine}
+  async getAccountsByBusinessLine(businessLine: string): Promise<OperationAccount[]> {
     try {
-      const apiResult: ApiResult<SocialMediaAccount[]> = await apiClient.get(
-        `/v1/social-accounts/platform/${platform}`
+      const apiResult: ApiResult<OperationAccount[]> = await apiClient.get(
+        `/v1/operation-accounts/business-line/${businessLine}`
       );
       
       if (apiResult.code !== 200 || !apiResult.data) {
@@ -1102,12 +1173,11 @@ export const socialMediaAccountService = {
     }
   },
 
-  // 根据状态查询账号 - GET /api/v1/social-accounts/status/{status}
-  async getAccountsByStatus(status: string, page: number = 0, size: number = 20): Promise<SocialMediaAccountListResponse> {
+  // 根据账号类型查询 - GET /api/v1/operation-accounts/type/{accountType}
+  async getAccountsByType(accountType: string): Promise<OperationAccount[]> {
     try {
-      const apiResult: ApiResult<SocialMediaAccountListResponse> = await apiClient.get(
-        `/v1/social-accounts/status/${status}`,
-        { params: { page, size } }
+      const apiResult: ApiResult<OperationAccount[]> = await apiClient.get(
+        `/v1/operation-accounts/type/${accountType}`
       );
       
       if (apiResult.code !== 200 || !apiResult.data) {
@@ -1121,11 +1191,30 @@ export const socialMediaAccountService = {
     }
   },
 
-  // 搜索账号 - GET /api/v1/social-accounts/search
-  async searchAccounts(keyword: string, page: number = 0, size: number = 20): Promise<SocialMediaAccountListResponse> {
+  // 根据业务线和账号类型查询 - GET /api/v1/operation-accounts/filter
+  async getAccountsByFilter(businessLine: string, accountType: string): Promise<OperationAccount[]> {
     try {
-      const apiResult: ApiResult<SocialMediaAccountListResponse> = await apiClient.get(
-        '/v1/social-accounts/search',
+      const apiResult: ApiResult<OperationAccount[]> = await apiClient.get(
+        '/v1/operation-accounts/filter',
+        { params: { businessLine, accountType } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch accounts');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch accounts:', error);
+      throw error;
+    }
+  },
+
+  // 搜索账号 - GET /api/v1/operation-accounts/search
+  async searchAccounts(keyword: string, page: number = 0, size: number = 20): Promise<OperationAccountListResponse> {
+    try {
+      const apiResult: ApiResult<OperationAccountListResponse> = await apiClient.get(
+        '/v1/operation-accounts/search',
         { params: { keyword, page, size } }
       );
       
@@ -1140,11 +1229,11 @@ export const socialMediaAccountService = {
     }
   },
 
-  // 删除账号 - DELETE /api/v1/social-accounts/{id}
+  // 删除账号 - DELETE /api/v1/operation-accounts/{id}
   async deleteAccount(id: number): Promise<void> {
     try {
       const apiResult: ApiResult<void> = await apiClient.delete(
-        `/v1/social-accounts/${id}`
+        `/v1/operation-accounts/${id}`
       );
       
       if (apiResult.code !== 200) {
@@ -1156,43 +1245,11 @@ export const socialMediaAccountService = {
     }
   },
 
-  // 更新最后登录时间 - POST /api/v1/social-accounts/{id}/login
-  async updateLastLogin(id: number): Promise<void> {
-    try {
-      const apiResult: ApiResult<void> = await apiClient.post(
-        `/v1/social-accounts/${id}/login`
-      );
-      
-      if (apiResult.code !== 200) {
-        throw new Error(apiResult.message || 'Failed to update login time');
-      }
-    } catch (error) {
-      console.error('Failed to update login time:', error);
-      throw error;
-    }
-  },
-
-  // 更新最后活跃时间 - POST /api/v1/social-accounts/{id}/active
-  async updateLastActive(id: number): Promise<void> {
-    try {
-      const apiResult: ApiResult<void> = await apiClient.post(
-        `/v1/social-accounts/${id}/active`
-      );
-      
-      if (apiResult.code !== 200) {
-        throw new Error(apiResult.message || 'Failed to update active time');
-      }
-    } catch (error) {
-      console.error('Failed to update active time:', error);
-      throw error;
-    }
-  },
-
-  // 获取平台统计数据 - GET /api/v1/social-accounts/statistics/platform
-  async getPlatformStatistics(): Promise<Record<string, any>> {
+  // 获取统计数据 - GET /api/v1/operation-accounts/statistics
+  async getStatistics(): Promise<Record<string, any>> {
     try {
       const apiResult: ApiResult<Record<string, any>> = await apiClient.get(
-        '/v1/social-accounts/statistics/platform'
+        '/v1/operation-accounts/statistics'
       );
       
       if (apiResult.code !== 200 || !apiResult.data) {
@@ -1202,41 +1259,6 @@ export const socialMediaAccountService = {
       return apiResult.data;
     } catch (error) {
       console.error('Failed to fetch statistics:', error);
-      throw error;
-    }
-  },
-
-  // 获取状态统计数据 - GET /api/v1/social-accounts/statistics/status
-  async getStatusStatistics(): Promise<Record<string, any>> {
-    try {
-      const apiResult: ApiResult<Record<string, any>> = await apiClient.get(
-        '/v1/social-accounts/statistics/status'
-      );
-      
-      if (apiResult.code !== 200 || !apiResult.data) {
-        throw new Error(apiResult.message || 'Failed to fetch statistics');
-      }
-      
-      return apiResult.data;
-    } catch (error) {
-      console.error('Failed to fetch statistics:', error);
-      throw error;
-    }
-  },
-
-  // 批量更新状态 - PUT /api/v1/social-accounts/batch/status
-  async batchUpdateStatus(ids: number[], status: string): Promise<void> {
-    try {
-      const apiResult: ApiResult<void> = await apiClient.put(
-        '/v1/social-accounts/batch/status',
-        { ids, status }
-      );
-      
-      if (apiResult.code !== 200) {
-        throw new Error(apiResult.message || 'Failed to batch update status');
-      }
-    } catch (error) {
-      console.error('Failed to batch update status:', error);
       throw error;
     }
   },

@@ -21,11 +21,14 @@ export default function LeadDetailPage() {
     followUpType: 'EMAIL',
     result: 'NO_RESPONSE',
   });
+  const [statusHistory, setStatusHistory] = useState<any[]>([]);
+  const [showStatusHistory, setShowStatusHistory] = useState(false);
 
   useEffect(() => {
     if (leadId) {
       fetchLead();
       fetchFollowUpRecords();
+      fetchStatusHistory();
     }
   }, [leadId]);
 
@@ -49,6 +52,15 @@ export default function LeadDetailPage() {
       setFollowUpRecords(data.content || []);
     } catch (error) {
       console.error('Failed to fetch follow-up records:', error);
+    }
+  };
+
+  const fetchStatusHistory = async () => {
+    try {
+      const data = await leadAdminService.getStatusHistory(leadId, 0, 100);
+      setStatusHistory(data.content || []);
+    } catch (error) {
+      console.error('Failed to fetch status history:', error);
     }
   };
 
@@ -443,6 +455,48 @@ export default function LeadDetailPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* 状态历史 */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">状态变更历史</h2>
+          <button
+            onClick={() => setShowStatusHistory(!showStatusHistory)}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            {showStatusHistory ? '收起' : '展开'}
+          </button>
+        </div>
+        {showStatusHistory && (
+          <div className="space-y-3">
+            {statusHistory.map((history) => (
+              <div key={history.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-600"></div>
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className="text-sm font-medium text-gray-900">
+                      {getStatusText(history.oldStatus || '未知')}
+                    </span>
+                    <span className="text-gray-500">→</span>
+                    <span className="text-sm font-medium text-blue-600">
+                      {getStatusText(history.newStatus)}
+                    </span>
+                  </div>
+                  {history.changeReason && (
+                    <p className="text-sm text-gray-600">原因：{history.changeReason}</p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">
+                    操作人：{history.operator || '系统'} | {history.createdAt ? new Date(history.createdAt).toLocaleString('zh-CN') : '-'}
+                  </p>
+                </div>
+              </div>
+            ))}
+            {statusHistory.length === 0 && (
+              <p className="text-center text-gray-500 py-4">暂无状态变更记录</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 跟进记录 */}

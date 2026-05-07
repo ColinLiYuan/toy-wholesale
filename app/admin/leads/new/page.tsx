@@ -51,10 +51,9 @@ export default function NewLeadPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">基本信息</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">公司名称 *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">公司名称</label>
                 <input
                   type="text"
-                  required
                   value={formData.companyName || ''}
                   onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
