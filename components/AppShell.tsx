@@ -2,7 +2,6 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import messages from "@/lib/i18n";
 import { usePathname } from "next/navigation";
 
 export default function AppShell({
@@ -17,14 +16,12 @@ export default function AppShell({
     <>
       {!isAdminRoute && (
         <>
-          <Header translations={messages} />
+          <Header />
           <main className="flex-1">{children}</main>
-          <Footer translations={messages} />
+          <Footer />
         </>
       )}
-      {isAdminRoute && (
-        <main className="min-h-screen">{children}</main>
-      )}
+      {isAdminRoute && children}
     </>
   );
 }

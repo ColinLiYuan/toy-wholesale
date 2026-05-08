@@ -15,12 +15,11 @@ export default function SocialMediaAccountsPage() {
   });
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedAccountType, setSelectedAccountType] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [visiblePasswords, setVisiblePasswords] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchAccounts();
-  }, [pagination.currentPage, selectedAccountType, selectedStatus]);
+  }, [pagination.currentPage, selectedAccountType]);
 
   const fetchAccounts = async () => {
     try {
@@ -46,12 +45,6 @@ export default function SocialMediaAccountsPage() {
           last: true,
           pageSize: 20,
         };
-      } else if (selectedStatus) {
-        response = await operationAccountService.getAllAccounts(
-          pagination.currentPage,
-          20
-        );
-        response.content = response.content.filter(acc => acc.status === selectedStatus);
       } else {
         response = await operationAccountService.getAllAccounts(
           pagination.currentPage,
@@ -267,7 +260,7 @@ export default function SocialMediaAccountsPage() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <input
                 type="text"
@@ -289,19 +282,6 @@ export default function SocialMediaAccountsPage() {
                 <option value="EMAIL">📧 邮箱</option>
                 <option value="PAYMENT">💳 支付账号</option>
                 <option value="OTHER">📦 其他</option>
-              </select>
-            </div>
-            <div>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-              >
-                <option value="">所有状态</option>
-                <option value="ACTIVE">正常</option>
-                <option value="INACTIVE">未激活</option>
-                <option value="BANNED">已封禁</option>
-                <option value="SUSPENDED">已暂停</option>
               </select>
             </div>
             <div>
@@ -345,10 +325,7 @@ export default function SocialMediaAccountsPage() {
                       密码
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      状态
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      用途
+                      备注
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       操作
@@ -416,13 +393,10 @@ export default function SocialMediaAccountsPage() {
                           <span className="text-sm text-gray-400">未设置</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(account.status)}`}>
-                          {getStatusText(account.status)}
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {account.notes || '-'}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {getPurposeText(account.purpose)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link

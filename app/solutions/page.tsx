@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import translations from '@/lib/i18n';
 
 export const metadata: Metadata = {
   title: 'Wholesale Solutions - LuxeAdult Global Distribution',
@@ -17,32 +16,32 @@ export default function SolutionsPage() {
 
   const solutions = [
     {
-      title: translations.solutions.pharma.title,
-      description: translations.solutions.pharma.description,
+      title: 'Custom Branding',
+      description: 'Private labeling and custom packaging to build your brand identity.',
       icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
       gradient: 'from-blue-900/40 to-purple-900/40',
       features: ['Micro-text Encoding', 'UV Ink Integration', 'Serialization Compliance', 'Track & Trace Ready'],
       color: '#00F2FE',
     },
     {
-      title: translations.solutions.beauty.title,
-      description: translations.solutions.beauty.description,
+      title: 'Product Customization',
+      description: 'Tailored designs, materials, and features to meet your market needs.',
       icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
       gradient: 'from-pink-900/40 to-rose-900/40',
       features: ['Premium Aesthetics', 'Custom Finishes', 'Luxury Brand Enhancement', 'Consumer Engagement'],
       color: '#FFD700',
     },
     {
-      title: translations.solutions.liquor.title,
-      description: translations.solutions.liquor.description,
+      title: 'Volume Discounts',
+      description: 'Competitive bulk pricing for large orders with flexible MOQs.',
       icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
       gradient: 'from-red-900/40 to-orange-900/40',
       features: ['Tamper-Evident Seals', 'Destructive Labels', 'Brand Protection', 'Anti-Refill Technology'],
       color: '#EF4444',
     },
     {
-      title: translations.solutions.documents.title,
-      description: translations.solutions.documents.description,
+      title: 'Quality Assurance',
+      description: 'Rigorous testing and certification to ensure product safety and compliance.',
       icon: 'M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9',
       gradient: 'from-green-900/40 to-teal-900/40',
       features: ['HRI Overlay Technology', 'Multi-Spectral Features', 'Government-Grade Security', 'Biometric Integration'],
@@ -68,10 +67,10 @@ export default function SolutionsPage() {
               <span className="text-sm text-[#00F2FE] font-medium tracking-wide">Industry Solutions</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-[#E5E5E5] mb-6">
-              {translations.solutions.title}
+              OEM/ODM Services
             </h1>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              {translations.solutions.subtitle}
+              Customized product design and manufacturing for global wholesalers
             </p>
           </div>
         </div>

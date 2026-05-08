@@ -1,10 +1,6 @@
 import Link from 'next/link';
 
-interface FooterProps {
-  translations: any;
-}
-
-export default function Footer({ translations }: FooterProps) {
+export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -50,7 +46,7 @@ export default function Footer({ translations }: FooterProps) {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-[#1A1A1A] font-semibold mb-6">{translations.footer.quickLinks}</h3>
+            <h3 className="text-[#1A1A1A] font-semibold mb-6">Quick Links</h3>
             <ul className="space-y-3">
               <li>
                 <Link href="/" className="text-[#6C757D] hover:text-[#0056B3] transition-colors text-sm">
@@ -92,7 +88,7 @@ export default function Footer({ translations }: FooterProps) {
 
           {/* Product Categories */}
           <div>
-            <h3 className="text-[#1A1A1A] font-semibold mb-6">{translations.footer.security}</h3>
+            <h3 className="text-[#1A1A1A] font-semibold mb-6">Product Categories</h3>
             <ul className="space-y-3">
               <li>
                 <a href="#" className="text-[#6C757D] hover:text-[#0056B3] transition-colors text-sm">
@@ -119,7 +115,7 @@ export default function Footer({ translations }: FooterProps) {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-[#1A1A1A] font-semibold mb-6">{translations.common.contact}</h3>
+            <h3 className="text-[#1A1A1A] font-semibold mb-6">Contact Us</h3>
             <ul className="space-y-4">
               <li className="flex items-start space-x-3">
                 <svg className="w-5 h-5 text-[#0056B3] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,10 +151,10 @@ export default function Footer({ translations }: FooterProps) {
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="/privacy" className="text-[#6C757D] hover:text-[#0056B3] text-sm transition-colors">
-              {translations.footer.privacy}
+              Privacy Policy
             </Link>
             <Link href="/terms" className="text-[#6C757D] hover:text-[#0056B3] text-sm transition-colors">
-              {translations.footer.terms}
+              Terms of Service
             </Link>
           </div>
         </div>

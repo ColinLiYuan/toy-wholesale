@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { adminService } from '@/services';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,18 +17,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // TODO: 实现实际登录逻辑
-      // const response = await loginService.login(email, password);
-      // localStorage.setItem('admin-token', response.token);
-      // router.push('/admin/dashboard');
+      const response = await adminService.login(username, password);
       
-      // 临时直接跳转（后续需要实现真实认证）
-      setTimeout(() => {
-        // 添加访问密钥参数到URL
-        router.push('/admin/dashboard?admin_access_key=luxe-admin-2024-secret');
-      }, 1000);
-    } catch (err) {
-      setError('邮箱或密码错误');
+      // 设置 localStorage
+      localStorage.setItem('admin_token', response.token);
+      localStorage.setItem('admin_info', JSON.stringify(response.admin));
+      
+      // 设置 cookie（需要调用 API，因为客户端组件不能直接设置 httpOnly cookie）
+      await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: response.token }),
+      });
+      
+      // 跳转到仪表板
+      router.push('/admin/dashboard');
+    } catch (err: any) {
+      setError(err.message || '登录失败，请检查用户名和密码');
     } finally {
       setLoading(false);
     }
@@ -53,14 +59,14 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                邮箱地址
+                用户名
               </label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
-                placeholder="admin@luxeadult.com"
+                placeholder="admin"
                 required
               />
             </div>

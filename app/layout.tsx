@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
-import messages from "@/lib/i18n";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {

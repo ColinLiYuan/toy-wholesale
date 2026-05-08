@@ -5,10 +5,9 @@ import { useState } from 'react';
 interface InquiryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  translations: any;
 }
 
-export default function InquiryModal({ isOpen, onClose, translations }: InquiryModalProps) {
+export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     industry: '',
@@ -79,10 +78,10 @@ export default function InquiryModal({ isOpen, onClose, translations }: InquiryM
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-[#E5E5E5] mb-2">
-                {translations.leadGen.title}
+                Request Your Security Consultation
               </h2>
               <p className="text-gray-400 text-sm">
-                {translations.leadGen.subtitle}
+                Complete this brief assessment to receive a customized security proposal
               </p>
             </div>
             <button
@@ -119,10 +118,10 @@ export default function InquiryModal({ isOpen, onClose, translations }: InquiryM
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-[#E5E5E5] mb-2">
-                  {translations.leadGen.step1.title}
+                  Select Your Industry
                 </h3>
                 <p className="text-gray-400 text-sm">
-                  {translations.leadGen.step1.description}
+                  Which sector requires protection?
                 </p>
               </div>
 
@@ -153,10 +152,10 @@ export default function InquiryModal({ isOpen, onClose, translations }: InquiryM
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-[#E5E5E5] mb-2">
-                  {translations.leadGen.step2.title}
+                  Choose Security Level
                 </h3>
                 <p className="text-gray-400 text-sm">
-                  {translations.leadGen.step2.description}
+                  What level of authentication do you need?
                 </p>
               </div>
 
@@ -187,10 +186,10 @@ export default function InquiryModal({ isOpen, onClose, translations }: InquiryM
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-[#E5E5E5] mb-2">
-                  {translations.leadGen.step3.title}
+                  Contact Information
                 </h3>
                 <p className="text-gray-400 text-sm">
-                  {translations.leadGen.step3.description}
+                  Where should we send your sample kit?
                 </p>
               </div>
 
@@ -252,7 +251,7 @@ export default function InquiryModal({ isOpen, onClose, translations }: InquiryM
                 : 'text-[#E5E5E5] hover:bg-white/5'
             }`}
           >
-            {translations.leadGen.previous}
+            Previous
           </button>
 
           <button
@@ -264,7 +263,7 @@ export default function InquiryModal({ isOpen, onClose, translations }: InquiryM
             }
             className="px-8 py-3 rounded-lg bg-gradient-to-r from-[#00F2FE] to-[#00C4CC] text-[#050505] font-semibold hover:shadow-[0_0_20px_rgba(0,242,254,0.4)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {step === 3 ? translations.leadGen.complete : translations.leadGen.next}
+            {step === 3 ? 'Submit Request' : 'Next Step'}
           </button>
         </div>
       </div>

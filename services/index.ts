@@ -1,6 +1,6 @@
 import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api-config';
-import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, OperationAccount, OperationAccountListResponse } from '@/types';
+import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, OperationAccount, OperationAccountListResponse, Inquiry, InquiryItem, Admin } from '@/types';
 
 // 防伪验证服务
 export const antiCounterfeitService = {
@@ -55,11 +55,18 @@ function getFallbackSuppliers(): Supplier[] {
 // 认证服务
 export const authService = {
   // 经销商登录 - POST /api/v1/auth/login
-  async login(email: string, password: string): Promise<AuthResponse> {
+  async login(email: string, password: string, sessionId?: string): Promise<AuthResponse> {
     try {
+      // 构建请求头，如果有 sessionId 则添加
+      const headers: Record<string, string> = {};
+      if (sessionId) {
+        headers['X-Session-Id'] = sessionId;
+      }
+      
       const apiResult: ApiResult<any> = await apiClient.post(
         '/v1/auth/login',
-        { email, password }
+        { email, password },
+        { headers }
       );
       
       console.log('API Result:', apiResult); // 调试日志
@@ -894,18 +901,29 @@ export const leadAdminService = {
     }
   },
 
-  // 添加跟进记录 - POST /api/v1/leads/{id}/follow-ups
+  // 添加跟进记录 - POST /api/v1/follow-up-records
   async addFollowUp(leadId: number, followUpRecord: Partial<FollowUpRecord>): Promise<FollowUpRecord> {
     try {
+      const cleanData: any = {
+        leadId: leadId,
+      };
+
+      if (followUpRecord.followUpType) cleanData.followUpType = followUpRecord.followUpType;
+      if (followUpRecord.content) cleanData.content = followUpRecord.content;
+      if (followUpRecord.result) cleanData.result = followUpRecord.result;
+      if (followUpRecord.nextAction) cleanData.nextAction = followUpRecord.nextAction;
+      if (followUpRecord.attachments) cleanData.attachments = followUpRecord.attachments;
+      if (followUpRecord.followUpBy) cleanData.followUpBy = followUpRecord.followUpBy;
+
       const apiResult: ApiResult<FollowUpRecord> = await apiClient.post(
-        `/v1/leads/${leadId}/follow-ups`,
-        followUpRecord
+        '/v1/follow-up-records',
+        cleanData
       );
-      
+
       if (apiResult.code !== 200 || !apiResult.data) {
         throw new Error(apiResult.message || 'Failed to add follow-up record');
       }
-      
+
       return apiResult.data;
     } catch (error) {
       console.error('Failed to add follow-up record:', error);
@@ -913,11 +931,11 @@ export const leadAdminService = {
     }
   },
 
-  // 获取潜客的跟进记录 - GET /api/v1/leads/{id}/follow-ups
+  // 获取潜客的跟进记录 - GET /api/v1/follow-up-records/lead/{leadId}
   async getFollowUpRecords(leadId: number, page: number = 0, size: number = 20): Promise<FollowUpRecordListResponse> {
     try {
       const apiResult: ApiResult<FollowUpRecordListResponse> = await apiClient.get(
-        `/v1/leads/${leadId}/follow-ups`,
+        `/v1/follow-up-records/lead/${leadId}`,
         { params: { page, size } }
       );
       
@@ -1054,7 +1072,7 @@ export const leadAdminService = {
     }
   },
 
-  // 获取潜客的状态变更历史 - GET /api/v1/leads/{id}/status-history
+  // 获取潜客的状态变更历史 - GET /api/v1/lead-status-history/lead/{leadId}
   async getStatusHistory(
     leadId: number,
     page: number = 0,
@@ -1062,7 +1080,7 @@ export const leadAdminService = {
   ): Promise<any> {
     try {
       const apiResult: ApiResult<any> = await apiClient.get(
-        `/v1/leads/${leadId}/status-history`,
+        `/v1/lead-status-history/lead/${leadId}`,
         { params: { page, size } }
       );
       
@@ -1071,8 +1089,210 @@ export const leadAdminService = {
       }
       
       return apiResult.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch status history:', error);
+      throw error;
+    }
+  },
+
+  // 快速转化潜客为经销商 - POST /api/v1/flexible-orders/leads/{leadId}/quick-convert
+  async quickConvertToDistributor(
+    leadId: number,
+    customerType: string = 'SMALL_BUSINESS'
+  ): Promise<Record<string, any>> {
+    try {
+      const apiResult: ApiResult<Record<string, any>> = await apiClient.post(
+        `/v1/flexible-orders/leads/${leadId}/quick-convert`,
+        null,
+        { params: { customerType } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to convert lead to distributor');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to convert lead to distributor:', error);
+      throw error;
+    }
+  },
+};
+
+// 询价单管理服务（后台管理接口）
+export const inquiryOrderAdminService = {
+  // 获取所有询价单列表 - GET /api/v1/inquiry-orders
+  async getAllOrders(page: number = 0, size: number = 20, sortBy = 'createdAt', direction = 'DESC'): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        '/v1/inquiry-orders',
+        { params: { page, size, sortBy, direction } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch orders');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      throw error;
+    }
+  },
+
+  // 根据ID查询询价单详情 - GET /api/v1/inquiry-orders/{id}
+  async getOrderById(id: number): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        `/v1/inquiry-orders/${id}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch inquiry order');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch inquiry order:', error);
+      throw error;
+    }
+  },
+
+  // 根据经销商ID查询询价单 - GET /api/v1/inquiry-orders/distributor/{distributorId}
+  async getOrdersByDistributorId(distributorId: number, page: number = 0, size: number = 20): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        `/v1/inquiry-orders/distributor/${distributorId}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch inquiry orders');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch inquiry orders:', error);
+      throw error;
+    }
+  },
+
+  // 根据状态查询询价单 - GET /api/v1/inquiry-orders/status/{status}
+  async getOrdersByStatus(status: string, page: number = 0, size: number = 20): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        `/v1/inquiry-orders/status/${status}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch inquiry orders');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch inquiry orders:', error);
+      throw error;
+    }
+  },
+
+  // 创建询价单 - POST /api/v1/inquiry-orders
+  async createOrder(order: any): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.post(
+        '/v1/inquiry-orders',
+        order
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create inquiry order');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create inquiry order:', error);
+      throw error;
+    }
+  },
+
+  // 更新询价单 - PUT /api/v1/inquiry-orders/{id}
+  async updateOrder(id: number, order: any): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.put(
+        `/v1/inquiry-orders/${id}`,
+        order
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update inquiry order');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update inquiry order:', error);
+      throw error;
+    }
+  },
+
+  // 删除询价单 - DELETE /api/v1/inquiry-orders/{id}
+  async deleteOrder(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/inquiry-orders/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete inquiry order');
+      }
+    } catch (error) {
+      console.error('Failed to delete inquiry order:', error);
+      throw error;
+    }
+  },
+
+  // 更新询价单状态 - PATCH /api/v1/inquiry-orders/{id}/status
+  async updateOrderStatus(id: number, status: string): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.patch(
+        `/v1/inquiry-orders/${id}/status`,
+        null,
+        { params: { status } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update inquiry order status');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update inquiry order status:', error);
+      throw error;
+    }
+  },
+
+  // 后台直接创建询价单（支持临时订单） - POST /api/v1/flexible-orders/create-direct
+  async createOrderDirectly(
+    inquiryOrder: any,
+    orderSourceType: string = 'ADMIN_CREATED',
+    temporaryCustomerInfo?: string
+  ): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.post(
+        '/v1/flexible-orders/create-direct',
+        {
+          inquiryOrder,
+          orderSourceType,
+          temporaryCustomerInfo,
+        }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create inquiry order');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create inquiry order:', error);
       throw error;
     }
   },
@@ -1259,6 +1479,494 @@ export const operationAccountService = {
       return apiResult.data;
     } catch (error) {
       console.error('Failed to fetch statistics:', error);
+      throw error;
+    }
+  },
+};
+
+// ==================== 询盘服务 ====================
+
+// 询盘管理服务（后台管理接口）
+export const inquiryAdminService = {
+  // 获取所有询盘列表 - GET /api/v1/inquiries
+  async getAllInquiries(page: number = 0, size: number = 20, sortBy = 'createdAt', direction = 'DESC'): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        '/v1/inquiries',
+        { params: { page, size, sortBy, direction } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch inquiries');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch inquiries:', error);
+      throw error;
+    }
+  },
+
+  // 根据ID查询询盘详情 - GET /api/v1/inquiries/{id}
+  async getInquiryById(id: number): Promise<Inquiry> {
+    try {
+      const apiResult: ApiResult<Inquiry> = await apiClient.get(
+        `/v1/inquiries/${id}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch inquiry');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch inquiry:', error);
+      throw error;
+    }
+  },
+
+  // 根据状态查询询盘 - GET /api/v1/inquiries/status/{status}
+  async getInquiriesByStatus(status: string, page: number = 0, size: number = 20): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        `/v1/inquiries/status/${status}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch inquiries');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch inquiries:', error);
+      throw error;
+    }
+  },
+
+  // 更新询盘状态 - PATCH /api/v1/inquiries/{id}/status
+  async updateInquiryStatus(id: number, status: string): Promise<Inquiry> {
+    try {
+      const apiResult: ApiResult<Inquiry> = await apiClient.patch(
+        `/v1/inquiries/${id}/status`,
+        null,
+        { params: { status } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update inquiry status');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update inquiry status:', error);
+      throw error;
+    }
+  },
+
+  // 分配销售人员 - PATCH /api/v1/inquiries/{id}/assign
+  async assignToSalesperson(id: number, salesperson: string): Promise<Inquiry> {
+    try {
+      const apiResult: ApiResult<Inquiry> = await apiClient.patch(
+        `/v1/inquiries/${id}/assign`,
+        null,
+        { params: { salesperson } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to assign salesperson');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to assign salesperson:', error);
+      throw error;
+    }
+  },
+
+  // 删除询盘 - DELETE /api/v1/inquiries/{id}
+  async deleteInquiry(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/inquiries/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete inquiry');
+      }
+    } catch (error) {
+      console.error('Failed to delete inquiry:', error);
+      throw error;
+    }
+  },
+
+  // 从询盘生成潜客 - POST /api/v1/inquiries/{id}/convert-to-lead
+  async convertToLead(id: number): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.post(
+        `/v1/inquiries/${id}/convert-to-lead`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to convert to lead');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to convert to lead:', error);
+      throw error;
+    }
+  },
+};
+
+// 询盘提交服务（前台用户接口）
+export const inquiryService = {
+  // 提交询盘 - POST /api/v1/inquiries
+  async submitInquiry(inquiry: Inquiry): Promise<Inquiry> {
+    try {
+      const apiResult: ApiResult<Inquiry> = await apiClient.post(
+        '/v1/inquiries',
+        inquiry
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to submit inquiry');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to submit inquiry:', error);
+      throw error;
+    }
+  },
+};
+
+// 经销商管理服务
+export const distributorAdminService = {
+  // 获取活跃经销商列表 - GET /api/v1/distributor/list
+  async getActiveDistributors(country?: string): Promise<Distributor[]> {
+    try {
+      const params: Record<string, string> = {};
+      if (country) {
+        params.country = country;
+      }
+      
+      const apiResult: ApiResult<Distributor[]> = await apiClient.get(
+        '/v1/distributor/list',
+        { params }
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to fetch distributors');
+      }
+      
+      return apiResult.data || [];
+    } catch (error) {
+      console.error('Failed to fetch active distributors:', error);
+      throw error;
+    }
+  },
+
+  // 搜索经销商 - GET /api/v1/distributor/search
+  async searchDistributors(keyword: string, page: number = 0, size: number = 20): Promise<{ content: Distributor[]; totalElements: number; totalPages: number; currentPage: number }> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        '/v1/distributor/search',
+        { params: { keyword, page, size } }
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Search failed');
+      }
+      
+      const data = apiResult.data;
+      return {
+        content: data.content || [],
+        totalElements: data.totalElements || 0,
+        totalPages: data.totalPages || 0,
+        currentPage: data.number || data.currentPage || 0,
+      };
+    } catch (error) {
+      console.error('Failed to search distributors:', error);
+      throw error;
+    }
+  },
+
+  // 创建经销商 - POST /api/v1/distributor
+  async createDistributor(distributor: Partial<Distributor>): Promise<Distributor> {
+    try {
+      const apiResult: ApiResult<Distributor> = await apiClient.post(
+        '/v1/distributor',
+        distributor
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to create distributor');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create distributor:', error);
+      throw error;
+    }
+  },
+
+  // 更新经销商 - PUT /api/v1/distributor/{id}
+  async updateDistributor(id: number, distributor: Partial<Distributor>): Promise<Distributor> {
+    try {
+      const apiResult: ApiResult<Distributor> = await apiClient.put(
+        `/v1/distributor/${id}`,
+        distributor
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to update distributor');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update distributor:', error);
+      throw error;
+    }
+  },
+
+  // 删除经销商 - DELETE /api/v1/distributor/{id}
+  async deleteDistributor(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/distributor/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete distributor');
+      }
+    } catch (error) {
+      console.error('Failed to delete distributor:', error);
+      throw error;
+    }
+  },
+
+  // 获取经销商详情 - GET /api/v1/distributor/{id}
+  async getDistributorById(id: number): Promise<Distributor> {
+    try {
+      const apiResult: ApiResult<Distributor> = await apiClient.get(
+        `/v1/distributor/${id}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch distributor');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch distributor:', error);
+      throw error;
+    }
+  },
+
+  // 获取经销商列表 - GET /api/v1/distributor/list
+  async getAllDistributors(page: number = 0, size: number = 20): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        '/v1/distributor/list',
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch distributors');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch distributors:', error);
+      throw error;
+    }
+  },
+
+  // 添加经销商跟进记录 - POST /api/v1/follow-up-records
+  async addFollowUp(distributorId: number, followUpRecord: Partial<FollowUpRecord>): Promise<FollowUpRecord> {
+    try {
+      const cleanData: any = {
+        distributorId: distributorId,
+      };
+      
+      if (followUpRecord.followUpType) cleanData.followUpType = followUpRecord.followUpType;
+      if (followUpRecord.content) cleanData.content = followUpRecord.content;
+      if (followUpRecord.result) cleanData.result = followUpRecord.result;
+      if (followUpRecord.nextAction) cleanData.nextAction = followUpRecord.nextAction;
+      if (followUpRecord.attachments) cleanData.attachments = followUpRecord.attachments;
+      if (followUpRecord.followUpBy) cleanData.followUpBy = followUpRecord.followUpBy;
+      
+      const apiResult: ApiResult<FollowUpRecord> = await apiClient.post(
+        '/v1/follow-up-records',
+        cleanData
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to add follow-up record');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to add follow-up record:', error);
+      throw error;
+    }
+  },
+
+  // 获取经销商的跟进记录 - GET /api/v1/follow-up-records/distributor/{distributorId}
+  async getFollowUpRecords(distributorId: number, page: number = 0, size: number = 20): Promise<FollowUpRecordListResponse> {
+    try {
+      const apiResult: ApiResult<FollowUpRecordListResponse> = await apiClient.get(
+        `/v1/follow-up-records/distributor/${distributorId}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch follow-up records');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch follow-up records:', error);
+      throw error;
+    }
+  },
+};
+
+// 管理员服务
+export const adminService = {
+  // 管理员登录 - POST /api/v1/admin/login
+  async login(username: string, password: string): Promise<{ token: string; admin: Admin }> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.post(
+        '/v1/admin/login',
+        { username, password }
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Login failed');
+      }
+      
+      return {
+        token: apiResult.data.token,
+        admin: apiResult.data.admin,
+      };
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  },
+
+  // 获取管理员列表 - GET /api/v1/admin
+  async getAdminList(page: number = 0, size: number = 20): Promise<{ content: Admin[]; totalElements: number; totalPages: number; currentPage: number }> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        '/v1/admin',
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to fetch admins');
+      }
+      
+      const data = apiResult.data;
+      return {
+        content: data.content || [],
+        totalElements: data.totalElements || 0,
+        totalPages: data.totalPages || 0,
+        currentPage: data.number || data.currentPage || 0,
+      };
+    } catch (error) {
+      console.error('Failed to fetch admins:', error);
+      throw error;
+    }
+  },
+
+  // 获取管理员详情 - GET /api/v1/admin/{id}
+  async getAdminById(id: number): Promise<Admin> {
+    try {
+      const apiResult: ApiResult<Admin> = await apiClient.get(
+        `/v1/admin/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Admin not found');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch admin:', error);
+      throw error;
+    }
+  },
+
+  // 创建管理员 - POST /api/v1/admin
+  async createAdmin(admin: Partial<Admin>): Promise<Admin> {
+    try {
+      const apiResult: ApiResult<Admin> = await apiClient.post(
+        '/v1/admin',
+        admin
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to create admin');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create admin:', error);
+      throw error;
+    }
+  },
+
+  // 更新管理员 - PUT /api/v1/admin/{id}
+  async updateAdmin(id: number, admin: Partial<Admin>): Promise<Admin> {
+    try {
+      const apiResult: ApiResult<Admin> = await apiClient.put(
+        `/v1/admin/${id}`,
+        admin
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to update admin');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update admin:', error);
+      throw error;
+    }
+  },
+
+  // 删除管理员 - DELETE /api/v1/admin/{id}
+  async deleteAdmin(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/admin/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete admin');
+      }
+    } catch (error) {
+      console.error('Failed to delete admin:', error);
+      throw error;
+    }
+  },
+
+  // 重置密码 - POST /api/v1/admin/{id}/reset-password
+  async resetPassword(id: number, newPassword: string): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.post(
+        `/v1/admin/${id}/reset-password`,
+        { password: newPassword }
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to reset password');
+      }
+    } catch (error) {
+      console.error('Failed to reset password:', error);
       throw error;
     }
   },

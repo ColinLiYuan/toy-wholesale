@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import translations from '@/lib/i18n';
 
 export default function VerifyPage() {
   
@@ -41,10 +40,10 @@ export default function VerifyPage() {
             </svg>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-[#E5E5E5] mb-4">
-            {translations.verify.title}
+            Product Authenticity
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            {translations.verify.subtitle}
+            Verify the authenticity of our products with unique codes
           </p>
         </div>
 
@@ -53,7 +52,7 @@ export default function VerifyPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="code" className="block text-sm font-medium text-[#E5E5E5] mb-3">
-                {translations.verify.placeholder}
+                Enter verification code
               </label>
               <input
                 type="text"
@@ -78,10 +77,10 @@ export default function VerifyPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {translations.verify.verifying}
+                  Verifying...
                 </>
               ) : (
-                translations.verify.button
+                'Verify Now'
               )}
             </button>
           </form>
@@ -97,7 +96,7 @@ export default function VerifyPage() {
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-green-400 mb-2">
-                {translations.verify.result.valid}
+                Authentic Product
               </h2>
               <p className="text-green-300">
                 Authentication Successful: Genuine Product
@@ -106,7 +105,7 @@ export default function VerifyPage() {
 
             <div className="bg-white/5 rounded-lg p-6 space-y-3 mt-6">
               <h3 className="font-semibold text-green-400 mb-3">
-                {translations.verify.result.productInfo}
+                Product Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import InquiryModal from '@/components/InquiryModal';
-import messages from '@/lib/i18n';
 import { R2_BASE_URL } from '@/lib/r2-config';
 
 export default function HomePageClient() {
@@ -444,7 +443,7 @@ export default function HomePageClient() {
       </section>
 
       {/* Inquiry Modal */}
-      <InquiryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} translations={messages} />
+      <InquiryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }

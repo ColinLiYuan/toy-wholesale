@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { Product } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
-import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
+import { inquiryCartUtils } from '@/lib/inquiry-cart';
 
 interface ProductDetailClientProps {
   initialProduct: Product | null;
@@ -14,14 +13,13 @@ interface ProductDetailClientProps {
 }
 
 export default function ProductDetailClient({ initialProduct, error, productSlug }: ProductDetailClientProps) {
-  const { isAuthenticated } = useAuth();
   const router = useRouter();
   
   const [product, setProduct] = useState<Product | null>(initialProduct);
   const [loading, setLoading] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [addingToCart, setAddingToCart] = useState(false);
+  const [quantity, setQuantity] = useState(product?.minOrder || 1);
+  const [addingToInquiry, setAddingToInquiry] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const mainImageRef = useRef<HTMLDivElement>(null);
@@ -123,13 +121,7 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
     setIsHovering(false);
   };
 
-  const handleAddToCart = async () => {
-    if (!isAuthenticated) {
-      alert('Please login to add items to cart');
-      router.push('/login');
-      return;
-    }
-
+  const handleAddToInquiryCart = async () => {
     const minOrder = product?.minOrder || 1;
     if (quantity < minOrder) {
       alert(`Minimum Order Quantity (MOQ) is ${minOrder} pcs. Please increase the quantity.`);
@@ -142,23 +134,27 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
       return;
     }
 
+    setAddingToInquiry(true);
+
     try {
-      setAddingToCart(true);
-      const response: UnwrappedAxiosResponse<any> = await apiClient.post('/v1/cart/add', {
+      // 添加到询盘车（调用后端 API）
+      await inquiryCartUtils.addItem({
+        productId: product.id,
+        productName: product.name,
+        productImage: product.image,
         skuId: sku.id,
+        skuCode: sku.sku,
+        color: sku.color,
         quantity: quantity,
+        specifications: featuresObj,
       });
 
-      if (response.code === 200) {
-        alert(`✅ Added ${quantity} pcs to cart!\n\nSKU: ${sku.sku}\nQuantity: ${quantity}`);
-      } else {
-        throw new Error(response.message || 'Failed to add to cart');
-      }
-    } catch (err: any) {
-      console.error('Failed to add to cart:', err);
-      alert(err.message || 'Failed to add to cart. Please try again.');
+      alert(`✅ Added to Inquiry Cart!\n\nProduct: ${product.name}\nSKU: ${sku.sku}\nQuantity: ${quantity}\n\nYou can submit inquiry from the Inquiry Cart.`);
+    } catch (error) {
+      console.error('Failed to add to inquiry cart:', error);
+      alert('❌ Failed to add to Inquiry Cart. Please try again.');
     } finally {
-      setAddingToCart(false);
+      setAddingToInquiry(false);
     }
   };
 
@@ -401,41 +397,31 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
                   </div>
                 </div>
 
-                {/* Add to Cart Button */}
-                {isAuthenticated ? (
-                  <button
-                    data-cart-button
-                    onClick={handleAddToCart}
-                    disabled={addingToCart || (product.productSkus?.[0]?.stock === 0)}
-                    className="w-full bg-gray-800 text-white py-4 px-6 rounded-xl font-bold text-lg hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    {addingToCart ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Adding to Cart...
-                      </>
-                    ) : product.productSkus?.[0]?.stock === 0 ? (
-                      'Out of Stock'
-                    ) : (
-                      <>
-                        <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Add to Inquiry Cart
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="block w-full bg-gray-800 text-white text-center py-4 px-6 rounded-xl font-bold text-lg hover:bg-gray-900 transition-all"
-                  >
-                    Login to Add to Cart
-                  </Link>
-                )}
+                {/* Add to Inquiry Button */}
+                <button
+                  onClick={handleAddToInquiryCart}
+                  disabled={addingToInquiry || (product.productSkus?.[0]?.stock === 0)}
+                  className="w-full bg-gray-800 text-white py-4 px-6 rounded-xl font-bold text-lg hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {addingToInquiry ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Adding...
+                    </>
+                  ) : product.productSkus?.[0]?.stock === 0 ? (
+                    'Out of Stock'
+                  ) : (
+                    <>
+                      <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                      Add to Inquiry
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
@@ -481,18 +467,16 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
         ) : null}
       </div>
 
-      {/* Floating Cart Button (Mobile) */}
-      {isAuthenticated && (
-        <Link
-          href="/cart"
-          data-cart-icon
-          className="fixed bottom-6 right-6 lg:hidden bg-gray-800 text-white p-4 rounded-full shadow-lg hover:bg-gray-900 transition-all z-50"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-        </Link>
-      )}
+      {/* Floating Inquiry Cart Button (Mobile) */}
+      <Link
+        href="/inquiry-cart"
+        data-inquiry-icon
+        className="fixed bottom-6 right-6 lg:hidden bg-gray-800 text-white p-4 rounded-full shadow-lg hover:bg-gray-900 transition-all z-50"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+        </svg>
+      </Link>
     </div>
   );
 }

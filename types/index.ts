@@ -205,8 +205,35 @@ export interface Distributor {
   level?: string;  // GOLD, SILVER, BRONZE
   creditRating?: string;
   serviceRegions?: string;  // JSON 数组
+  customerType?: string;  // REGULAR-正规经销商, SMALL_BUSINESS-小B商户, INDIVIDUAL-个人客户
+  accountCreatedBy?: string;  // ADMIN-管理员创建, SELF_REGISTER-自助注册
+  registrationRequired?: boolean;  // 是否需要完整注册流程
   createdAt?: string;
   updatedAt?: string;
+}
+
+// 管理员类型 - 根据后端实体 Admin
+export interface Admin {
+  id?: number;
+  username: string;
+  email?: string;
+  realName?: string;
+  role?: string;  // SUPER_ADMIN, ADMIN, OPERATOR
+  status?: string;  // ACTIVE, INACTIVE
+  lastLoginAt?: string;
+  loginFailCount?: number;
+  lockedUntil?: string;
+  remark?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// 管理员登录响应类型
+export interface AdminLoginResponse {
+  success: boolean;
+  message?: string;
+  token?: string;
+  admin?: Admin;
 }
 
 // 认证响应类型
@@ -347,4 +374,60 @@ export interface OperationAccountListResponse {
   hasPrevious: boolean;
   first: boolean;
   last: boolean;
+}
+
+// ==================== 询盘相关类型 ====================
+
+// 询单项 - 对应后端 InquiryItem
+export interface InquiryItem {
+  id?: number;
+  productId: number;
+  skuId?: number;
+  quantity: number;
+  productName?: string;
+  productImage?: string;
+  specifications?: string;  // JSON字符串
+  notes?: string;
+}
+
+// 询盘实体 - 对应后端 Inquiry
+export interface Inquiry {
+  id?: number;
+  inquiryNumber?: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  companyName?: string;
+  country?: string;
+  distributorId?: number;
+  status?: string;  // NEW, CONTACTED, QUOTING, NEGOTIATING, CONVERTED, CLOSED
+  source?: string;  // WEBSITE_FORM, EMAIL, ALIBABA, WHATSAPP, TRADE_SHOW
+  message?: string;
+  assignedTo?: string;
+  contactedAt?: string;
+  convertedAt?: string;
+  closedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  items: InquiryItem[];
+}
+
+// 询盘车商品项（前端临时存储）
+export interface InquiryCartItem {
+  id?: number;
+  productId: number;
+  productName: string;
+  productImage: string;
+  skuId?: number;
+  skuCode?: string;
+  color?: string;
+  quantity: number;
+  specifications?: Record<string, any>;
+  notes?: string;
+}
+
+// 询盘车（前端本地存储）
+export interface InquiryCart {
+  items: InquiryCartItem[];
+  itemCount: number;
 }

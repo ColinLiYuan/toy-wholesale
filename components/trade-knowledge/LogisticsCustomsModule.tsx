@@ -15,149 +15,153 @@ export default function LogisticsCustomsModule() {
       {/* 二级菜单 */}
       <div className="mb-8 bg-gray-50 rounded-xl p-4">
         <div className="flex flex-wrap gap-3">
-          <a href="#customs-codes" className="px-4 py-2 bg-white border border-indigo-200 rounded-lg text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors">
-            🌐 监管代码
-          </a>
-          <a href="#market-purchase" className="px-4 py-2 bg-white border border-orange-200 rounded-lg text-sm font-medium text-orange-600 hover:bg-orange-50 transition-colors">
-            🏪 1039市场采购
-          </a>
           <a href="#export-modes" className="px-4 py-2 bg-white border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
-            🚀 出口方式对比
+            🚀 出口方式
           </a>
-          <a href="#booking-process" className="px-4 py-2 bg-white border border-green-200 rounded-lg text-sm font-medium text-green-600 hover:bg-green-50 transition-colors">
-            📦 订舱流程
+          <a href="#customs-codes" className="px-4 py-2 bg-white border border-indigo-200 rounded-lg text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors">
+            ️ 报关方式
           </a>
           <a href="#customs-declaration" className="px-4 py-2 bg-white border border-purple-200 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
             📋 报关流程
           </a>
-          <a href="#tax-refund" className="px-4 py-2 bg-white border border-teal-200 rounded-lg text-sm font-medium text-teal-600 hover:bg-teal-50 transition-colors">
-            💰 退税指南
-          </a>
           <a href="#logistics-plan" className="px-4 py-2 bg-white border border-blue-200 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
             ✈️ 物流方案
+          </a>
+          <a href="#tax-refund" className="px-4 py-2 bg-white border border-teal-200 rounded-lg text-sm font-medium text-teal-600 hover:bg-teal-50 transition-colors">
+            💰 退税指南
           </a>
         </div>
       </div>
 
-      {/* 内容区域 - 这里可以继续添加详细内容 */}
+      {/* 内容区域 */}
       <div className="space-y-8">
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-indigo-900 mb-4">🌐 跨境电商监管代码</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg p-4">
-              <h4 className="font-bold text-blue-600 mb-2">9610 - B2C直邮</h4>
-              <p className="text-sm text-gray-600">通过电商平台向境外消费者零售，快递直接寄递</p>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <h4 className="font-bold text-green-600 mb-2">9710 - B2B直接出口</h4>
-              <p className="text-sm text-gray-600">通过跨境电商平台与境外企业交易，货物直接出口</p>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <h4 className="font-bold text-purple-600 mb-2">9810 - 海外仓</h4>
-              <p className="text-sm text-gray-600">先出口至海外仓，再销售并从海外仓发货</p>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <h4 className="font-bold text-orange-600 mb-2">1039 - 市场采购</h4>
-              <p className="text-sm text-gray-600">在市场集聚区采购，由符合条件的经营者办理出口</p>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <h4 className="font-bold text-red-600 mb-2">0110 - 一般贸易</h4>
-              <p className="text-sm text-gray-600">传统B2B大宗贸易，完整单证出口</p>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <h4 className="font-bold text-teal-600 mb-2">1210 - 保税电商</h4>
-              <p className="text-sm text-gray-600">货物先入保税区，再根据订单清关配送</p>
+        {/* 1. 报关方式对比（怎么报关） */}
+        <div id="customs-codes" className="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-indigo-900 mb-4">️ 报关方式对比（怎么报关）</h3>
+          
+          {/* 概念说明 */}
+          <div className="bg-indigo-50 rounded-lg p-4 mb-6 border-l-4 border-indigo-500">
+            <h4 className="font-semibold text-indigo-900 mb-2 flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              什么是报关方式？
+            </h4>
+            <p className="text-sm text-indigo-800">
+              报关方式指的是<strong>用什么监管代码报关</strong>，即向海关申报时使用的贸易方式。
+              不同的报关方式对应不同的海关监管代码（如0110、9610等），决定了报关流程、单证要求和退税政策。
+            </p>
+          </div>
+
+          {/* 报关方式详细对比表 */}
+          <div className="bg-white rounded-lg p-5 border-2 border-gray-200 mb-6">
+            <h4 className="font-bold text-gray-900 mb-4">📊 报关方式详细对比表</h4>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-indigo-50">
+                  <tr>
+                    <th className="px-3 py-3 text-left font-semibold">监管代码</th>
+                    <th className="px-3 py-3 text-center font-semibold">名称</th>
+                    <th className="px-3 py-3 text-center font-semibold">退税情况</th>
+                    <th className="px-3 py-3 text-center font-semibold">增值税票</th>
+                    <th className="px-3 py-3 text-center font-semibold">适合物流</th>
+                    <th className="px-3 py-3 text-center font-semibold">适用场景</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  <tr className="bg-green-50">
+                    <td className="px-3 py-3 font-medium"><span className="px-2 py-1 bg-red-100 text-red-700 rounded">0110</span></td>
+                    <td className="px-3 py-3 text-center">一般贸易</td>
+                    <td className="px-3 py-3 text-center text-green-600 font-semibold">✅ 可退税</td>
+                    <td className="px-3 py-3 text-center">必须有</td>
+                    <td className="px-3 py-3 text-center text-sm">海运/空派/海派</td>
+                    <td className="px-3 py-3 text-center text-sm">传统B2B批发 ⭐</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-3 font-medium"><span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">9610</span></td>
+                    <td className="px-3 py-3 text-center">跨境电商B2C</td>
+                    <td className="px-3 py-3 text-center text-green-600 font-semibold">✅ 可退税</td>
+                    <td className="px-3 py-3 text-center">需要</td>
+                    <td className="px-3 py-3 text-center text-sm">国际快递/空派</td>
+                    <td className="px-3 py-3 text-center text-sm">小额零售直邮</td>
+                  </tr>
+                  <tr className="bg-green-50">
+                    <td className="px-3 py-3 font-medium"><span className="px-2 py-1 bg-green-100 text-green-700 rounded">9710</span></td>
+                    <td className="px-3 py-3 text-center">跨境电商B2B</td>
+                    <td className="px-3 py-3 text-center text-green-600 font-semibold">✅ 可退税</td>
+                    <td className="px-3 py-3 text-center">需要</td>
+                    <td className="px-3 py-3 text-center text-sm">海运/空派/海派</td>
+                    <td className="px-3 py-3 text-center text-sm">电商平台B2B订单</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-3 font-medium"><span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">9810</span></td>
+                    <td className="px-3 py-3 text-center">海外仓模式</td>
+                    <td className="px-3 py-3 text-center text-green-600 font-semibold">✅ 可退税</td>
+                    <td className="px-3 py-3 text-center">需要</td>
+                    <td className="px-3 py-3 text-center text-sm">海运整柜/拼箱</td>
+                    <td className="px-3 py-3 text-center text-sm">亚马逊FBA备货</td>
+                  </tr>
+                  <tr className="bg-yellow-50">
+                    <td className="px-3 py-3 font-medium"><span className="px-2 py-1 bg-orange-100 text-orange-700 rounded">1039</span></td>
+                    <td className="px-3 py-3 text-center">市场采购</td>
+                    <td className="px-3 py-3 text-center text-orange-600 font-semibold">⚠️ 免征不退</td>
+                    <td className="px-3 py-3 text-center text-orange-600">无需</td>
+                    <td className="px-3 py-3 text-center text-sm">海运/陆运</td>
+                    <td className="px-3 py-3 text-center text-sm">无票小商品出口</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-3 font-medium"><span className="px-2 py-1 bg-teal-100 text-teal-700 rounded">1210</span></td>
+                    <td className="px-3 py-3 text-center">保税电商</td>
+                    <td className="px-3 py-3 text-center text-green-600 font-semibold">✅ 可退税</td>
+                    <td className="px-3 py-3 text-center">需要</td>
+                    <td className="px-3 py-3 text-center text-sm">保税区内配送</td>
+                    <td className="px-3 py-3 text-center text-sm">保税备货模式</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-orange-900 mb-4">🏪 1039市场采购贸易</h3>
-          <p className="text-sm text-gray-700 mb-4">在经认定的市场集聚区采购商品，享受特殊政策支持</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div className="bg-white rounded-lg p-4">
-              <p className="font-semibold text-gray-900 mb-2">✅ 核心优势：</p>
-              <ul className="text-gray-600 space-y-1 ml-4">
-                <li>• 免征不退：无需增值税发票</li>
-                <li>• 简化申报：按大类申报</li>
-                <li>• 允许多主体：可多人拼柜</li>
-                <li>• 便利收汇：允许人民币结算</li>
-              </ul>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <p className="font-semibold text-gray-900 mb-2">📍 试点地区：</p>
-              <ul className="text-gray-600 space-y-1 ml-4">
-                <li>• 浙江义乌（最早试点）</li>
-                <li>• 江苏海门叠石桥</li>
-                <li>• 广东花都皮革皮具市场</li>
-                <li>• 全国共39个试点地区</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border-2 border-red-200 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-red-900 mb-4">🚀 出口方式全面对比</h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-red-50">
-                <tr>
-                  <th className="px-4 py-3 text-left font-semibold">对比项</th>
-                  <th className="px-4 py-3 text-center font-semibold text-green-700">自营出口</th>
-                  <th className="px-4 py-3 text-center font-semibold text-blue-700">代理出口</th>
-                  <th className="px-4 py-3 text-center font-semibold text-orange-700">1039</th>
-                  <th className="px-4 py-3 text-center font-semibold text-red-700">买单</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                <tr>
-                  <td className="px-4 py-3 font-medium">合法性</td>
-                  <td className="px-4 py-3 text-center text-green-600">✅ 合法</td>
-                  <td className="px-4 py-3 text-center text-green-600">✅ 合法</td>
-                  <td className="px-4 py-3 text-center text-green-600">✅ 政策</td>
-                  <td className="px-4 py-3 text-center text-red-600">❌ 灰色</td>
-                </tr>
-                <tr className="bg-gray-50">
-                  <td className="px-4 py-3 font-medium">退税</td>
-                  <td className="px-4 py-3 text-center text-green-600">✅ 可退</td>
-                  <td className="px-4 py-3 text-center text-green-600">✅ 可退</td>
-                  <td className="px-4 py-3 text-center text-orange-600">⚠️ 免征</td>
-                  <td className="px-4 py-3 text-center text-red-600">❌ 不可</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-medium">增值税票</td>
-                  <td className="px-4 py-3 text-center">必须有</td>
-                  <td className="px-4 py-3 text-center">必须有</td>
-                  <td className="px-4 py-3 text-center text-orange-600">无需</td>
-                  <td className="px-4 py-3 text-center">不需要</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="bg-white border-2 border-green-200 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-green-900 mb-4">📦 订舱流程</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">订舱步骤：</h4>
-              <ol className="space-y-2 ml-4">
-                <li>① 选择货代（对比价格、服务）</li>
-                <li>② 提交订舱委托书</li>
-                <li>③ 货代向船公司订舱</li>
-                <li>④ 获取S/O（装货单）</li>
-                <li>⑤ 安排拖车提货</li>
-                <li>⑥ 报关装船</li>
-              </ol>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">关键时间节点：</h4>
-              <ul className="space-y-2 ml-4">
-                <li>• <strong>截关时间</strong>：必须在此时间前进场</li>
-                <li>• <strong>截单时间</strong>：提交提单补料截止</li>
-                <li>• <strong>开船时间 (ETD)</strong>：预计开船日期</li>
-                <li>• <strong>到港时间 (ETA)</strong>：预计到港日期</li>
-              </ul>
+          {/* 报关方式选择建议 */}
+          <div className="bg-white rounded-lg p-5 border-2 border-gray-200">
+            <h4 className="font-bold text-gray-900 mb-4">🎯 报关方式选择建议</h4>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold">业务场景</th>
+                    <th className="px-4 py-3 text-center font-semibold">推荐报关方式</th>
+                    <th className="px-4 py-3 text-left font-semibold">原因</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  <tr className="bg-green-50">
+                    <td className="px-4 py-3 font-medium">传统B2B玩具批发 ⭐</td>
+                    <td className="px-4 py-3 text-center"><span className="px-2 py-1 bg-red-100 text-red-700 rounded">0110</span></td>
+                    <td className="px-4 py-3 text-sm">有增值税票，可退税，流程成熟</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-3 font-medium">跨境电商B2C零售</td>
+                    <td className="px-4 py-3 text-center"><span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">9610</span></td>
+                    <td className="px-4 py-3 text-sm">小额高频，清单核放，通关快</td>
+                  </tr>
+                  <tr className="bg-green-50">
+                    <td className="px-4 py-3 font-medium">跨境电商B2B订单</td>
+                    <td className="px-4 py-3 text-center"><span className="px-2 py-1 bg-green-100 text-green-700 rounded">9710</span></td>
+                    <td className="px-4 py-3 text-sm">简化申报，优先查验</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-3 font-medium">亚马逊FBA备货</td>
+                    <td className="px-4 py-3 text-center"><span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">9810</span></td>
+                    <td className="px-4 py-3 text-sm">批量出口至海外仓，合规</td>
+                  </tr>
+                  <tr className="bg-yellow-50">
+                    <td className="px-4 py-3 font-medium">无票小商品出口</td>
+                    <td className="px-4 py-3 text-center"><span className="px-2 py-1 bg-orange-100 text-orange-700 rounded">1039</span></td>
+                    <td className="px-4 py-3 text-sm">免征不退，无需增值税票</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -244,6 +248,280 @@ export default function LogisticsCustomsModule() {
                 <li>• 旺季提前1-2周订舱，避免舱位紧张</li>
                 <li>• 特殊货物（带电、液体、粉末）需提前说明</li>
               </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. 物流方案（含订舱流程） */}
+        <div id="logistics-plan" className="bg-white border-2 border-blue-200 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-blue-900 mb-4">✈️ 物流方案与订舱流程</h3>
+          
+          {/* 物流方式详细对比表 */}
+          <div className="bg-white rounded-lg p-5 border-2 border-gray-200 mb-8">
+            <h4 className="font-bold text-gray-900 mb-4">📊 物流方式详细对比表</h4>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-blue-50">
+                  <tr>
+                    <th className="px-3 py-3 text-left font-semibold">物流方式</th>
+                    <th className="px-3 py-3 text-center font-semibold">时效</th>
+                    <th className="px-3 py-3 text-center font-semibold">成本</th>
+                    <th className="px-3 py-3 text-center font-semibold">适合重量</th>
+                    <th className="px-3 py-3 text-center font-semibold">可退税</th>
+                    <th className="px-3 py-3 text-center font-semibold">报关要求</th>
+                    <th className="px-3 py-3 text-center font-semibold">适用场景</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  <tr className="bg-green-50">
+                    <td className="px-3 py-3 font-medium">国际快递</td>
+                    <td className="px-3 py-3 text-center">3-7天</td>
+                    <td className="px-3 py-3 text-center text-red-600">¥50-100/kg</td>
+                    <td className="px-3 py-3 text-center">&lt;50kg</td>
+                    <td className="px-3 py-3 text-center text-green-600">✅ 可退</td>
+                    <td className="px-3 py-3 text-center text-xs">9610/0110</td>
+                    <td className="px-3 py-3 text-center text-xs">样品、紧急小包裹</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-3 font-medium">空派专线 ⭐</td>
+                    <td className="px-3 py-3 text-center">7-15天</td>
+                    <td className="px-3 py-3 text-center text-orange-600">¥30-60/kg</td>
+                    <td className="px-3 py-3 text-center">10-500kg</td>
+                    <td className="px-3 py-3 text-center text-green-600">✅ 可退</td>
+                    <td className="px-3 py-3 text-center text-xs">0110一般贸易</td>
+                    <td className="px-3 py-3 text-center text-xs">中等批量B2B ⭐推荐</td>
+                  </tr>
+                  <tr className="bg-green-50">
+                    <td className="px-3 py-3 font-medium">海派专线</td>
+                    <td className="px-3 py-3 text-center">20-35天</td>
+                    <td className="px-3 py-3 text-center text-green-600">¥8-15/kg</td>
+                    <td className="px-3 py-3 text-center">&gt;100kg</td>
+                    <td className="px-3 py-3 text-center text-green-600">✅ 可退</td>
+                    <td className="px-3 py-3 text-center text-xs">0110一般贸易</td>
+                    <td className="px-3 py-3 text-center text-xs">大批量B2B ⭐最常用</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-3 font-medium">海运整柜FCL</td>
+                    <td className="px-3 py-3 text-center">20-40天</td>
+                    <td className="px-3 py-3 text-center text-green-600">$1500-4000/柜</td>
+                    <td className="px-3 py-3 text-center">&gt;15CBM</td>
+                    <td className="px-3 py-3 text-center text-green-600">✅ 可退</td>
+                    <td className="px-3 py-3 text-center text-xs">0110一般贸易</td>
+                    <td className="px-3 py-3 text-center text-xs">超大批量订单</td>
+                  </tr>
+                  <tr className="bg-yellow-50">
+                    <td className="px-3 py-3 font-medium">双清包税专线</td>
+                    <td className="px-3 py-3 text-center">15-30天</td>
+                    <td className="px-3 py-3 text-center text-orange-600">¥15-40/kg</td>
+                    <td className="px-3 py-3 text-center">&gt;50kg</td>
+                    <td className="px-3 py-3 text-center text-red-600 font-semibold">❌ 不可退</td>
+                    <td className="px-3 py-3 text-center text-xs text-red-600">货代代报</td>
+                    <td className="px-3 py-3 text-center text-xs">无进出口权企业</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-3 font-medium">中欧班列</td>
+                    <td className="px-3 py-3 text-center">12-18天</td>
+                    <td className="px-3 py-3 text-center text-blue-600">¥20-35/kg</td>
+                    <td className="px-3 py-3 text-center">&gt;500kg</td>
+                    <td className="px-3 py-3 text-center text-green-600">✅ 可退</td>
+                    <td className="px-3 py-3 text-center text-xs">0110一般贸易</td>
+                    <td className="px-3 py-3 text-center text-xs">欧洲市场大宗货物</td>
+                  </tr>
+                  <tr className="bg-green-50">
+                    <td className="px-3 py-3 font-medium">海运拼箱LCL</td>
+                    <td className="px-3 py-3 text-center">25-40天</td>
+                    <td className="px-3 py-3 text-center text-green-600">¥10-18/kg</td>
+                    <td className="px-3 py-3 text-center">1-15CBM</td>
+                    <td className="px-3 py-3 text-center text-green-600">✅ 可退</td>
+                    <td className="px-3 py-3 text-center text-xs">0110一般贸易</td>
+                    <td className="px-3 py-3 text-center text-xs">中小批量海运</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <p className="text-sm text-blue-900">
+                <strong>💡 提示：</strong>玩具批发最常用的组合是 <span className="px-2 py-1 bg-green-100 text-green-700 rounded">海派 + 0110一般贸易</span>，
+                成本低、可退税、时效适中。如果客户急需，可以选择 <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">空派 + 0110一般贸易</span>。
+              </p>
+            </div>
+          </div>
+
+          {/* 空派 vs 海派对比 */}
+          <div className="mb-8">
+            <h4 className="font-bold text-gray-900 mb-4">📊 空派 vs 海派对比</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* 空派 */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-5 border-2 border-blue-200">
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">✈️</span>
+                  <div>
+                    <h4 className="text-lg font-bold text-blue-700">空派（空运+派送）</h4>
+                    <p className="text-xs text-gray-600">Air Freight + Local Delivery</p>
+                  </div>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between border-b border-blue-200 pb-2">
+                    <span className="text-gray-600">全程时效：</span>
+                    <span className="font-bold text-blue-700">7-15天</span>
+                  </div>
+                  <div className="flex justify-between border-b border-blue-200 pb-2">
+                    <span className="text-gray-600">运输成本：</span>
+                    <span className="font-bold">¥30-60/kg</span>
+                  </div>
+                  <div className="flex justify-between border-b border-blue-200 pb-2">
+                    <span className="text-gray-600">适合重量：</span>
+                    <span className="font-bold">10-500kg</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">适合场景：</span>
+                    <span className="font-bold text-green-600">中等批量B2B</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-blue-300">
+                  <p className="text-xs text-gray-700"><strong>流程：</strong>国内仓 → 空运到目的国 → 清关 → 当地快递/卡车派送</p>
+                </div>
+              </div>
+
+              {/* 海派 */}
+              <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg p-5 border-2 border-green-200">
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">🚢</span>
+                  <div>
+                    <h4 className="text-lg font-bold text-green-700">海派（海运+派送）</h4>
+                    <p className="text-xs text-gray-600">Sea Freight + Local Delivery</p>
+                  </div>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between border-b border-green-200 pb-2">
+                    <span className="text-gray-600">全程时效：</span>
+                    <span className="font-bold text-green-700">20-35天</span>
+                  </div>
+                  <div className="flex justify-between border-b border-green-200 pb-2">
+                    <span className="text-gray-600">运输成本：</span>
+                    <span className="font-bold">¥8-15/kg</span>
+                  </div>
+                  <div className="flex justify-between border-b border-green-200 pb-2">
+                    <span className="text-gray-600">适合重量：</span>
+                    <span className="font-bold">100kg以上</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">适合场景：</span>
+                    <span className="font-bold text-green-600">大批量B2B</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-green-300">
+                  <p className="text-xs text-gray-700"><strong>流程：</strong>国内仓 → 海运到目的港 → 清关 → 当地快递/卡车派送</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 双清包税说明 */}
+          <div className="bg-yellow-50 rounded-lg p-5 border-2 border-yellow-300 mb-8">
+            <h4 className="font-bold text-yellow-900 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              关于“双清包税”专线的重要说明
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h5 className="font-semibold text-green-700 mb-3">✅ 优点</h5>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  <li>• 省事：货代代清关，不用自己找报关行</li>
+                  <li>• 成本可控：运费=全包价（含关税）</li>
+                  <li>• 适合无进出口权的企业</li>
+                </ul>
+              </div>
+              <div>
+                <h5 className="font-semibold text-red-700 mb-3">❌ 缺点</h5>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  <li>• <strong>无法退税</strong>（因为不是您自己报关）</li>
+                  <li>• 无法抵扣进项税</li>
+                  <li>• 财务不透明，无法取得报关单</li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-yellow-300 bg-white rounded-lg p-4">
+              <p className="text-sm text-red-700 font-bold">
+                ⚠️ 重要提醒：如果您的目的是退税，<strong>不要走双清包税</strong>！必须自己报关（0110一般贸易）。
+              </p>
+            </div>
+          </div>
+
+          {/* 订舱流程 */}
+          <div className="bg-white border-2 border-green-200 rounded-xl p-6">
+            <h4 className="text-xl font-bold text-green-900 mb-4">📦 订舱流程详解</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+              <div>
+                <h5 className="font-semibold text-gray-900 mb-3">订舱步骤：</h5>
+                <ol className="space-y-2 ml-4">
+                  <li>① 选择货代（对比价格、服务）</li>
+                  <li>② 提交订舱委托书</li>
+                  <li>③ 货代向船公司订舱</li>
+                  <li>④ 获取S/O（装货单）</li>
+                  <li>⑤ 安排拖车提货</li>
+                  <li>⑥ 报关装船</li>
+                </ol>
+              </div>
+              <div>
+                <h5 className="font-semibold text-gray-900 mb-3">关键时间节点：</h5>
+                <ul className="space-y-2 ml-4">
+                  <li>• <strong>截关时间</strong>：必须在此时间前进场</li>
+                  <li>• <strong>截单时间</strong>：提交提单补料截止</li>
+                  <li>• <strong>开船时间 (ETD)</strong>：预计开船日期</li>
+                  <li>• <strong>到港时间 (ETA)</strong>：预计到港日期</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* 物流方案选择建议 */}
+          <div className="mt-8 bg-blue-50 rounded-lg p-5 border-2 border-blue-200">
+            <h4 className="font-bold text-blue-900 mb-4">📋 物流方案选择建议</h4>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-white">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold">订单类型</th>
+                    <th className="px-4 py-3 text-center font-semibold">推荐方案</th>
+                    <th className="px-4 py-3 text-center font-semibold">报关方式</th>
+                    <th className="px-4 py-3 text-center font-semibold">时效</th>
+                    <th className="px-4 py-3 text-center font-semibold">是否可退税</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-blue-200">
+                  <tr className="bg-white">
+                    <td className="px-4 py-3 font-medium">样品/小包裹</td>
+                    <td className="px-4 py-3 text-center">国际快递</td>
+                    <td className="px-4 py-3 text-center">9610或0110</td>
+                    <td className="px-4 py-3 text-center">3-7天</td>
+                    <td className="px-4 py-3 text-center text-green-600">✅ 可退</td>
+                  </tr>
+                  <tr className="bg-green-50">
+                    <td className="px-4 py-3 font-medium">中等批量B2B ⭐</td>
+                    <td className="px-4 py-3 text-center">空派专线</td>
+                    <td className="px-4 py-3 text-center">0110一般贸易</td>
+                    <td className="px-4 py-3 text-center">7-15天</td>
+                    <td className="px-4 py-3 text-center text-green-600">✅ 可退</td>
+                  </tr>
+                  <tr className="bg-white">
+                    <td className="px-4 py-3 font-medium">大批量B2B</td>
+                    <td className="px-4 py-3 text-center">海派专线</td>
+                    <td className="px-4 py-3 text-center">0110一般贸易</td>
+                    <td className="px-4 py-3 text-center">20-35天</td>
+                    <td className="px-4 py-3 text-center text-green-600">✅ 可退</td>
+                  </tr>
+                  <tr className="bg-yellow-50">
+                    <td className="px-4 py-3 font-medium">亚马逊FBA</td>
+                    <td className="px-4 py-3 text-center">海派/空派</td>
+                    <td className="px-4 py-3 text-center">9810海外仓</td>
+                    <td className="px-4 py-3 text-center">7-35天</td>
+                    <td className="px-4 py-3 text-center text-green-600">✅ 可退</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

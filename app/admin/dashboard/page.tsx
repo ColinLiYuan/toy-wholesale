@@ -129,10 +129,10 @@ export default function DashboardPage() {
             <span className="mr-2">📝</span> 发布新文章
           </Link>
           <Link
-            href="/admin/products"
+            href="/admin/inquiries"
             className="flex items-center justify-center px-6 py-4 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
           >
-            <span className="mr-2">📋</span> 管理产品列表
+            <span className="mr-2">💬</span> 管理询盘
           </Link>
         </div>
       </div>

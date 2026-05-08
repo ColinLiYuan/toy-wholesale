@@ -1,14 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+
+// 检查是否已登录
+const checkAuth = () => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('admin_token');
+    return !!token;
+  }
+  return false;
+};
 
 // 定义导航菜单，支持子菜单
 const navigation = [
   { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
   { name: '产品管理', href: '/admin/products', icon: '📦' },
   { name: '潜客管理', href: '/admin/leads', icon: '👥' },
+  { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
+  { name: '管理员管理', href: '/admin/admins', icon: '🔐' },
+  { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
   { name: '博客管理', href: '/admin/blog', icon: '📝' },
   { name: '运营账号', href: '/admin/operation-accounts', icon: '🌐' },
   { name: '报价计算器', href: '/admin/quotation-calculator', icon: '💰' },
@@ -33,9 +45,54 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // 跟踪哪些菜单项是展开的
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // 标记客户端渲染
+  useEffect(() => {
+    setIsClient(true);
+    
+    // 排除登录页面
+    if (pathname === '/admin/login') {
+      setIsAuthenticated(true);
+      return;
+    }
+    
+    const isLoggedIn = checkAuth();
+    setIsAuthenticated(isLoggedIn);
+    
+    if (!isLoggedIn) {
+      router.push('/admin/login');
+    }
+  }, [pathname, router]);
+
+  // 服务端渲染或客户端初始化期间，显示加载中
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0056B3] mx-auto mb-4"></div>
+          <p className="text-gray-600">正在验证身份...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 如果未登录且不在登录页面，显示加载中
+  if (pathname !== '/admin/login' && !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0056B3] mx-auto mb-4"></div>
+          <p className="text-gray-600">正在跳转...</p>
+        </div>
+      </div>
+    );
+  }
 
   const toggleMenu = (name: string) => {
     setExpandedMenus(prev => ({
@@ -154,6 +211,24 @@ export default function AdminLayout({
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600">管理员</span>
+            <button
+              onClick={async () => {
+                // 清除 localStorage
+                localStorage.removeItem('admin_token');
+                localStorage.removeItem('admin_info');
+                
+                // 清除 cookie
+                await fetch('/api/admin/logout', {
+                  method: 'POST',
+                });
+                
+                // 跳转到登录页
+                router.push('/admin/login');
+              }}
+              className="text-sm text-red-500 hover:text-red-700 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+            >
+              登出
+            </button>
             <div className="w-8 h-8 bg-[#0056B3] rounded-full flex items-center justify-center text-white font-bold">
               A
             </div>

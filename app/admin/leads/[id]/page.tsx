@@ -90,6 +90,48 @@ export default function LeadDetailPage() {
     }
   };
 
+  const handleQuickConvert = async () => {
+    const customerType = prompt(
+      `请选择客户类型（输入数字）：\n1. 正规经销商 (REGULAR)\n2. 小B商户 (SMALL_BUSINESS)\n3. 个人客户 (INDIVIDUAL)\n\n默认为小B商户`,
+      '2'
+    );
+    
+    if (customerType === null) return; // 用户取消
+    
+    const typeMap: Record<string, string> = {
+      '1': 'REGULAR',
+      '2': 'SMALL_BUSINESS',
+      '3': 'INDIVIDUAL',
+    };
+    
+    const selectedType = typeMap[customerType] || 'SMALL_BUSINESS';
+    
+    if (!lead) return;
+    
+    if (!confirm(`确定要将 "${lead.companyName || lead.contactPerson}" 快速转化为 ${selectedType} 类型的经销商吗？\n系统将自动生成账号和密码。`)) {
+      return;
+    }
+    
+    try {
+      const result = await leadAdminService.quickConvertToDistributor(leadId, selectedType);
+      
+      // 显示生成的账号信息
+      alert(
+        `转化成功！\n\n` +
+        `经销商ID: ${result.distributorId}\n` +
+        `邮箱: ${result.email}\n` +
+        `密码: ${result.password}\n` +
+        `客户类型: ${result.customerTypeDescription}\n\n` +
+        `请妥善保存账号信息并发送给客户。`
+      );
+      
+      fetchLead();
+    } catch (error: any) {
+      console.error('Failed to convert lead:', error);
+      alert('转化失败：' + error.message);
+    }
+  };
+
   const getStatusText = (status: string) => {
     const statusMap: Record<string, string> = {
       NEW: '新线索',
@@ -456,6 +498,33 @@ export default function LeadDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* 转化信息 */}
+      {lead.isConverted && (
+        <div className="bg-green-50 border border-green-200 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-green-900 mb-4">✅ 已转化为经销商</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-green-700">经销商ID</p>
+              <p className="text-lg font-semibold text-green-900">{lead.convertedDistributorId}</p>
+            </div>
+            <div>
+              <p className="text-sm text-green-700">转化时间</p>
+              <p className="text-lg font-semibold text-green-900">
+                {lead.convertedAt ? new Date(lead.convertedAt).toLocaleString('zh-CN') : '-'}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <Link
+              href={`/admin/distributors/${lead.convertedDistributorId}`}
+              className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              查看经销商详情 →
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* 状态历史 */}
       <div className="bg-white rounded-xl shadow-sm p-6">

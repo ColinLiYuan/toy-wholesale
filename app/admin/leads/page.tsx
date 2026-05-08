@@ -47,7 +47,7 @@ export default function LeadsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('确定要删除此潜客吗？')) return;
+    if (!confirm('确认删除此潜客？此操作不可恢复！')) return;
     try {
       await leadAdminService.deleteLead(id);
       fetchLeads();
@@ -55,6 +55,46 @@ export default function LeadsPage() {
     } catch (error) {
       console.error('Failed to delete lead:', error);
       alert('删除失败');
+    }
+  };
+
+  const handleQuickConvert = async (leadId: number, companyName: string) => {
+    const customerType = prompt(
+      `请选择客户类型（输入数字）：\n1. 普通经销商 (REGULAR)\n2. 小型企业 (SMALL_BUSINESS)\n3. 个人 (INDIVIDUAL)\n\n默认：小型企业`,
+      '2'
+    );
+    
+    if (customerType === null) return;
+    
+    const typeMap: Record<string, string> = {
+      '1': 'REGULAR',
+      '2': 'SMALL_BUSINESS',
+      '3': 'INDIVIDUAL',
+    };
+    
+    const selectedType = typeMap[customerType] || 'SMALL_BUSINESS';
+    
+    if (!confirm(`确认将“${companyName}”转化为${selectedType}经销商？\n系统将自动生成账号和密码。`)) {
+      return;
+    }
+    
+    try {
+      const result = await leadAdminService.quickConvertToDistributor(leadId, selectedType);
+      
+      alert(
+        `转化成功！\n\n` +
+        `经销商 ID: ${result.distributorId}\n` +
+        `邮箱: ${result.email}\n` +
+        `密码: ${result.password}\n` +
+        `客户类型: ${result.customerTypeDescription}\n\n` +
+        `请保存账号信息并发送给客户。`
+      );
+      
+      fetchLeads();
+      fetchStatistics();
+    } catch (error: any) {
+      console.error('Failed to convert lead:', error);
+      alert('转化失败: ' + error.message);
     }
   };
 
@@ -66,7 +106,7 @@ export default function LeadsPage() {
       alert('状态更新成功');
     } catch (error: any) {
       console.error('Failed to update status:', error);
-      alert('状态更新失败：' + error.message);
+      alert('状态更新失败: ' + error.message);
     }
   };
 
@@ -77,7 +117,7 @@ export default function LeadsPage() {
       INTERESTED: '有意向',
       QUOTED: '已报价',
       NEGOTIATING: '谈判中',
-      CONVERTED: '已成交',
+      CONVERTED: '已转化',
       INVALID: '无效',
     };
     return statusMap[status] || status;
@@ -114,6 +154,18 @@ export default function LeadsPage() {
     return colorMap[priority] || 'bg-gray-100 text-gray-800';
   };
 
+  const getSourceText = (source: string) => {
+    const sourceMap: Record<string, string> = {
+      EMAIL: '邮件开发',
+      EXHIBITION: '展会',
+      WEBSITE: '网站询盘',
+      REFERRAL: '推荐',
+      COLD_CALL: '电话开发',
+      MYTH_TOY: 'MythToy',
+    };
+    return sourceMap[source] || source || '-';
+  };
+
   // 定义状态流转规则
   const statusTransitions: Record<string, string[]> = {
     NEW: ['CONTACTED', 'INVALID'],
@@ -143,7 +195,7 @@ export default function LeadsPage() {
 
   return (
     <div className="space-y-6">
-      {/* 页面标题 */}
+      {/* Page Title */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">潜客管理</h1>
@@ -308,7 +360,7 @@ export default function LeadsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {lead.source || '-'}
+                        {getSourceText(lead.source || '')}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
@@ -318,12 +370,12 @@ export default function LeadsPage() {
                           >
                             查看
                           </Link>
-                          <button
-                            onClick={() => handleDelete(lead.id)}
-                            className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                          <Link
+                            href={`/admin/leads/${lead.id}/edit`}
+                            className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-colors"
                           >
-                            删除
-                          </button>
+                            编辑
+                          </Link>
                         </div>
                       </td>
                     </tr>

@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { productService } from '@/services';
 import type { Product } from '@/types';
-import translations from '@/lib/i18n';
 import { R2_BASE_URL } from '@/lib/r2-config';
 
 export default function ProductDetailPage() {

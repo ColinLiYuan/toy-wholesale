@@ -4,7 +4,8 @@ import { API_BASE_URL, BACKEND_BASE_URL } from './api-config';
 // 获取后端 API 的绝对地址（用于 Server Component）
 const getAbsoluteBaseUrl = () => {
   if (typeof window === 'undefined') {
-    // Server Component 环境，使用环境变量中的后端地址
+    // Server Component 环境，直接使用后端地址（不走 Next.js 代理）
+    // 后端接口路径是 /api/v1/xxx，所以需要加上 /api
     return `${BACKEND_BASE_URL}/api`;
   }
   // Client Component 环境，使用相对路径（走 Next.js 代理）
@@ -23,6 +24,9 @@ const apiClient = axios.create({
 // 请求拦截器
 apiClient.interceptors.request.use(
   (config) => {
+    // 添加多租户标识
+    config.headers['X-Site-Id'] = 'toy';
+    
     // 可以在这里添加 token 等认证信息
     // 注意：Server Component 中无法使用 localStorage
     if (typeof window !== 'undefined') {

@@ -20,7 +20,7 @@ export default function NewProductPage() {
     alt: '',
     description: '',
     shortDescription: '',
-    currentPrice: 0,
+    currentPrice: undefined,
     status: 'ACTIVE',
     colors: [],
     tags: [],
@@ -35,6 +35,7 @@ export default function NewProductPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [skus, setSkus] = useState<ProductSku[]>([]);
   const [specifications, setSpecifications] = useState<ProductSpecification[]>([]);
+  const [galleries, setGalleries] = useState<Array<{ imageUrl: string; alt?: string; sortOrder: number; isPrimary: boolean }>>([]);
   
   // 特性管理
   const [featureKey, setFeatureKey] = useState('');
@@ -109,6 +110,79 @@ export default function NewProductPage() {
     setSpecifications(specifications.filter((_, i) => i !== index));
   };
 
+  // 相册管理
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    try {
+      setLoading(true);
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/v1/upload/product', {
+          method: 'POST',
+          headers: {
+            'X-Site-Id': 'toy',
+          },
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (result.code === 200 && result.data) {
+          setGalleries(prev => [...prev, {
+            imageUrl: result.data,
+            alt: '',
+            sortOrder: prev.length,
+            isPrimary: prev.length === 0, // 第一张设为主图
+          }]);
+        }
+      }
+      
+      alert(`成功上传 ${files.length} 张图片！`);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('图片上传失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeGallery = (index: number) => {
+    const updated = galleries.filter((_, i) => i !== index);
+    // 如果删除的是主图，将第一张设为主图
+    if (galleries[index].isPrimary && updated.length > 0) {
+      updated[0].isPrimary = true;
+    }
+    setGalleries(updated);
+  };
+
+  const setAsPrimary = (index: number) => {
+    const updated = galleries.map((g, i) => ({
+      ...g,
+      isPrimary: i === index,
+    }));
+    setGalleries(updated);
+  };
+
+  const moveGallery = (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= galleries.length) return;
+    
+    const updated = [...galleries];
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    
+    // 更新 sortOrder
+    updated.forEach((g, i) => {
+      g.sortOrder = i;
+    });
+    
+    setGalleries(updated);
+  };
+
   // 图片上传处理
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -121,6 +195,9 @@ export default function NewProductPage() {
 
       const response = await fetch('/api/v1/upload/product', {
         method: 'POST',
+        headers: {
+          'X-Site-Id': 'toy',
+        },
         body: formData,
       });
 
@@ -155,8 +232,9 @@ export default function NewProductPage() {
       alert('请输入产品 Slug');
       return;
     }
-    if (product.currentPrice === undefined || product.currentPrice === null || product.currentPrice <= 0) {
-      alert('请输入正确的当前价格');
+    // 价格改为非必填，但如果填写了必须是正数
+    if (product.currentPrice !== undefined && product.currentPrice !== null && product.currentPrice <= 0) {
+      alert('如果填写价格，必须是正数');
       return;
     }
 
@@ -195,7 +273,28 @@ export default function NewProductPage() {
       
       console.log('Submitting product data:', JSON.stringify(productData, null, 2));
       
-      await productAdminService.createProduct(productData);
+      // 创建产品
+      const createdProduct = await productAdminService.createProduct(productData);
+      
+      // 如果有相册，上传相册
+      if (galleries.length > 0 && createdProduct.id) {
+        try {
+          for (const gallery of galleries) {
+            await fetch(`/api/v1/products/admin/${createdProduct.id}/galleries`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Site-Id': 'toy',
+              },
+              body: JSON.stringify(gallery),
+            });
+          }
+          console.log('Galleries uploaded successfully');
+        } catch (error) {
+          console.error('Failed to upload galleries:', error);
+        }
+      }
+      
       alert('产品创建成功！');
       router.push('/admin/products');
     } catch (error) {
@@ -364,15 +463,15 @@ export default function NewProductPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                当前价格 *
+                当前价格
               </label>
               <input
                 type="number"
                 step="0.01"
-                value={product.currentPrice}
-                onChange={(e) => setProduct({ ...product, currentPrice: parseFloat(e.target.value) })}
+                value={product.currentPrice ?? ''}
+                onChange={(e) => setProduct({ ...product, currentPrice: e.target.value ? parseFloat(e.target.value) : undefined })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                required
+                placeholder="选填"
               />
             </div>
             <div>
@@ -518,6 +617,101 @@ export default function NewProductPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 产品相册 */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">产品相册（Gallery）</h2>
+            <label className="px-4 py-2 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors cursor-pointer">
+              + 上传图片
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleGalleryUpload}
+                className="hidden"
+              />
+            </label>
+          </div>
+          
+          {galleries.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {galleries.map((gallery, index) => (
+                <div key={index} className="relative group border border-gray-200 rounded-lg overflow-hidden">
+                  <img
+                    src={gallery.imageUrl.startsWith('http') ? gallery.imageUrl : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${gallery.imageUrl}`}
+                    alt={gallery.alt || 'Product image'}
+                    className="w-full h-32 object-cover"
+                  />
+                  
+                  {gallery.isPrimary && (
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-green-500 text-white text-xs font-bold rounded">
+                      主图
+                    </div>
+                  )}
+                  
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="flex space-x-2">
+                      {!gallery.isPrimary && (
+                        <button
+                          type="button"
+                          onClick={() => setAsPrimary(index)}
+                          className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                        >
+                          设为主图
+                        </button>
+                      )}
+                      {index > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => moveGallery(index, 'up')}
+                          className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+                        >
+                          ↑
+                        </button>
+                      )}
+                      {index < galleries.length - 1 && (
+                        <button
+                          type="button"
+                          onClick={() => moveGallery(index, 'down')}
+                          className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+                        >
+                          ↓
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeGallery(index)}
+                        className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="p-2 bg-gray-50">
+                    <input
+                      type="text"
+                      value={gallery.alt}
+                      onChange={(e) => {
+                        const updated = [...galleries];
+                        updated[index].alt = e.target.value;
+                        setGalleries(updated);
+                      }}
+                      placeholder="Alt 文本"
+                      className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <p className="text-gray-500">暂无相册图片</p>
+              <p className="text-xs text-gray-400 mt-1">点击上方按钮上传多张图片</p>
+            </div>
+          )}
         </div>
 
         {/* 产品特性（JSON对象格式） */}

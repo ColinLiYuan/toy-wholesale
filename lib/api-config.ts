@@ -1,8 +1,11 @@
 // API 基础配置
 // 使用相对路径 /api，由 Next.js rewrites 代理到真实 API
+// 这样可以解决 Vercel HTTPS 与后端 HTTP 的混合内容问题
 export const API_BASE_URL = '/api';
 
-// 后端服务基础 URL（从环境变量读取，用于 SSR 环境下的 API 请求）
+// 后端服务基础 URL（用于 SSR/服务端组件环境下的 API 请求）
+// 注意：在服务端组件中，axios 默认会使用相对路径，
+// 但如果需要直接调用后端，可以使用此变量
 export const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
 
 // Cloudflare R2 CDN 地址（从环境变量读取，用于图片等静态资源）
@@ -60,4 +63,39 @@ export const API_ENDPOINTS = {
   ADMIN_BLOG_UPDATE: '/v1/blog/posts',     // PUT /v1/blog/posts/{id}
   ADMIN_BLOG_DELETE: '/v1/blog/posts',     // DELETE /v1/blog/posts/{id}
   ADMIN_BLOG_PUBLISH: '/v1/blog/posts',    // POST /v1/blog/posts/{id}/publish
+  
+  // 潜客管理（后台管理接口）
+  ADMIN_LEADS: '/v1/leads',                          // GET /v1/leads
+  ADMIN_LEAD_DETAIL: '/v1/leads',                    // GET /v1/leads/{id}
+  ADMIN_LEAD_CREATE: '/v1/leads',                    // POST /v1/leads
+  ADMIN_LEAD_UPDATE: '/v1/leads',                    // PUT /v1/leads/{id}
+  ADMIN_LEAD_DELETE: '/v1/leads',                    // DELETE /v1/leads/{id}
+  ADMIN_LEADS_BY_STATUS: '/v1/leads/status',         // GET /v1/leads/status/{status}
+  ADMIN_LEADS_SEARCH: '/v1/leads/search',            // GET /v1/leads/search?keyword=xxx
+  ADMIN_LEAD_FOLLOW_UPS: '/v1/leads',                // POST /v1/leads/{id}/follow-ups
+  ADMIN_LEAD_CONVERT: '/v1/leads',                   // POST /v1/leads/{id}/convert
+  ADMIN_LEAD_STATISTICS: '/v1/leads/statistics',     // GET /v1/leads/statistics
+  ADMIN_LEAD_STATUS_UPDATE: '/v1/leads',             // PATCH /v1/leads/{id}/status
+  ADMIN_LEAD_STATUS_HISTORY: '/v1/leads',            // GET /v1/leads/{id}/status-history
+  
+  // 经销商管理（后台管理接口）
+  ADMIN_DISTRIBUTORS: '/v1/distributors',            // GET /v1/distributors
+  ADMIN_DISTRIBUTOR_DETAIL: '/v1/distributors',      // GET /v1/distributors/{id}
+  ADMIN_DISTRIBUTOR_CREATE: '/v1/distributors',      // POST /v1/distributors
+  ADMIN_DISTRIBUTOR_UPDATE: '/v1/distributors',      // PUT /v1/distributors/{id}
+  ADMIN_DISTRIBUTOR_DELETE: '/v1/distributors',      // DELETE /v1/distributors/{id}
+  
+  // 订单管理（后台管理接口）
+  ADMIN_ORDERS: '/v1/inquiry-orders',                // GET /v1/inquiry-orders
+  ADMIN_ORDER_DETAIL: '/v1/inquiry-orders',          // GET /v1/inquiry-orders/{id}
+  ADMIN_ORDER_CREATE: '/v1/inquiry-orders',          // POST /v1/inquiry-orders
+  ADMIN_ORDER_UPDATE: '/v1/inquiry-orders',          // PUT /v1/inquiry-orders/{id}
+  ADMIN_ORDER_DELETE: '/v1/inquiry-orders',          // DELETE /v1/inquiry-orders/{id}
+  ADMIN_ORDER_STATUS: '/v1/inquiry-orders',          // PATCH /v1/inquiry-orders/{id}/status
+  ADMIN_ORDERS_BY_DISTRIBUTOR: '/v1/inquiry-orders/distributor',  // GET /v1/inquiry-orders/distributor/{id}
+  ADMIN_ORDERS_BY_STATUS: '/v1/inquiry-orders/status',  // GET /v1/inquiry-orders/status/{status}
+  
+  // 灵活订单管理（潜客转化和快速下单）
+  FLEXIBLE_QUICK_CONVERT: '/v1/flexible-orders/leads',  // POST /v1/flexible-orders/leads/{id}/quick-convert
+  FLEXIBLE_CREATE_ORDER: '/v1/flexible-orders/create-direct',  // POST /v1/flexible-orders/create-direct
 } as const;

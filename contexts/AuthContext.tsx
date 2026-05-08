@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService } from '@/services';
 import type { Distributor } from '@/types';
+import { getSessionId, clearSessionId } from '@/lib/session-id';
 
 interface AuthContextType {
   user: Distributor | null;
@@ -48,7 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const response = await authService.login(email, password);
+      
+      // 获取 sessionId 用于合并购物车
+      const sessionId = getSessionId();
+      
+      const response = await authService.login(email, password, sessionId);
       
       console.log('Login response:', response); // 调试日志
       
@@ -59,6 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // 持久化到 localStorage
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.distributor));
+        
+        // 登录成功后清除 sessionId（已合并到后端）
+        clearSessionId();
       } else {
         console.error('Invalid response structure:', response);
         throw new Error('Login failed: Invalid response');
