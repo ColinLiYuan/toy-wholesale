@@ -33,7 +33,7 @@ apiClient.interceptors.request.use(
     // 调试日志：输出请求信息
     console.log('[API Request]', {
       method: config.method?.toUpperCase(),
-      url: config.baseURL + config.url,
+      url: (config.baseURL || '') + config.url,
       headers: config.headers,
     });
     
