@@ -79,6 +79,8 @@ export default function InquiryCartPage() {
   const handleSubmitInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('[InquiryCart] Form submitted');
+
     // Validate required fields
     if (!customerInfo.customerName || !customerInfo.customerEmail) {
       alert('Please fill in your name and email');
@@ -100,8 +102,12 @@ export default function InquiryCartPage() {
         source: 'WEBSITE_FORM',
       };
 
+      console.log('[InquiryCart] Submitting inquiry data:', inquiryData);
+
       // Submit inquiry
       const result = await inquiryService.submitInquiry(inquiryData as any);
+
+      console.log('[InquiryCart] Inquiry submitted successfully:', result);
 
       // Clear inquiry cart
       await inquiryCartUtils.clearCart();
@@ -112,7 +118,7 @@ export default function InquiryCartPage() {
       // Redirect to homepage
       router.push('/');
     } catch (error) {
-      console.error('Failed to submit inquiry:', error);
+      console.error('[InquiryCart] Failed to submit inquiry:', error);
       alert('Submission failed, please try again later');
     } finally {
       setSubmitting(false);

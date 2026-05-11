@@ -22,9 +22,21 @@ export default function NewLeadPage() {
       await leadAdminService.createLead(formData);
       alert('潜客创建成功');
       router.push('/admin/leads');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create lead:', error);
-      alert('创建失败');
+      
+      // 提取错误信息
+      let errorMessage = '创建失败';
+      
+      if (error.response?.data?.message) {
+        // 后端返回的错误消息
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        // Axios 错误消息
+        errorMessage = error.message;
+      }
+      
+      alert(`创建失败：${errorMessage}`);
     } finally {
       setLoading(false);
     }

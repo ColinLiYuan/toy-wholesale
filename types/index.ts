@@ -270,6 +270,7 @@ export interface ShoppingCart {
 // 潜在客户类型 - 根据后端实体 Lead
 export interface Lead {
   id: number;
+  siteId?: string;  // 站点标识（用于多租户隔离）
   companyName?: string;
   contactPerson?: string;
   position?: string;

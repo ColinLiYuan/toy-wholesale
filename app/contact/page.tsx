@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { inquiryService } from '@/services';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -26,6 +27,8 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('[ContactPage] Form submitted');
+    
     if (!formData.name || !formData.email || !formData.company || !formData.businessType || !formData.message) {
       setError('Please fill in all required fields');
       return;
@@ -36,11 +39,28 @@ export default function ContactPage() {
     setSuccess(false);
 
     try {
-      // TODO: 实现实际的 API 调用
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Build inquiry data
+      const inquiryData = {
+        customerName: formData.name,
+        customerEmail: formData.email,
+        companyName: formData.company,
+        website: formData.website,
+        businessType: formData.businessType,
+        message: formData.message,
+        source: 'WEBSITE_FORM',
+      };
+
+      console.log('[ContactPage] Submitting inquiry:', inquiryData);
+
+      // Submit inquiry to backend
+      const result = await inquiryService.submitInquiry(inquiryData as any);
+
+      console.log('[ContactPage] Inquiry submitted successfully:', result);
+
       setSuccess(true);
       setFormData({ name: '', email: '', company: '', website: '', businessType: '', message: '' });
     } catch (err) {
+      console.error('[ContactPage] Failed to submit inquiry:', err);
       setError(err instanceof Error ? err.message : 'Failed to send inquiry');
     } finally {
       setLoading(false);

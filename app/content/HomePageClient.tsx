@@ -83,19 +83,19 @@ export default function HomePageClient() {
               </div>
               <div>
                 <div className="text-sm font-semibold text-[#1A1A1A]">Fast Shipping</div>
-                <div className="text-xs text-[#6C757D]">Global Delivery</div>
+                <div className="text-xs text-[#6C757D]">Air express 3-7 days delivery</div>
               </div>
             </div>
             
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
               <div>
-                <div className="text-sm font-semibold text-[#1A1A1A]">Drop-shipping</div>
-                <div className="text-xs text-[#6C757D]">Friendly</div>
+                <div className="text-sm font-semibold text-[#1A1A1A]">Discreet Packaging</div>
+                <div className="text-xs text-[#6C757D]">Your privacy is our priority</div>
               </div>
             </div>
             
@@ -118,12 +118,12 @@ export default function HomePageClient() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] mb-4">
+            <p className="text-lg text-[#6C757D] max-w-3xl mx-auto mb-4 font-medium">
+              Safety & Quality Guaranteed: All products meet medical-grade silicone standards.
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A]">
               Certified & Compliant
             </h2>
-            <p className="text-lg text-[#6C757D] max-w-3xl mx-auto">
-              All products meet international safety and quality standards
-            </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -134,8 +134,8 @@ export default function HomePageClient() {
               { name: 'Phthalate-Free', desc: 'Body-Safe Materials' },
             ].map((cert, index) => (
               <div key={index} className="bg-[#F8F9FA] rounded-xl p-6 border border-gray-200 text-center hover:border-[#0056B3] transition-colors">
-                <div className="w-16 h-16 rounded-full bg-[#0056B3]/10 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-20 h-20 rounded-full bg-[#0056B3]/10 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -253,30 +253,48 @@ export default function HomePageClient() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                name: 'Pro Prostate Massager Model X',
-                material: 'Liquid Silicone + ABS',
-                feature: 'Dual Motor, App Control',
+                id: 'WL-020',
+                name: 'WL-020 Thrusting & Peristaltic Massager',
+                image: '/products/wl-020.jpg',
+                material: 'Medical Grade Silicone + ABS',
+                feature: 'Dual Motor, App Control,伸缩蠕动',
                 moq: '50 pcs',
+                tag: '技术标杆',
               },
               {
-                name: 'Rechargeable Wand Vibrator',
-                material: 'Medical Grade Silicone',
-                feature: '10 Vibration Modes, IPX7',
+                id: 'AHT-016',
+                name: 'AHT-016 Pelvic Floor Trainer (Whale Tail)',
+                image: '/products/aht-016.jpg',
+                material: 'Liquid Silicone',
+                feature: 'Health Training, 鲸鱼尾训练器',
                 moq: '50 pcs',
+                tag: '健康训练',
               },
               {
-                name: 'Luxury Bondage Kit Premium',
-                material: 'Genuine Leather',
-                feature: '7 Pieces, Adjustable',
-                moq: '100 sets',
+                id: 'WL-025',
+                name: 'WL-025 Velvet Gradient Vibrator',
+                image: '/products/wl-025.jpg',
+                material: 'Velvet Gradient Silicone',
+                feature: 'Purple Gradient, 紫色渐变款',
+                moq: '50 pcs',
+                tag: '时尚颜值',
               },
             ].map((product, index) => (
               <div key={index} className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
                 {/* Product Image */}
-                <div className="relative h-64 bg-[#F8F9FA] flex items-center justify-center">
-                  <svg className="w-24 h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                <div className="relative h-64 bg-white flex items-center justify-center overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder-product.svg';
+                    }}
+                  />
+                  {/* Tag Badge */}
+                  <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-[#0056B3] to-purple-600 text-white text-xs font-semibold rounded-full">
+                    {product.tag}
+                  </div>
                 </div>
 
                 {/* Product Info */}
@@ -312,12 +330,12 @@ export default function HomePageClient() {
                   </div>
 
                   {/* CTA Button */}
-                  <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="w-full py-3 rounded-lg bg-[#0056B3] text-white font-semibold hover:bg-[#004494] transition-colors duration-200"
+                  <Link
+                    href={`/contact?product=${product.id}`}
+                    className="block w-full py-3 rounded-lg bg-gradient-to-r from-[#0056B3] to-purple-600 text-white font-semibold hover:from-[#004494] hover:to-purple-700 transition-all duration-200 text-center"
                   >
-                    Request Quote
-                  </button>
+                    Get Bulk Quote
+                  </Link>
                 </div>
               </div>
             ))}

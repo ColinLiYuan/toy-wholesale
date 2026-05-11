@@ -48,12 +48,16 @@ export default function InquiriesPage() {
   const fetchInquiries = async () => {
     try {
       setLoading(true);
+      console.log('Fetching inquiries...', { currentPage, statusFilter });
       let response;
       if (statusFilter) {
+        console.log('Calling getInquiriesByStatus...');
         response = await inquiryAdminService.getInquiriesByStatus(statusFilter, currentPage, 20);
       } else {
+        console.log('Calling getAllInquiries...');
         response = await inquiryAdminService.getAllInquiries(currentPage, 20);
       }
+      console.log('Inquiry response:', response);
       setInquiries(response.content || []);
       setTotalPages(response.totalPages || 0);
       setTotalElements(response.totalElements || 0);

@@ -1624,10 +1624,13 @@ export const inquiryService = {
   // 提交询盘 - POST /api/v1/inquiries
   async submitInquiry(inquiry: Inquiry): Promise<Inquiry> {
     try {
+      console.log('[inquiryService] submitInquiry called with:', inquiry);
       const apiResult: ApiResult<Inquiry> = await apiClient.post(
         '/v1/inquiries',
         inquiry
       );
+      
+      console.log('[inquiryService] submitInquiry response:', apiResult);
       
       if (apiResult.code !== 200 || !apiResult.data) {
         throw new Error(apiResult.message || 'Failed to submit inquiry');
@@ -1635,7 +1638,7 @@ export const inquiryService = {
       
       return apiResult.data;
     } catch (error) {
-      console.error('Failed to submit inquiry:', error);
+      console.error('[inquiryService] Failed to submit inquiry:', error);
       throw error;
     }
   },
