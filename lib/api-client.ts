@@ -6,9 +6,12 @@ const getAbsoluteBaseUrl = () => {
   if (typeof window === 'undefined') {
     // Server Component 环境，直接使用后端地址（不走 Next.js 代理）
     // 后端接口路径是 /api/v1/xxx，所以需要加上 /api
-    return `${BACKEND_BASE_URL}/api`;
+    const baseUrl = `${BACKEND_BASE_URL}/api`;
+    console.log('[Server] API Base URL:', baseUrl);
+    return baseUrl;
   }
   // Client Component 环境，使用相对路径（走 Next.js 代理）
+  console.log('[Client] API Base URL: /api');
   return '/api';
 };
 
@@ -26,6 +29,13 @@ apiClient.interceptors.request.use(
   (config) => {
     // 添加多租户标识
     config.headers['X-Site-Id'] = 'toy';
+    
+    // 调试日志：输出请求信息
+    console.log('[API Request]', {
+      method: config.method?.toUpperCase(),
+      url: config.baseURL + config.url,
+      headers: config.headers,
+    });
     
     // 可以在这里添加 token 等认证信息
     // 注意：Server Component 中无法使用 localStorage
@@ -45,9 +55,23 @@ apiClient.interceptors.request.use(
 // 响应拦截器
 apiClient.interceptors.response.use(
   (response) => {
+    // 调试日志：输出响应信息
+    console.log('[API Response]', {
+      status: response.status,
+      url: response.config?.url,
+      data: response.data,
+    });
     return response.data;
   },
   (error) => {
+    // 调试日志：输出错误信息
+    console.error('[API Error]', {
+      message: error.message,
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    
     // 处理 401 未授权错误（token 过期或无效）
     if (error.response && error.response.status === 401) {
       console.warn('Authentication failed, redirecting to login...');
