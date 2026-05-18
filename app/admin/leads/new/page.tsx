@@ -175,6 +175,7 @@ export default function NewLeadPage() {
                   <option value="WEBSITE">网站询盘</option>
                   <option value="REFERRAL">推荐</option>
                   <option value="COLD_CALL">电话开发</option>
+                  <option value="MYTH_TOY">MythToy</option>
                 </select>
               </div>
             </div>

@@ -97,9 +97,15 @@ export default function EditProductPage() {
         }
       }
       
-      // 处理数值字段，确保不为 null（受控组件需要非 null 值）
-      data.currentPrice = data.currentPrice ?? 0;
-      data.minOrder = data.minOrder ?? 0;
+      // 处理数值字段
+      // 价格改为可选，0、null、空字符串、负数都视为未填写
+      if (data.currentPrice === null || data.currentPrice === undefined || data.currentPrice === 0) {
+        (data as any).currentPrice = undefined;
+      } else if (typeof data.currentPrice === 'number' && data.currentPrice <= 0) {
+        // 如果是负数或 0，也清空
+        (data as any).currentPrice = undefined;
+      }
+      data.minOrder = data.minOrder ?? 1;
       data.netWeight = data.netWeight ?? undefined;
       data.supplierId = data.supplierId ?? undefined;
       
@@ -151,10 +157,6 @@ export default function EditProductPage() {
       alert('请输入产品描述');
       return;
     }
-    if (product.currentPrice === undefined || product.currentPrice === null || product.currentPrice <= 0) {
-      alert('请输入正确的当前价格');
-      return;
-    }
     if (product.minOrder === undefined || product.minOrder === null || product.minOrder < 0) {
       alert('请输入正确的最小起订量（MOQ）');
       return;
@@ -168,19 +170,19 @@ export default function EditProductPage() {
         name: product.name,
         title: product.title,
         slug: product.slug,
-        brand: product.brand,
+        brand: product.brand || null,
         status: product.status,
-        image: product.image,
-        alt: product.alt,
+        image: product.image || null,
+        alt: product.alt || null,
         currentPrice: product.currentPrice,
-        shortDescription: product.shortDescription,
-        description: product.description,
-        categories: JSON.stringify(selectedCategories),
-        colors: typeof product.colors === 'string' ? product.colors : JSON.stringify(product.colors || []),
+        shortDescription: product.shortDescription || null,
+        description: product.description || null,
+        categories: selectedCategories.length > 0 ? JSON.stringify(selectedCategories) : null,
+        colors: typeof product.colors === 'string' ? product.colors : (Array.isArray(product.colors) && product.colors.length > 0 ? JSON.stringify(product.colors) : null),
         minOrder: product.minOrder,
-        material: product.material,
+        material: product.material || null,
         netWeight: product.netWeight,
-        supplierSku: product.supplierSku,
+        supplierSku: product.supplierSku || null,
         supplierId: product.supplierId,
       };
       
@@ -190,8 +192,11 @@ export default function EditProductPage() {
       }
       
       // 处理features（JSON对象 -> 字符串）
+      // 无论是否有内容都传递，确保能清空 features
       if (product.features && typeof product.features === 'object' && Object.keys(product.features).length > 0) {
         productData.features = JSON.stringify(product.features);
+      } else {
+        productData.features = ''; // 空字符串，后端会清空
       }
       
       // 处理规格（独立表）
@@ -237,8 +242,28 @@ export default function EditProductPage() {
 
       const response = await fetch('/api/v1/upload/product', {
         method: 'POST',
+        headers: {
+          'X-Site-Id': 'toy',
+        },
         body: formData,
       });
+
+      // 检查响应状态
+      if (!response.ok) {
+        console.error('Upload failed with status:', response.status);
+        alert(`图片上传失败 (HTTP ${response.status})`);
+        return;
+      }
+
+      // 检查响应内容类型
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Response is not JSON:', contentType);
+        const text = await response.text();
+        console.error('Response text:', text);
+        alert('图片上传失败：服务器返回格式错误');
+        return;
+      }
 
       const result = await response.json();
       if (result.code === 200 && result.data) {
@@ -271,8 +296,28 @@ export default function EditProductPage() {
         // 先上传图片
         const response = await fetch('/api/v1/upload/product', {
           method: 'POST',
+          headers: {
+            'X-Site-Id': 'toy',
+          },
           body: formData,
         });
+
+        // 检查响应状态
+        if (!response.ok) {
+          console.error('Upload failed with status:', response.status);
+          alert(`图片上传失败 (HTTP ${response.status})`);
+          continue;
+        }
+
+        // 检查响应内容类型
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Response is not JSON:', contentType);
+          const text = await response.text();
+          console.error('Response text:', text);
+          alert('图片上传失败：服务器返回格式错误');
+          continue;
+        }
 
         const result = await response.json();
         if (result.code === 200 && result.data) {
@@ -449,11 +494,21 @@ export default function EditProductPage() {
   const addTag = () => {
     if (!newTag.trim()) return;
     
-    const tags = Array.isArray(product.tags) ? [...product.tags] : (product.tags ? JSON.parse(product.tags) : []);
-    if (!tags.includes(newTag.trim())) {
-      tags.push(newTag.trim());
-      setProduct({ ...product, tags });
-    }
+    // 按逗号分割标签，并去除空白
+    const tagsToAdd = newTag.split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+    
+    const currentTags = Array.isArray(product.tags) ? [...product.tags] : (product.tags ? JSON.parse(product.tags) : []);
+    
+    // 添加不重复的标签
+    tagsToAdd.forEach(tag => {
+      if (!currentTags.includes(tag)) {
+        currentTags.push(tag);
+      }
+    });
+    
+    setProduct({ ...product, tags: currentTags });
     setNewTag('');
   };
 
@@ -674,15 +729,15 @@ export default function EditProductPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                当前价格 *
+                当前价格
               </label>
               <input
                 type="number"
                 step="0.01"
-                value={product.currentPrice}
-                onChange={(e) => setProduct({ ...product, currentPrice: parseFloat(e.target.value) })}
+                value={product.currentPrice ?? ''}
+                onChange={(e) => setProduct({ ...product, currentPrice: e.target.value ? parseFloat(e.target.value) : undefined })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                required
+                placeholder="选填"
               />
             </div>
             <div>
@@ -741,7 +796,7 @@ export default function EditProductPage() {
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                placeholder="输入标签后回车..."
+                placeholder="输入标签，用逗号分隔多个标签..."
                 className="px-3 py-1.5 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
               />
               <button
@@ -911,14 +966,14 @@ export default function EditProductPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                净重（Net Weight, kg）
+                净重（Net Weight, g）
               </label>
               <input
                 type="number"
-                step="0.001"
+                step="1"
                 value={product.netWeight || ''}
                 onChange={(e) => setProduct({ ...product, netWeight: parseFloat(e.target.value) || undefined })}
-                placeholder="例如：2.5"
+                placeholder="例如：2500"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
               />
             </div>
@@ -1024,7 +1079,7 @@ export default function EditProductPage() {
                   <img
                     src={gallery.imageUrl.startsWith('http') ? gallery.imageUrl : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${gallery.imageUrl}`}
                     alt={gallery.alt || '产品图片'}
-                    className="w-full h-32 object-cover rounded-lg"
+                    className="w-full h-32 object-contain rounded-lg bg-white"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/placeholder-product.svg';
                     }}

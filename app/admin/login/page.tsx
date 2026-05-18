@@ -65,7 +65,11 @@ export default function LoginPage() {
       router.push('/admin/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err.message || '登录失败，请检查用户名和密码');
+      
+      // 使用拦截器设置的友好提示信息
+      const errorMessage = err.userMessage || err.message || '登录失败，请检查用户名和密码';
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

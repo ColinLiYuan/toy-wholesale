@@ -146,7 +146,6 @@ export default function BlogPage() {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">文章标题</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">分类</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">状态</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">浏览量</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">发布时间</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">操作</th>
                   </tr>
@@ -155,10 +154,7 @@ export default function BlogPage() {
                   {filteredBlogs.map((blog) => (
                     <tr key={blog.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{blog.title}</h3>
-                          <p className="text-sm text-gray-500 mt-1 line-clamp-1">{blog.excerpt}</p>
-                        </div>
+                        <h3 className="font-semibold text-gray-900 line-clamp-1">{blog.title}</h3>
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800 font-medium">
@@ -174,7 +170,6 @@ export default function BlogPage() {
                           {blog.isPublished ? '已发布' : '草稿'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{blog.viewCount || 0}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">
                         {blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString() : '-'}
                       </td>

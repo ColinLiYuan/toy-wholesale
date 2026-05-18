@@ -395,11 +395,15 @@ export interface InquiryItem {
 export interface Inquiry {
   id?: number;
   inquiryNumber?: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone?: string;
-  companyName?: string;
-  country?: string;
+  name?: string;  // 客户姓名（提交时使用）
+  email?: string;  // 邮箱（提交时使用）
+  phone?: string;  // 电话（提交时使用）
+  company?: string;  // 公司名称（提交时使用）
+  country?: string;  // 国家（提交时使用）
+  customerName?: string;  // 客户姓名（后端实体字段）
+  customerEmail?: string;  // 邮箱（后端实体字段）
+  customerPhone?: string;  // 电话（后端实体字段）
+  companyName?: string;  // 公司名称（后端实体字段）
   distributorId?: number;
   status?: string;  // NEW, CONTACTED, QUOTING, NEGOTIATING, CONVERTED, CLOSED
   source?: string;  // WEBSITE_FORM, EMAIL, ALIBABA, WHATSAPP, TRADE_SHOW
@@ -410,7 +414,7 @@ export interface Inquiry {
   closedAt?: string;
   createdAt?: string;
   updatedAt?: string;
-  items: InquiryItem[];
+  items?: InquiryItem[];
 }
 
 // 询盘车商品项（前端临时存储）
@@ -431,4 +435,181 @@ export interface InquiryCartItem {
 export interface InquiryCart {
   items: InquiryCartItem[];
   itemCount: number;
+}
+
+// ==================== 订单相关类型 ====================
+
+// 订单状态枚举
+export type OrderStatus = 
+  | 'CREATED'        // 已创建
+  | 'CONFIRMED'      // 已确认
+  | 'PRODUCING'      // 生产中
+  | 'READY_TO_SHIP'  // 待发货
+  | 'SHIPPED'        // 已发货
+  | 'DELIVERED'      // 已送达
+  | 'COMPLETED'      // 已完成
+  | 'CANCELLED'      // 已取消
+  | 'REFUNDED';      // 已退款
+
+// 支付状态枚举
+export type PaymentStatus = 
+  | 'PENDING'    // 待支付
+  | 'PAID'       // 已支付
+  | 'PARTIAL'    // 部分支付
+  | 'REFUNDED'   // 已退款
+  | 'FAILED';    // 支付失败
+
+// 物流状态枚举
+export type ShippingStatus = 
+  | 'NOT_SHIPPED'  // 未发货
+  | 'SHIPPING'     // 运输中
+  | 'SHIPPED'      // 已发货
+  | 'DELIVERED'    // 已送达
+  | 'RETURNED';    // 已退回
+
+// 销售订单项
+export interface SalesOrderItem {
+  id?: number;
+  orderId?: number;
+  productId?: number;
+  productName?: string;
+  productSku?: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice?: number;
+  weightWithBox?: number;  // 单件重量（kg）
+  notes?: string;
+}
+
+// 支付记录
+export interface PaymentRecord {
+  id: number;
+  transactionId?: string;
+  amount: number;
+  paymentMethod?: string;  // BANK_TRANSFER, PAYPAL, CREDIT_CARD, ALIPAY, WECHAT
+  status?: PaymentStatus;
+  paidAt?: string;
+  notes?: string;
+  operator?: string;
+  createdAt: string;
+}
+
+// 物流记录
+export interface ShipmentRecord {
+  id: number;
+  carrier: string;
+  trackingNumber: string;
+  status?: ShippingStatus;
+  shippedAt?: string;
+  estimatedDeliveryAt?: string;
+  deliveredAt?: string;
+  notes?: string;
+  operator?: string;
+  createdAt: string;
+}
+
+// 销售订单
+export interface SalesOrder {
+  id?: number;
+  siteId?: string;
+  orderNumber: string;
+  distributorId?: number;
+  distributor?: Distributor;
+  supplierId?: number;
+  supplier?: Supplier;
+  status: OrderStatus;
+  paymentStatus?: PaymentStatus;
+  shippingStatus?: ShippingStatus;
+  totalAmount: number;
+  paidAmount?: number;
+  totalWeight?: number;
+  receiverName?: string;
+  receiverPhone?: string;
+  shippingAddress?: string;
+  shippingCity?: string;
+  shippingRegion?: string;
+  shippingCountry?: string;
+  shippingZipCode?: string;
+  carrier?: string;
+  trackingNumber?: string;
+  estimatedShipDate?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+  paidAt?: string;
+  completedAt?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
+  notes?: string;
+  internalNotes?: string;
+  inquiryOrderId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  items?: SalesOrderItem[];
+  paymentRecords?: PaymentRecord[];
+  shipmentRecords?: ShipmentRecord[];
+  followUpRecords?: FollowUpRecord[];
+}
+
+// 订单列表响应
+export interface SalesOrderListResponse {
+  content: SalesOrder[];
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  first: boolean;
+  last: boolean;
+}
+
+// SEO关键词库类型 - 根据后端实体 SeoKeywordLibrary
+export interface SeoKeyword {
+  id: number;
+  siteId?: string;  // 站点标识（多租户隔离）
+  keyword: string;  // 关键词（唯一）
+  volume?: number;  // 月搜索量
+  kd?: number;  // 关键词难度 (0-100)
+  intent?: string;  // 搜索意图: C(Commercial), T(Transaction), I(Informational), N(Navigational)
+  category?: string;  // 关键词分类: core(核心词), long_tail(定制长尾词), article(信息文章词), brand(品牌词)
+  status?: number;  // 使用状态: 0-未使用 (Unused), 1-已使用 (Used)
+  usedInType?: number;  // 应用页面类型: 0-无, 1-产品详情页, 2-博客文章, 3-其他
+  usedInId?: number;  // 关联的页面 ID（产品ID 或 博客文章ID）
+  notes?: string;  // 备注/观察记录
+  addedAt?: string;  // 添加时间
+  lastUpdatedAt?: string;  // 最后更新时间
+}
+
+// SEO关键词详情（包含关联的URL列表）
+export interface KeywordDetailDTO {
+  id: number;
+  keyword: string;
+  volume?: number;
+  kd?: number;
+  intent?: string;
+  category?: string;
+  status?: number;
+  urls?: string[];  // 关联的URL列表
+  addedAt?: string;
+  lastUpdatedAt?: string;
+}
+
+// 关键词关联请求
+export interface LinkKeywordRequest {
+  pageUrl: string;  // 页面URL
+  pageType?: number;  // 页面类型: 0-未指定, 1-产品页, 2-博客文章, 3-分类页, 4-其他
+  keywordIds: number[];  // 关键词ID列表
+}
+
+// SEO关键词列表响应
+export interface SeoKeywordListResponse {
+  content: SeoKeyword[];
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  first: boolean;
+  last: boolean;
 }

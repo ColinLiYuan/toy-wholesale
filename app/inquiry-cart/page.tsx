@@ -40,6 +40,13 @@ export default function InquiryCartPage() {
     }
   };
 
+  // 获取图片 URL（处理 R2 CDN）
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return '/placeholder-product.svg';
+    if (imagePath.startsWith('http')) return imagePath;
+    return `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${imagePath}`;
+  };
+
   // Update quantity
   const handleQuantityChange = async (cartItemId: number, newQuantity: number) => {
     try {
@@ -95,11 +102,20 @@ export default function InquiryCartPage() {
     setSubmitting(true);
 
     try {
-      // Build inquiry data
+      // Build inquiry data matching backend InquiryRequest DTO
       const inquiryData = {
-        ...customerInfo,
-        items: inquiryCartUtils.convertToInquiryItems(cartItems),
+        name: customerInfo.customerName,
+        email: customerInfo.customerEmail,
+        phone: customerInfo.customerPhone || undefined,
+        company: customerInfo.companyName || undefined,
+        country: customerInfo.country || undefined,
+        message: customerInfo.message || undefined,
         source: 'WEBSITE_FORM',
+        items: cartItems.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          notes: item.notes || undefined,
+        })),
       };
 
       console.log('[InquiryCart] Submitting inquiry data:', inquiryData);
@@ -187,9 +203,9 @@ export default function InquiryCartPage() {
                       {/* Product Image */}
                       <div className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
                         <img
-                          src={item.productImage || '/placeholder-product.svg'}
+                          src={getImageUrl(item.productImage)}
                           alt={item.productName}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       </div>
 
@@ -198,16 +214,17 @@ export default function InquiryCartPage() {
                         <h3 className="font-semibold text-gray-900 mb-1">
                           {item.productName}
                         </h3>
-                        {item.color && (
-                          <p className="text-sm text-gray-600 mb-2">
-                            Color: {item.color}
-                          </p>
-                        )}
-                        {item.skuCode && (
-                          <p className="text-xs text-gray-500 mb-2">
-                            SKU: {item.skuCode}
-                          </p>
-                        )}
+                        
+                        {/* SKU and Color */}
+                        <div className="text-sm text-gray-600 mb-2">
+                          {item.skuCode && (
+                            <span className="text-xs text-gray-500 font-mono">{item.skuCode}</span>
+                          )}
+                          {item.skuCode && item.color && <span className="mx-2">|</span>}
+                          {item.color && (
+                            <span className="text-xs text-gray-500">{item.color}</span>
+                          )}
+                        </div>
 
                         {/* Quantity Control */}
                         <div className="flex items-center gap-3 mt-3">

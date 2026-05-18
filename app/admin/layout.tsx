@@ -19,13 +19,26 @@ const navigation = [
   { name: '产品管理', href: '/admin/products', icon: '📦' },
   { name: '潜客管理', href: '/admin/leads', icon: '👥' },
   { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
+  { name: '订单管理', href: '/admin/orders', icon: '🛒' },
   { name: '管理员管理', href: '/admin/admins', icon: '🔐' },
   { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
   { name: '博客管理', href: '/admin/blog', icon: '📝' },
   { name: '运营账号', href: '/admin/operation-accounts', icon: '🌐' },
-  { name: '报价计算器', href: '/admin/quotation-calculator', icon: '💰' },
   {
-    name: '外贸知识库',
+    name: 'SEO 专题',
+    href: '/admin/seo-knowledge',
+    icon: '🔍',
+    children: [
+      { name: 'SEO 基础知识', href: '/admin/seo-knowledge/basics' },
+      { name: '关键词管理', href: '/admin/seo-keywords' },
+      { name: '技术 SEO', href: '/admin/seo-knowledge/technical' },
+      { name: '内容策略', href: '/admin/seo-knowledge/content' },
+      { name: '数据分析', href: '/admin/seo-knowledge/analytics' },
+      { name: '国际化 SEO', href: '/admin/seo-knowledge/international' },
+    ],
+  },
+  {
+    name: '外贸专题',
     href: '/admin/trade-knowledge',
     icon: '📚',
     children: [
@@ -35,6 +48,7 @@ const navigation = [
       { name: '支付与风控', href: '/admin/trade-knowledge/payment-risk' },
       { name: '物流与通关', href: '/admin/trade-knowledge/logistics-customs' },
       { name: '产品认证', href: '/admin/trade-knowledge/certifications' },
+      { name: '报价计算器', href: '/admin/quotation-calculator' },
     ],
   },
 ];
@@ -69,6 +83,34 @@ export default function AdminLayout({
       router.push('/admin/login');
     }
   }, [pathname, router]);
+
+  // 当路由变化时，自动展开包含当前页面的父菜单
+  useEffect(() => {
+    if (isClient && isAuthenticated && pathname !== '/admin/login') {
+      const newExpandedMenus: Record<string, boolean> = {};
+      
+      navigation.forEach((item: any) => {
+        if (item.children && item.children.length > 0) {
+          // 检查当前路径是否匹配任何子菜单
+          const hasActiveChild = item.children.some((child: any) => 
+            pathname === child.href || pathname?.startsWith(child.href.split('#')[0])
+          );
+          
+          if (hasActiveChild) {
+            newExpandedMenus[item.name] = true;
+          }
+        }
+      });
+      
+      // 只有当有新的菜单需要展开时才更新状态
+      if (Object.keys(newExpandedMenus).length > 0) {
+        setExpandedMenus(prev => ({
+          ...prev,
+          ...newExpandedMenus
+        }));
+      }
+    }
+  }, [pathname, isClient, isAuthenticated]);
 
   // 服务端渲染或客户端初始化期间，显示加载中
   if (!isClient) {
@@ -166,7 +208,12 @@ export default function AdminLayout({
                           <Link
                             key={child.name}
                             href={child.href}
-                            onClick={() => setSidebarOpen(false)}
+                            onClick={() => {
+                              // 只在移动端关闭侧边栏
+                              if (window.innerWidth < 1024) {
+                                setSidebarOpen(false);
+                              }
+                            }}
                             className={`flex items-center px-3 py-2 rounded-lg text-sm transition-colors ${
                               isChildActive
                                 ? 'bg-blue-50 text-blue-700 font-medium'

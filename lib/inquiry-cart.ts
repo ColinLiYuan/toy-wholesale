@@ -48,6 +48,11 @@ export const inquiryCartUtils = {
     } catch (error) {
       console.error('Failed to add item to inquiry cart:', error);
       throw error;
+    } finally {
+      // 触发事件更新 Header 角标
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('inquiryCartUpdated'));
+      }
     }
   },
 
@@ -99,6 +104,11 @@ export const inquiryCartUtils = {
     } catch (error) {
       console.error('Failed to update quantity:', error);
       throw error;
+    } finally {
+      // 触发事件更新 Header 角标
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('inquiryCartUpdated'));
+      }
     }
   },
 
@@ -114,6 +124,11 @@ export const inquiryCartUtils = {
     } catch (error) {
       console.error('Failed to remove item:', error);
       throw error;
+    } finally {
+      // 触发事件更新 Header 角标
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('inquiryCartUpdated'));
+      }
     }
   },
 
@@ -129,6 +144,11 @@ export const inquiryCartUtils = {
     } catch (error) {
       console.error('Failed to clear cart:', error);
       throw error;
+    } finally {
+      // 触发事件更新 Header 角标
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('inquiryCartUpdated'));
+      }
     }
   },
 

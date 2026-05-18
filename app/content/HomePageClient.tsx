@@ -1,37 +1,79 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import InquiryModal from '@/components/InquiryModal';
 import { R2_BASE_URL } from '@/lib/r2-config';
+import type { Product } from '@/types';
 
 export default function HomePageClient() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // 价格格式化工具函数：修复 19,50 → 19.50
+  const formatPrice = (price: string | number): string => {
+    const priceStr = String(price).replace(',', '.');
+    const num = parseFloat(priceStr);
+    return isNaN(num) ? priceStr : num.toFixed(2);
+  };
+
+  // 获取首页推荐产品
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
+        const response = await fetch(`${apiBaseUrl}/api/v1/products/featured?tag=首页推荐&limit=6`, {
+          headers: {
+            'X-Site-Id': 'toy',
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.code === 200 && data.data) {
+            setFeaturedProducts(data.data);
+          }
+        }
+      } catch (error) {
+        console.error('获取推荐产品失败:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section - Precise & Professional */}
+      {/* ============================================
+          1. Hero Section - 白色极简视觉
+      ============================================ */}
       <section className="relative min-h-screen flex items-center pt-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left Content */}
+            {/* 左侧文字 */}
             <div className="space-y-8">
               <div className="space-y-6">
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-[#1A1A1A]">
-                  Certified Medical-Grade<br />Silicone Toys.
+                  Silvibe Supply<br />
+                  Premium Medical-Grade<br />
+                  Adult Wellness.
                 </h1>
                 
                 <p className="text-xl md:text-2xl text-[#6C757D] leading-relaxed max-w-2xl">
-                  Low MOQ for Global Retailers. FDA, CE, RoHS compliant products from Dongguan factory.
+                  Wholesale-only platform for professional retailers and health brands.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/products"
-                  className="group inline-flex items-center justify-center px-8 py-4 rounded-lg bg-[#0056B3] text-white font-semibold text-lg hover:bg-[#004494] transition-all duration-200 shadow-sm"
+                  className="group inline-flex items-center justify-center px-8 py-4 rounded-lg bg-[#6B46C1] text-white font-semibold text-lg hover:bg-[#553C9A] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                 >
-                  Browse Bulk Orders
+                  Browse Wholesale Catalog
                   <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -40,18 +82,18 @@ export default function HomePageClient() {
                   onClick={() => setIsModalOpen(true)}
                   className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-[#1A1A1A] text-[#1A1A1A] font-semibold text-lg hover:bg-[#1A1A1A] hover:text-white transition-all duration-200"
                 >
-                  Get Catalog & Wholesale Pricing
+                  Request Catalog & Pricing
                 </button>
               </div>
             </div>
 
-            {/* Right - Product Image */}
+            {/* 右侧产品图 */}
             <div className="relative hidden lg:block">
-              <div className="relative w-full aspect-square bg-[#F8F9FA] rounded-2xl overflow-hidden border border-gray-200">
+              <div className="relative w-full aspect-[4/5] bg-white rounded-2xl overflow-hidden shadow-2xl">
                 <img
                   src={`${R2_BASE_URL}/toy/home_product.jpg`}
-                  alt="Medical-grade silicone adult toys"
-                  className="w-full h-full object-cover"
+                  alt="WL-020 Medical-grade silicone massager on marble surface"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
@@ -59,57 +101,45 @@ export default function HomePageClient() {
         </div>
       </section>
 
-      {/* Trust Bar - Core Capabilities */}
-      <section className="py-12 bg-[#F8F9FA] border-y border-gray-200">
+      {/* ============================================
+          2. B2B Features - 模块化分割
+      ============================================ */}
+      <section className="py-16 bg-[#F8F9FA]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { icon: 'box', title: 'Flexible MOQ', desc: 'From 20 pcs' },
+              { icon: 'globe', title: 'Global Fulfillment', desc: 'Air & Sea shipping' },
+              { icon: 'customize', title: 'OEM/ODM Support', desc: 'Custom branding' },
+              { icon: 'shield', title: 'Full Compliance', desc: 'FDA / CE / RoHS' },
+            ].map((feature, index) => (
+              <div key={index} className="bg-white rounded-xl p-6 border border-[#E0E0E0] text-center hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+                <div className="w-14 h-14 rounded-lg bg-[#F8F9FA] flex items-center justify-center mx-auto mb-4">
+                  {feature.icon === 'box' && (
+                    <svg className="w-7 h-7 text-[#6B46C1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  )}
+                  {feature.icon === 'globe' && (
+                    <svg className="w-7 h-7 text-[#6B46C1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  {feature.icon === 'customize' && (
+                    <svg className="w-7 h-7 text-[#6B46C1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  )}
+                  {feature.icon === 'shield' && (
+                    <svg className="w-7 h-7 text-[#6B46C1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  )}
+                </div>
+                <h3 className="text-base font-bold text-[#1A1A1A] mb-1">{feature.title}</h3>
+                <p className="text-xs text-[#6C757D]">{feature.desc}</p>
               </div>
-              <div>
-                <div className="text-sm font-semibold text-[#1A1A1A]">Low MOQ</div>
-                <div className="text-xs text-[#6C757D]">From 20 pcs</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-[#1A1A1A]">Fast Shipping</div>
-                <div className="text-xs text-[#6C757D]">Air express 3-7 days delivery</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-[#1A1A1A]">Discreet Packaging</div>
-                <div className="text-xs text-[#6C757D]">Your privacy is our priority</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-[#1A1A1A]">Premium Quality</div>
-                <div className="text-xs text-[#6C757D]">Selection</div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -250,96 +280,112 @@ export default function HomePageClient() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                id: 'WL-020',
-                name: 'WL-020 Thrusting & Peristaltic Massager',
-                image: '/products/wl-020.jpg',
-                material: 'Medical Grade Silicone + ABS',
-                feature: 'Dual Motor, App Control,伸缩蠕动',
-                moq: '50 pcs',
-                tag: '技术标杆',
-              },
-              {
-                id: 'AHT-016',
-                name: 'AHT-016 Pelvic Floor Trainer (Whale Tail)',
-                image: '/products/aht-016.jpg',
-                material: 'Liquid Silicone',
-                feature: 'Health Training, 鲸鱼尾训练器',
-                moq: '50 pcs',
-                tag: '健康训练',
-              },
-              {
-                id: 'WL-025',
-                name: 'WL-025 Velvet Gradient Vibrator',
-                image: '/products/wl-025.jpg',
-                material: 'Velvet Gradient Silicone',
-                feature: 'Purple Gradient, 紫色渐变款',
-                moq: '50 pcs',
-                tag: '时尚颜值',
-              },
-            ].map((product, index) => (
-              <div key={index} className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
-                {/* Product Image */}
-                <div className="relative h-64 bg-white flex items-center justify-center overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder-product.svg';
-                    }}
-                  />
-                  {/* Tag Badge */}
-                  <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-[#0056B3] to-purple-600 text-white text-xs font-semibold rounded-full">
-                    {product.tag}
+          {loading ? (
+            // 加载状态
+            <div className="grid md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse">
+                  <div className="h-64 bg-gray-200"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                    <div className="h-12 bg-gray-200 rounded"></div>
                   </div>
                 </div>
-
-                {/* Product Info */}
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-[#1A1A1A] mb-4">
-                    {product.name}
-                  </h3>
-
-                  {/* Technical Specs */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#6C757D]">Material:</span>
-                      <span className="text-[#1A1A1A] font-medium">{product.material}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#6C757D]">Feature:</span>
-                      <span className="text-[#1A1A1A] font-medium">{product.feature}</span>
-                    </div>
-                    <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
-                      <span className="text-[#6C757D]">MOQ:</span>
-                      <span className="text-[#0056B3] font-semibold">{product.moq}</span>
-                    </div>
-                  </div>
-
-                  {/* OEM Badge */}
-                  <div className="mb-4 p-3 bg-[#0056B3]/5 rounded-lg border border-[#0056B3]/20">
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-4 h-4 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
-                      <span className="text-xs font-semibold text-[#0056B3]">Custom Branding (OEM) Available</span>
-                    </div>
-                  </div>
-
-                  {/* CTA Button */}
-                  <Link
-                    href={`/contact?product=${product.id}`}
-                    className="block w-full py-3 rounded-lg bg-gradient-to-r from-[#0056B3] to-purple-600 text-white font-semibold hover:from-[#004494] hover:to-purple-700 transition-all duration-200 text-center"
-                  >
-                    Get Bulk Quote
+              ))}
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            // 显示推荐产品
+            <div className="grid md:grid-cols-3 gap-8">
+              {featuredProducts.map((product) => (
+                <div key={product.id} className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
+                  {/* Product Image */}
+                  <Link href={`/products/${product.slug}`} className="relative h-64 bg-white flex items-center justify-center overflow-hidden block">
+                    <img
+                      src={product.image?.startsWith('http') ? product.image : `${R2_BASE_URL}/${product.image}`}
+                      alt={product.alt || product.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-product.svg';
+                      }}
+                    />
+                    {/* Tag Badge - 如果有标签 */}
+                    {product.tags && (() => {
+                      const tagList = Array.isArray(product.tags) ? product.tags : (typeof product.tags === 'string' ? JSON.parse(product.tags) : []);
+                      const firstTag = tagList[0];
+                      return firstTag ? (
+                        <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-[#0056B3] to-purple-600 text-white text-xs font-semibold rounded-full">
+                          {firstTag}
+                        </div>
+                      ) : null;
+                    })()}
                   </Link>
+
+                  {/* Product Info */}
+                  <div className="p-6">
+                    <Link href={`/products/${product.slug}`}>
+                      <h3 className="text-lg font-bold text-[#1A1A1A] mb-4 hover:text-[#0056B3] transition-colors">
+                        {product.title}
+                      </h3>
+                    </Link>
+
+                    {/* Technical Specs */}
+                    <div className="space-y-2 mb-4">
+                      {product.material && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-[#6C757D]">Material:</span>
+                          <span className="text-[#1A1A1A] font-medium">{product.material}</span>
+                        </div>
+                      )}
+                      {product.shortDescription && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-[#6C757D]">Feature:</span>
+                          <span className="text-[#1A1A1A] font-medium line-clamp-1">{product.shortDescription}</span>
+                        </div>
+                      )}
+                      {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
+                        <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
+                          <span className="text-[#6C757D]">MOQ:</span>
+                          <span className="text-[#0056B3] font-semibold">{product.minOrder} pcs</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* OEM Badge */}
+                    <div className="mb-4 p-3 bg-[#0056B3]/5 rounded-lg border border-[#0056B3]/20">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        <span className="text-xs font-semibold text-[#0056B3]">Custom Branding (OEM) Available</span>
+                      </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <Link
+                      href={`/contact?product=${product.slug}`}
+                      className="block w-full py-3 rounded-lg bg-gradient-to-r from-[#0056B3] to-purple-600 text-white font-semibold hover:from-[#004494] hover:to-purple-700 transition-all duration-200 text-center"
+                    >
+                      Get Bulk Quote
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            // 无数据提示
+            <div className="text-center py-16">
+              <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+              <p className="text-[#6C757D] text-lg mb-2">No featured products available</p>
+              <p className="text-gray-400 text-sm">Check back later for new arrivals</p>
+            </div>
+          )}
         </div>
       </section>
 

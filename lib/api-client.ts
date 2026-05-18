@@ -72,6 +72,37 @@ apiClient.interceptors.response.use(
       data: error.response?.data,
     });
     
+    // 处理 HTTP 错误
+    if (error.response) {
+      const status = error.response.status;
+      const responseData = error.response.data;
+      
+      // 为所有错误添加友好的中文提示
+      if (status === 400) {
+        // 400 错误：请求参数错误，显示后端返回的具体信息
+        const errorMsg = responseData?.message || responseData?.error || '请求参数错误';
+        error.userMessage = errorMsg;
+      } else if (status === 401) {
+        error.userMessage = '认证失败，请重新登录';
+      } else if (status === 403) {
+        error.userMessage = '权限不足，无法执行此操作';
+      } else if (status === 404) {
+        error.userMessage = '请求的资源不存在';
+      } else if (status === 409) {
+        error.userMessage = responseData?.message || '数据冲突，可能已存在';
+      } else if (status === 500) {
+        error.userMessage = '服务器错误，请稍后重试';
+      } else {
+        error.userMessage = responseData?.message || `请求失败 (${status})`;
+      }
+    } else if (error.request) {
+      // 请求已发送但没有收到响应（网络错误）
+      error.userMessage = '网络连接失败，请检查网络后重试';
+    } else {
+      // 请求配置出错
+      error.userMessage = error.message || '请求失败';
+    }
+    
     // 处理 401 未授权错误（token 过期或无效）
     if (error.response && error.response.status === 401) {
       console.warn('Authentication failed, redirecting to login...');

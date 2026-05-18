@@ -1,14 +1,20 @@
 import Link from 'next/link';
 
-export default function KnowledgeNav() {
+interface KnowledgeNavProps {
+  title?: string;
+  description?: string;
+  sections?: { id: string; title: string }[];
+}
+
+export default function KnowledgeNav({ title, description, sections }: KnowledgeNavProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-5xl mx-auto">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-        <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-        </svg>
-        知识体系导航
-      </h2>
+      {title && (
+        <>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
+          {description && <p className="text-sm text-gray-600 mb-4">{description}</p>}
+        </>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link href="/admin/trade-knowledge/basics" className="flex items-start p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg hover:shadow-md transition-all border border-blue-200">
           <span className="text-2xl mr-3">📚</span>

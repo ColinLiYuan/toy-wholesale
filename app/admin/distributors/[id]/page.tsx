@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { distributorAdminService } from '@/services';
 import { Distributor, FollowUpRecord } from '@/types';
+import AttachmentManager from '@/components/AttachmentManager';
 
 export default function DistributorDetailPage() {
   const router = useRouter();
@@ -530,6 +531,9 @@ export default function DistributorDetailPage() {
           )}
         </div>
       </div>
+
+      {/* 附件管理 */}
+      <AttachmentManager entityType="SUPPLIER" entityId={distributor.id!} />
     </div>
   );
 }

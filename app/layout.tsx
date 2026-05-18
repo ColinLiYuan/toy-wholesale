@@ -27,14 +27,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://silvibe.com"),
+  metadataBase: new URL("https://www.adult-toy-wholesale.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://silvibe.com",
+    url: "https://www.adult-toy-wholesale.com",
     siteName: "Silvibe",
     title: "Silvibe - Medical-Grade Silicone Adult Toys",
     description: "Certified medical-grade silicone toys from Dongguan. Low MOQ, FDA/CE/RoHS compliant.",

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { inquiryAdminService } from '@/services';
 import type { Inquiry } from '@/types';
+import AttachmentManager from '@/components/AttachmentManager';
 
 const statusMap: Record<string, string> = {
   NEW: '新询盘',
@@ -364,6 +365,9 @@ export default function InquiryDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* 附件管理 */}
+      <AttachmentManager entityType="INQUIRY" entityId={inquiryId} />
     </div>
   );
 }

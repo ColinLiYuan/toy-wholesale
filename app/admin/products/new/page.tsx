@@ -15,7 +15,7 @@ export default function NewProductPage() {
     name: '',
     title: '',
     slug: '',
-    brand: 'MythToy',
+    brand: '',
     image: '',
     alt: '',
     description: '',
@@ -66,11 +66,21 @@ export default function NewProductPage() {
   const addTag = () => {
     if (!newTag.trim()) return;
     
-    const tags = Array.isArray(product.tags) ? [...product.tags] : [];
-    if (!tags.includes(newTag.trim())) {
-      tags.push(newTag.trim());
-      setProduct({ ...product, tags });
-    }
+    // 按逗号分割标签，并去除空白
+    const tagsToAdd = newTag.split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+    
+    const currentTags = Array.isArray(product.tags) ? [...product.tags] : [];
+    
+    // 添加不重复的标签
+    tagsToAdd.forEach(tag => {
+      if (!currentTags.includes(tag)) {
+        currentTags.push(tag);
+      }
+    });
+    
+    setProduct({ ...product, tags: currentTags });
     setNewTag('');
   };
 
@@ -80,19 +90,33 @@ export default function NewProductPage() {
     setProduct({ ...product, tags });
   };
 
-  // SKU管理
-  const addSku = () => {
-    setSkus([...skus, { sku: '', color: '', stock: 0 }]);
+  // SKU管理（后端自动生成，无需手动输入）
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+
+  const colorOptions = [
+    { value: 'BK', label: '黑色 (BK)' },
+    { value: 'WH', label: '白色 (WH)' },
+    { value: 'RD', label: '红色 (RD)' },
+    { value: 'PK', label: '粉色 (PK)' },
+    { value: 'PU', label: '紫色 (PU)' },
+    { value: 'BL', label: '蓝色 (BL)' },
+    { value: 'GN', label: '绿色 (GN)' },
+    { value: 'SK', label: '肤色 (SK)' },
+    { value: 'CL', label: '透明 (CL)' },
+  ];
+
+  const addColor = () => {
+    if (!selectedColors.includes('BK')) {
+      const updated = [...selectedColors, 'BK'];
+      setSelectedColors(updated);
+      setProduct({ ...product, colors: updated });
+    }
   };
 
-  const updateSku = (index: number, field: keyof ProductSku, value: any) => {
-    const updatedSkus = [...skus];
-    updatedSkus[index] = { ...updatedSkus[index], [field]: value };
-    setSkus(updatedSkus);
-  };
-
-  const removeSku = (index: number) => {
-    setSkus(skus.filter((_, i) => i !== index));
+  const removeColor = (color: string) => {
+    const updated = selectedColors.filter(c => c !== color);
+    setSelectedColors(updated);
+    setProduct({ ...product, colors: updated });
   };
 
   // 规格管理
@@ -130,6 +154,23 @@ export default function NewProductPage() {
           },
           body: formData,
         });
+
+        // 检查响应状态
+        if (!response.ok) {
+          console.error('Upload failed with status:', response.status);
+          alert(`图片上传失败 (HTTP ${response.status})`);
+          continue;
+        }
+
+        // 检查响应内容类型
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Response is not JSON:', contentType);
+          const text = await response.text();
+          console.error('Response text:', text);
+          alert('图片上传失败：服务器返回格式错误');
+          continue;
+        }
 
         const result = await response.json();
         if (result.code === 200 && result.data) {
@@ -201,6 +242,23 @@ export default function NewProductPage() {
         body: formData,
       });
 
+      // 检查响应状态
+      if (!response.ok) {
+        console.error('Upload failed with status:', response.status);
+        alert(`图片上传失败 (HTTP ${response.status})`);
+        return;
+      }
+
+      // 检查响应内容类型
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Response is not JSON:', contentType);
+        const text = await response.text();
+        console.error('Response text:', text);
+        alert('图片上传失败：服务器返回格式错误');
+        return;
+      }
+
       const result = await response.json();
       if (result.code === 200 && result.data) {
         setProduct({ ...product, image: result.data });
@@ -232,41 +290,46 @@ export default function NewProductPage() {
       alert('请输入产品 Slug');
       return;
     }
-    // 价格改为非必填，但如果填写了必须是正数
-    if (product.currentPrice !== undefined && product.currentPrice !== null && product.currentPrice <= 0) {
-      alert('如果填写价格，必须是正数');
-      return;
-    }
 
     setLoading(true);
 
     try {
+      // 构建产品数据（后端 Product 实体字段）
       const productData: any = { 
         name: product.name,
         title: product.title,
         slug: product.slug,
-        brand: product.brand,
+        brand: product.brand || null,
         status: product.status,
-        image: product.image,
-        alt: product.alt,
+        image: product.image || null,
+        alt: product.alt || null,
         currentPrice: product.currentPrice,
-        shortDescription: product.shortDescription,
-        description: product.description,
-        categories: JSON.stringify(selectedCategories),
-        colors: typeof product.colors === 'string' ? product.colors : JSON.stringify(product.colors || []),
+        shortDescription: product.shortDescription || null,
+        description: product.description || null,
+        categories: selectedCategories.length > 0 ? JSON.stringify(selectedCategories) : null,
+        colors: selectedColors.length > 0 ? JSON.stringify(selectedColors) : null,
         minOrder: product.minOrder,
-        material: product.material,
+        material: product.material || null,
         netWeight: product.netWeight,
-        supplierSku: product.supplierSku,
+        supplierSku: product.supplierSku || null,
         supplierId: product.supplierId,
       };
+      
+      // 根据选中的颜色生成 productSkus（后端需要 productSkus 数组才能自动生成 SKU 编码）
+      if (selectedColors.length > 0) {
+        productData.productSkus = selectedColors.map(color => ({
+          color: color,
+          sku: '', // 留空让后端自动生成
+          stock: 0,
+        }));
+      }
       
       // 处理tags（JSON数组）
       if (product.tags && Array.isArray(product.tags) && product.tags.length > 0) {
         productData.tags = JSON.stringify(product.tags);
       }
       
-      // 处理features（JSON对象）
+      // 处理features（JSON对象 -> 字符串）
       if (product.features && Object.keys(product.features).length > 0) {
         productData.features = JSON.stringify(product.features);
       }
@@ -389,70 +452,45 @@ export default function NewProductPage() {
           />
         </div>
 
-        {/* SKU 管理 */}
+        {/* SKU 管理（后端自动生成） */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">SKU 管理</h2>
-            <button
-              type="button"
-              onClick={addSku}
-              className="px-4 py-2 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors"
-            >
-              + 添加 SKU
-            </button>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">SKU 管理</h2>
+          <p className="text-sm text-gray-500 mb-4">选择颜色后，后端将自动生成 SKU 编码</p>
+          
+          <div className="flex flex-wrap gap-3">
+            {colorOptions.map((color) => (
+              <button
+                key={color.value}
+                type="button"
+                onClick={() => {
+                  if (selectedColors.includes(color.value)) {
+                    removeColor(color.value);
+                  } else {
+                    const updated = [...selectedColors, color.value];
+                    setSelectedColors(updated);
+                    setProduct({ ...product, colors: updated });
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  selectedColors.includes(color.value)
+                    ? 'bg-[#00F2FE] text-[#050505]'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {color.label}
+              </button>
+            ))}
           </div>
           
-          {skus.length > 0 ? (
-            <div className="space-y-4">
-              {skus.map((sku, index) => (
-                <div key={index} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">SKU 编码</label>
-                    <input
-                      type="text"
-                      value={sku.sku}
-                      onChange={(e) => updateSku(index, 'sku', e.target.value)}
-                      placeholder="例如：SKU-001"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">颜色</label>
-                    <input
-                      type="text"
-                      value={sku.color || ''}
-                      onChange={(e) => updateSku(index, 'color', e.target.value)}
-                      placeholder="例如：Black"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                    />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">库存</label>
-                    <input
-                      type="number"
-                      value={sku.stock}
-                      onChange={(e) => updateSku(index, 'stock', parseInt(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                    />
-                  </div>
-                  
-                  <button
-                    type="button"
-                    onClick={() => removeSku(index)}
-                    className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                  >
-                    删除
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-              <p className="text-gray-500">暂无 SKU</p>
-              <p className="text-xs text-gray-400 mt-1">点击上方按钮添加 SKU</p>
+          {selectedColors.length > 0 && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-800">
+                <span className="font-medium">已选择 {selectedColors.length} 种颜色：</span>
+                {selectedColors.map(c => colorOptions.find(opt => opt.value === c)?.label).join(', ')}
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                后端将根据颜色自动生成对应的 SKU 编码
+              </p>
             </div>
           )}
         </div>
@@ -530,7 +568,7 @@ export default function NewProductPage() {
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                placeholder="输入标签后回车..."
+                placeholder="输入标签，用逗号分隔多个标签..."
                 className="px-3 py-1.5 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
               />
               <button
@@ -642,7 +680,7 @@ export default function NewProductPage() {
                   <img
                     src={gallery.imageUrl.startsWith('http') ? gallery.imageUrl : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${gallery.imageUrl}`}
                     alt={gallery.alt || 'Product image'}
-                    className="w-full h-32 object-cover"
+                    className="w-full h-32 object-contain bg-white"
                   />
                   
                   {gallery.isPrimary && (
@@ -787,14 +825,14 @@ export default function NewProductPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                净重（Net Weight, kg）
+                净重（Net Weight, g）
               </label>
               <input
                 type="number"
-                step="0.001"
+                step="1"
                 value={product.netWeight || ''}
                 onChange={(e) => setProduct({ ...product, netWeight: parseFloat(e.target.value) || undefined })}
-                placeholder="例如：2.5"
+                placeholder="例如：2500"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
               />
             </div>

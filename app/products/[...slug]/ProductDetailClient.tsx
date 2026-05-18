@@ -61,15 +61,12 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
   };
 
   // 构建画廊图片列表
+  // 优先使用管理后台设置的相册顺序（galleries），如果没有相册则使用主图（image）兜底
   const galleryImages = (() => {
-    const images: string[] = [];
-    if (product?.image) {
-      images.push(product.image);
-    }
     if (product?.galleries && product.galleries.length > 0) {
-      images.push(...product.galleries.map(g => g.imageUrl));
+      return product.galleries.map(g => g.imageUrl);
     }
-    return images;
+    return product?.image ? [product.image] : [];
   })();
 
   // 解析核心特性（从 shortDescription 中用分号分割）
@@ -242,27 +239,29 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
 
               {/* Thumbnail Gallery */}
               {galleryImages.length > 1 && (
-                <div className="grid grid-cols-5 gap-3">
-                  {galleryImages.slice(0, 5).map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedImageIndex(idx)}
-                      className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                        selectedImageIndex === idx
-                          ? 'border-gray-800 shadow-md'
-                          : 'border-gray-200 hover:border-gray-400'
-                      }`}
-                    >
-                      <img
-                        src={getImageUrl(img)}
-                        alt={`${product.title} - Image ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = getPlaceholderUrl();
-                        }}
-                      />
-                    </button>
-                  ))}
+                <div className="relative">
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    {galleryImages.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedImageIndex(idx)}
+                        className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                          selectedImageIndex === idx
+                            ? 'border-gray-800 shadow-md'
+                            : 'border-gray-200 hover:border-gray-400'
+                        }`}
+                      >
+                        <img
+                          src={getImageUrl(img)}
+                          alt={`${product.title} - Image ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = getPlaceholderUrl();
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -274,43 +273,47 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
                 {product.title}
               </h1>
 
-              {/* Tags Badges */}
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-blue-50 text-blue-700 text-sm font-medium rounded-full border border-blue-100"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Key Features (Bullet Points with Green Checkmark) */}
-              {(keyFeatures.length > 0 || Object.keys(featuresObj).length > 0) && (
-                <div className="mb-6 space-y-2">
-                  {keyFeatures.length > 0 ? (
-                    keyFeatures.map((feature, index) => (
-                      <div key={index} className="flex items-start space-x-3">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-gray-700 text-sm">{feature.trim()}</span>
-                      </div>
-                    ))
-                  ) : (
-                    Object.entries(featuresObj).slice(0, 5).map(([key, value], index) => (
-                      <div key={index} className="flex items-start space-x-3">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-gray-700 text-sm">
-                          <span className="font-semibold">{key}:</span> {String(value)}
+              {/* Tags & Features Section */}
+              {(tags.length > 0 || Object.keys(featuresObj).length > 0 || keyFeatures.length > 0) && (
+                <div className="mb-6 p-6 bg-gray-50 rounded-xl border border-gray-200">
+                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-4">Product Highlights</h3>
+                  
+                  {/* Tags */}
+                  {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full"
+                        >
+                          {tag}
                         </span>
-                      </div>
-                    ))
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Features List */}
+                  {(keyFeatures.length > 0 || Object.keys(featuresObj).length > 0) && (
+                    <ul className="space-y-3">
+                      {keyFeatures.map((feature, index) => (
+                        <li key={index} className="flex items-start space-x-3">
+                          <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-gray-700 text-sm">{feature.trim()}</span>
+                        </li>
+                      ))}
+                      {Object.entries(featuresObj).map(([key, value], index) => (
+                        <li key={index} className="flex items-start space-x-3">
+                          <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-gray-700 text-sm">
+                            <span className="font-semibold">{key}:</span> {String(value)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </div>
               )}
@@ -338,28 +341,37 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
                 <div className="mb-6">
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">Available Options</h3>
                   <div className="space-y-2">
-                    {product.productSkus.map((sku, index) => (
-                      <div 
-                        key={sku.id || index} 
-                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                          sku.stock === 0 
-                            ? 'bg-gray-100 border-gray-200 opacity-50' 
-                            : 'bg-white border-gray-300 hover:border-gray-800'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="text-sm font-mono font-semibold text-gray-900">{sku.sku}</span>
-                            {sku.color && (
-                              <span className="ml-2 text-xs text-gray-500">({sku.color})</span>
-                            )}
+                    {product.productSkus.map((sku, index) => {
+                      // 颜色代码映射到全称（与新建产品页面保持一致）
+                      const colorMap: Record<string, string> = {
+                        'BK': 'Black',
+                        'WH': 'White',
+                        'RD': 'Red',
+                        'PK': 'Pink',
+                        'PU': 'Purple',
+                        'BL': 'Blue',
+                        'GN': 'Green',
+                        'SK': 'Skin',
+                        'CL': 'Clear',
+                      };
+                      const fullColorName = sku.color ? (colorMap[sku.color] || sku.color) : '';
+                      
+                      return (
+                        <div 
+                          key={sku.id || index} 
+                          className="p-3 border border-gray-300 rounded-lg bg-white"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="text-sm font-mono font-semibold text-gray-900">{sku.sku}</span>
+                              {fullColorName && (
+                                <span className="ml-2 text-xs text-gray-500">({fullColorName})</span>
+                              )}
+                            </div>
                           </div>
-                          {sku.stock === 0 && (
-                            <span className="text-xs text-red-600 font-semibold">Out of Stock</span>
-                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -400,7 +412,7 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
                 {/* Add to Inquiry Button */}
                 <button
                   onClick={handleAddToInquiryCart}
-                  disabled={addingToInquiry || (product.productSkus?.[0]?.stock === 0)}
+                  disabled={addingToInquiry}
                   className="w-full bg-gray-800 text-white py-4 px-6 rounded-xl font-bold text-lg hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
                   {addingToInquiry ? (
@@ -411,8 +423,6 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
                       </svg>
                       Adding...
                     </>
-                  ) : product.productSkus?.[0]?.stock === 0 ? (
-                    'Out of Stock'
                   ) : (
                     <>
                       <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -448,7 +458,7 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
                     {product.netWeight !== undefined && product.netWeight !== null && (
                       <tr>
                         <td className="px-4 py-3 text-sm font-semibold text-gray-900 w-1/3 border-r border-gray-200">Net Weight</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{product.netWeight} kg</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{product.netWeight} g</td>
                       </tr>
                     )}
 

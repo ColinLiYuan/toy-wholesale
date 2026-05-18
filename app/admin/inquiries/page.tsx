@@ -172,9 +172,17 @@ export default function InquiriesPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">询盘管理</h1>
-        <p className="mt-2 text-sm text-gray-600">管理客户提交的询盘信息</p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">询盘管理</h1>
+          <p className="mt-2 text-sm text-gray-600">管理客户提交的询盘信息</p>
+        </div>
+        <button
+          onClick={() => router.push('/admin/inquiries/new')}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          + 新建询盘
+        </button>
       </div>
 
       {/* 统计卡片 */}
@@ -308,7 +316,7 @@ export default function InquiriesPage() {
                       >
                         查看
                       </button>
-                      {!inquiry.assignedTo && (
+                      {!inquiry.assignedTo && inquiry.status !== 'CONVERTED' && inquiry.status !== 'CLOSED' && (
                         <button
                           onClick={() => handleAssignSalesperson(inquiry.id!)}
                           className="text-green-600 hover:text-green-900 mr-3"
@@ -324,13 +332,15 @@ export default function InquiriesPage() {
                           标记已联系
                         </button>
                       )}
-                      <button
-                        onClick={() => handleConvertToLead(inquiry.id!)}
-                        className="text-purple-600 hover:text-purple-900 mr-3"
-                      >
-                        生成潜客
-                      </button>
-                      {inquiry.status !== 'CLOSED' && (
+                      {inquiry.status !== 'CONVERTED' && inquiry.status !== 'CLOSED' && (
+                        <button
+                          onClick={() => handleConvertToLead(inquiry.id!)}
+                          className="text-purple-600 hover:text-purple-900 mr-3"
+                        >
+                          生成潜客
+                        </button>
+                      )}
+                      {inquiry.status !== 'CLOSED' && inquiry.status !== 'CONVERTED' && (
                         <button
                           onClick={() => handleCloseInquiry(inquiry.id!)}
                           className="text-red-600 hover:text-red-900"

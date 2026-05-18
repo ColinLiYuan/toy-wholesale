@@ -36,7 +36,7 @@ export async function GET() {
   ${blogs.map(blog => `
   <url>
     <loc>${baseUrl}/blog/${blog.slug}</loc>
-    <changefreq>weekly</changefreq>
+    <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   `).join('')}

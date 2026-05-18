@@ -161,7 +161,7 @@ export default function TermsOfServicePage() {
           </p>
           <div className="bg-[#F8F9FA] p-6 rounded-lg mb-6">
             <p className="text-[#6C757D] mb-2"><strong>Email:</strong> colinliyuan@gmail.com</p>
-            <p className="text-[#6C757D] mb-2"><strong>WhatsApp:</strong> +86 176 2018 9025</p>
+            <p className="text-[#6C757D] mb-2"><strong>WhatsApp:</strong> +86 138 2442 3871</p>
             <p className="text-[#6C757D]"><strong>Address:</strong> Dongguan, Guangdong, China</p>
           </div>
         </div>

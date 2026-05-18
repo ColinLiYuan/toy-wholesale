@@ -27,9 +27,6 @@ export default function NewDistributorPage() {
     if (!formData.name?.trim()) {
       newErrors.name = '请输入经销商名称';
     }
-    if (!formData.code?.trim()) {
-      newErrors.code = '请输入经销商编码';
-    }
     if (!formData.contactPerson?.trim()) {
       newErrors.contactPerson = '请输入联系人';
     }
@@ -95,18 +92,6 @@ export default function NewDistributorPage() {
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
               />
               {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">经销商编码 <span className="text-red-500">*</span></label>
-              <input
-                type="text"
-                name="code"
-                value={formData.code || ''}
-                onChange={handleInputChange}
-                placeholder="请输入经销商编码"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent ${errors.code ? 'border-red-500' : 'border-gray-300'}`}
-              />
-              {errors.code && <p className="mt-1 text-sm text-red-500">{errors.code}</p>}
             </div>
 
             <div>

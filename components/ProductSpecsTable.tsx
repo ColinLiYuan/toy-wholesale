@@ -13,7 +13,7 @@ export default function ProductSpecsTable({ product }: ProductSpecsTableProps) {
     ...(product.sku ? [{ key: 'SKU', value: product.sku, highlight: true }] : []),
     ...(product.material ? [{ key: 'Material', value: product.material }] : []),
     ...(product.netWeight !== undefined && product.netWeight !== null 
-      ? [{ key: 'Net Weight', value: `${product.netWeight} kg` }] 
+      ? [{ key: 'Net Weight', value: `${product.netWeight} g` }] 
       : []),
     ...(product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0
       ? [{ key: 'MOQ', value: `${product.minOrder} pcs`, important: true }]

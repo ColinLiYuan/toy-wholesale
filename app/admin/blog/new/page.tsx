@@ -86,10 +86,24 @@ export default function NewBlogPage() {
   };
 
   const addTag = () => {
-    if (newTag.trim() && !blog.tags.includes(newTag.trim())) {
-      setBlog({ ...blog, tags: [...blog.tags, newTag.trim()] });
-      setNewTag('');
-    }
+    if (!newTag.trim()) return;
+    
+    // 按逗号分割标签，并去除空白
+    const tagsToAdd = newTag.split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+    
+    const currentTags = [...blog.tags];
+    
+    // 添加不重复的标签
+    tagsToAdd.forEach(tag => {
+      if (!currentTags.includes(tag)) {
+        currentTags.push(tag);
+      }
+    });
+    
+    setBlog({ ...blog, tags: currentTags });
+    setNewTag('');
   };
 
   const removeTag = (tag: string) => {
@@ -257,7 +271,7 @@ export default function NewBlogPage() {
                   onChange={(e) => setNewTag(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  placeholder="输入标签后按回车"
+                  placeholder="输入标签，用逗号分隔多个标签..."
                 />
                 <button
                   type="button"

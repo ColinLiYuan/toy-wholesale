@@ -274,45 +274,17 @@ export const productAdminService = {
   // 更新产品 - PUT /v1/products/admin/{id}
   async updateProduct(id: number, product: Partial<Product>): Promise<Product> {
     try {
-      const url = `${API_ENDPOINTS.ADMIN_UPDATE_PRODUCT}/${id}`;
-      const requestBody = JSON.stringify(product);
-      
-      console.log('updateProduct API call:', {
-        url: `/api${url}`,
-        method: 'PUT',
-        contentType: 'application/json; charset=UTF-8',
-        bodySize: requestBody.length,
-        bodyPreview: requestBody.substring(0, 200),
-      });
-      
-      // 尝试直接使用 fetch 并明确设置 charset
-      const response = await fetch(`/api${url}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-        },
-        body: requestBody,
-      });
-      
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response body:', errorText);
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const apiResult = await response.json();
-      console.log('updateProduct response:', apiResult);
+      const apiResult: ApiResult<Product> = await apiClient.put(
+        `${API_ENDPOINTS.ADMIN_UPDATE_PRODUCT}/${id}`,
+        product
+      );
       
       if (apiResult.code !== 200 || !apiResult.data) {
         throw new Error(apiResult.message || 'Failed to update product');
       }
       
       return apiResult.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to update product:', error);
       throw error;
     }
@@ -1024,7 +996,7 @@ export const leadAdminService = {
     }
   },
 
-  // 更新潜客状态（带状态流转验证） - PATCH /api/v1/leads/{id}/status
+  // 更新潜客状态（带状态流转验证） - 使用 PUT /api/v1/leads/{id}
   async updateLeadStatus(
     id: number,
     status: string,
@@ -1032,9 +1004,10 @@ export const leadAdminService = {
     operator: string = 'admin'
   ): Promise<Lead> {
     try {
-      const apiResult: ApiResult<Lead> = await apiClient.patch(
-        `/v1/leads/${id}/status`,
-        { status, changeReason, operator }
+      // 后端没有单独的 /status 接口，直接使用 updateLead 更新 status 字段
+      const apiResult: ApiResult<Lead> = await apiClient.put(
+        `/v1/leads/${id}`,
+        { status }
       );
       
       if (apiResult.code !== 200 || !apiResult.data) {
@@ -1048,7 +1021,7 @@ export const leadAdminService = {
     }
   },
 
-  // 批量更新潜客状态 - PATCH /api/v1/leads/batch/status
+  // 批量更新潜客状态 - 使用 POST /api/v1/leads/batch-update
   async batchUpdateLeadStatus(
     leadIds: number[],
     status: string,
@@ -1056,16 +1029,16 @@ export const leadAdminService = {
     operator: string = 'admin'
   ): Promise<Record<string, any>> {
     try {
-      const apiResult: ApiResult<Record<string, any>> = await apiClient.patch(
-        '/v1/leads/batch/status',
-        { leadIds, status, changeReason, operator }
+      // 后端可能不支持批量更新，使用逐个更新
+      const results = await Promise.all(
+        leadIds.map(id => this.updateLeadStatus(id, status, changeReason, operator))
       );
       
-      if (apiResult.code !== 200 || !apiResult.data) {
-        throw new Error(apiResult.message || 'Failed to batch update lead status');
-      }
-      
-      return apiResult.data;
+      return {
+        successCount: results.length,
+        totalCount: leadIds.length,
+        failedIds: [],
+      };
     } catch (error) {
       console.error('Failed to batch update lead status:', error);
       throw error;
@@ -1617,6 +1590,25 @@ export const inquiryAdminService = {
       throw error;
     }
   },
+
+  // 创建询盘 - POST /api/v1/inquiries
+  async createInquiry(inquiry: Partial<Inquiry>): Promise<Inquiry> {
+    try {
+      const apiResult: ApiResult<Inquiry> = await apiClient.post(
+        '/v1/inquiries',
+        inquiry
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create inquiry');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create inquiry:', error);
+      throw error;
+    }
+  },
 };
 
 // 询盘提交服务（前台用户接口）
@@ -1974,3 +1966,923 @@ export const adminService = {
     }
   },
 };
+
+// 附件管理服务
+export interface Attachment {
+  id: number;
+  siteId: string;
+  entityType: 'INQUIRY' | 'LEAD' | 'SUPPLIER' | 'ORDER';
+  entityId: number;
+  fileName: string;
+  filePath: string;
+  fileUrl: string;
+  fileSize: number;
+  fileType: string;
+  fileExtension: string;
+  description?: string;
+  uploadBy?: string;
+  createdAt: string;
+}
+
+// 订单状态
+export type OrderStatus = 'CREATED' | 'CONFIRMED' | 'PRODUCING' | 'READY_TO_SHIP' | 'SHIPPED' | 'DELIVERED' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
+
+// 支付状态
+export type PaymentStatus = 'PENDING' | 'PAID' | 'PARTIAL' | 'REFUNDED' | 'FAILED';
+
+// 物流状态
+export type ShippingStatus = 'NOT_SHIPPED' | 'SHIPPING' | 'SHIPPED' | 'DELIVERED' | 'RETURNED';
+
+// 订单项
+export interface OrderItem {
+  id: number;
+  sku?: {
+    id: number;
+    sku: string;
+    product?: {
+      id: number;
+      name: string;
+      title: string;
+    };
+  };
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  weightWithBox?: number;
+  specifications?: string;
+  supplierNotes?: string;
+}
+
+// 销售订单
+export interface SalesOrder {
+  id: number;
+  siteId: string;
+  orderNumber: string;
+  distributorId?: number;
+  distributor?: {
+    id: number;
+    name: string;
+    code: string;
+  };
+  supplierId?: number;
+  supplier?: {
+    id: number;
+    name: string;
+    code: string;
+  };
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  shippingStatus: ShippingStatus;
+  totalAmount: number;
+  paidAmount: number;
+  totalWeight?: number;
+  receiverName?: string;
+  receiverPhone?: string;
+  shippingAddress?: string;
+  shippingCity?: string;
+  shippingRegion?: string;
+  shippingCountry?: string;
+  shippingZipCode?: string;
+  carrier?: string;
+  trackingNumber?: string;
+  estimatedShipDate?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+  paidAt?: string;
+  completedAt?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
+  notes?: string;
+  internalNotes?: string;
+  inquiryOrderId?: number;
+  items?: OrderItem[];
+  paymentRecords?: PaymentRecord[];
+  shipmentRecords?: ShipmentRecord[];
+  followUpRecords?: FollowUpRecord[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 支付记录
+export interface PaymentRecord {
+  id: number;
+  transactionId?: string;
+  amount: number;
+  paymentMethod?: string;  // BANK_TRANSFER, PAYPAL, CREDIT_CARD, ALIPAY, WECHAT
+  status?: PaymentStatus;
+  paidAt?: string;
+  notes?: string;
+  operator?: string;
+  createdAt: string;
+}
+
+// 物流记录
+export interface ShipmentRecord {
+  id: number;
+  carrier: string;
+  trackingNumber: string;
+  status?: ShippingStatus;
+  shippedAt?: string;
+  estimatedDeliveryAt?: string;
+  deliveredAt?: string;
+  notes?: string;
+  operator?: string;
+  createdAt: string;
+}
+
+// 订单列表响应
+export interface SalesOrderListResponse {
+  content: SalesOrder[];
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+export const attachmentService = {
+  // 上传附件 - POST /api/v1/attachments/upload
+  async uploadAttachment(
+    file: File,
+    entityType: 'INQUIRY' | 'LEAD' | 'SUPPLIER' | 'ORDER',
+    entityId: number,
+    description?: string,
+    uploadBy?: string
+  ): Promise<Attachment> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('entityType', entityType);
+      formData.append('entityId', String(entityId));
+      if (description) formData.append('description', description);
+      if (uploadBy) formData.append('uploadBy', uploadBy);
+
+      const apiResult: ApiResult<Attachment> = await apiClient.post(
+        '/v1/attachments/upload',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to upload attachment');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to upload attachment:', error);
+      throw error;
+    }
+  },
+
+  // 查询附件列表 - GET /api/v1/attachments
+  async getAttachments(
+    entityType: 'INQUIRY' | 'LEAD' | 'SUPPLIER' | 'ORDER',
+    entityId: number,
+    page: number = 0,
+    size: number = 20
+  ): Promise<{ content: Attachment[]; totalElements: number }> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        '/v1/attachments',
+        { params: { entityType, entityId, page, size } }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch attachments');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch attachments:', error);
+      throw error;
+    }
+  },
+
+  // 获取附件详情 - GET /api/v1/attachments/{id}
+  async getAttachment(id: number): Promise<Attachment> {
+    try {
+      const apiResult: ApiResult<Attachment> = await apiClient.get(
+        `/v1/attachments/${id}`
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch attachment');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch attachment:', error);
+      throw error;
+    }
+  },
+
+  // 下载附件 - GET /api/v1/attachments/{id}/download
+  async downloadAttachment(id: number): Promise<void> {
+    try {
+      window.open(`/api/v1/attachments/${id}/download`, '_blank');
+    } catch (error) {
+      console.error('Failed to download attachment:', error);
+      throw error;
+    }
+  },
+
+  // 删除附件 - DELETE /api/v1/attachments/{id}
+  async deleteAttachment(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/attachments/${id}`
+      );
+
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete attachment');
+      }
+    } catch (error) {
+      console.error('Failed to delete attachment:', error);
+      throw error;
+    }
+  },
+
+  // 更新附件描述 - PUT /api/v1/attachments/{id}
+  async updateAttachmentDescription(id: number, description: string): Promise<Attachment> {
+    try {
+      const apiResult: ApiResult<Attachment> = await apiClient.put(
+        `/v1/attachments/${id}`,
+        null,
+        { params: { description } }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update attachment');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update attachment:', error);
+      throw error;
+    }
+  },
+};
+
+// 销售订单服务
+export const salesOrderService = {
+  // 获取所有订单列表 - GET /api/v1/sales-orders
+  async getAllOrders(page: number = 0, size: number = 20, sortBy = 'createdAt', direction = 'DESC'): Promise<SalesOrderListResponse> {
+    try {
+      const apiResult: ApiResult<SalesOrderListResponse> = await apiClient.get(
+        '/v1/sales-orders',
+        { params: { page, size, sortBy, direction } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch orders');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      throw error;
+    }
+  },
+
+  // 根据 ID 查询订单详情 - GET /api/v1/sales-orders/{id}
+  async getOrderById(id: number): Promise<SalesOrder> {
+    try {
+      const apiResult: ApiResult<SalesOrder> = await apiClient.get(
+        `/v1/sales-orders/${id}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch order');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch order:', error);
+      throw error;
+    }
+  },
+
+  // 根据订单编号查询 - GET /api/v1/sales-orders/number/{orderNumber}
+  async getByOrderNumber(orderNumber: string): Promise<SalesOrder> {
+    try {
+      const apiResult: ApiResult<SalesOrder> = await apiClient.get(
+        `/v1/sales-orders/number/${orderNumber}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch order');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch order:', error);
+      throw error;
+    }
+  },
+
+  // 根据经销商 ID 查询订单 - GET /api/v1/sales-orders/distributor/{distributorId}
+  async getByDistributorId(distributorId: number, page: number = 0, size: number = 20): Promise<SalesOrderListResponse> {
+    try {
+      const apiResult: ApiResult<SalesOrderListResponse> = await apiClient.get(
+        `/v1/sales-orders/distributor/${distributorId}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch orders');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      throw error;
+    }
+  },
+
+  // 根据状态查询订单 - GET /api/v1/sales-orders/status/{status}
+  async getByStatus(status: string, page: number = 0, size: number = 20): Promise<SalesOrderListResponse> {
+    try {
+      const apiResult: ApiResult<SalesOrderListResponse> = await apiClient.get(
+        `/v1/sales-orders/status/${status}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch orders');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      throw error;
+    }
+  },
+
+  // 创建订单 - POST /api/v1/sales-orders
+  async createOrder(order: Partial<SalesOrder>): Promise<SalesOrder> {
+    try {
+      const apiResult: ApiResult<SalesOrder> = await apiClient.post(
+        '/v1/sales-orders',
+        order
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create order');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create order:', error);
+      throw error;
+    }
+  },
+
+  // 更新订单 - PUT /api/v1/sales-orders/{id}
+  async updateOrder(id: number, order: Partial<SalesOrder>): Promise<SalesOrder> {
+    try {
+      const apiResult: ApiResult<SalesOrder> = await apiClient.put(
+        `/v1/sales-orders/${id}`,
+        order
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update order');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update order:', error);
+      throw error;
+    }
+  },
+
+  // 删除订单 - DELETE /api/v1/sales-orders/{id}
+  async deleteOrder(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/sales-orders/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete order');
+      }
+    } catch (error) {
+      console.error('Failed to delete order:', error);
+      throw error;
+    }
+  },
+
+  // 更新订单状态 - PATCH /api/v1/sales-orders/{id}/status
+  async updateOrderStatus(id: number, status: OrderStatus): Promise<SalesOrder> {
+    try {
+      const apiResult: ApiResult<SalesOrder> = await apiClient.patch(
+        `/v1/sales-orders/${id}/status`,
+        null,
+        { params: { status } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update order status');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      throw error;
+    }
+  },
+
+  // 添加支付记录 - POST /api/v1/sales-orders/{id}/payments
+  async addPayment(id: number, paymentRecord: any): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.post(
+        `/v1/sales-orders/${id}/payments`,
+        paymentRecord
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to add payment');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to add payment:', error);
+      throw error;
+    }
+  },
+
+  // 删除支付记录 - DELETE /api/v1/sales-orders/{orderId}/payments/{paymentId}
+  async deletePayment(orderId: number, paymentId: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/sales-orders/${orderId}/payments/${paymentId}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete payment');
+      }
+    } catch (error) {
+      console.error('Failed to delete payment:', error);
+      throw error;
+    }
+  },
+
+  // 添加物流记录 - POST /api/v1/sales-orders/{id}/shipments
+  async addShipment(id: number, shipmentRecord: any): Promise<any> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.post(
+        `/v1/sales-orders/${id}/shipments`,
+        shipmentRecord
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to add shipment');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to add shipment:', error);
+      throw error;
+    }
+  },
+
+  // 删除物流记录 - DELETE /api/v1/sales-orders/{orderId}/shipments/{shipmentId}
+  async deleteShipment(orderId: number, shipmentId: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/sales-orders/${orderId}/shipments/${shipmentId}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete shipment');
+      }
+    } catch (error) {
+      console.error('Failed to delete shipment:', error);
+      throw error;
+    }
+  },
+
+  // 添加跟进记录 - POST /api/v1/sales-orders/{id}/follow-ups
+  async addFollowUp(id: number, followUpData: { content: string; followUpType?: string; result?: string }): Promise<FollowUpRecord> {
+    try {
+      console.log('Adding follow-up for order:', id, 'with data:', followUpData);
+      const apiResult: ApiResult<FollowUpRecord> = await apiClient.post(
+        `/v1/sales-orders/${id}/follow-ups`,
+        followUpData
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to add follow-up');
+      }
+      
+      return apiResult.data;
+    } catch (error: any) {
+      console.error('Failed to add follow-up:', error);
+      console.error('Error response:', error.response?.data);
+      throw error;
+    }
+  },
+
+  // 删除跟进记录 - DELETE /api/v1/sales-orders/{orderId}/follow-ups/{followUpId}
+  async deleteFollowUp(orderId: number, followUpId: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/sales-orders/${orderId}/follow-ups/${followUpId}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete follow-up');
+      }
+    } catch (error) {
+      console.error('Failed to delete follow-up:', error);
+      throw error;
+    }
+  },
+};
+
+// SEO关键词库服务
+export const seoKeywordService = {
+  // 获取所有关键词（分页） - GET /api/v1/seo-keywords
+  async getAllKeywords(
+    page: number = 0,
+    size: number = 20,
+    sortBy: string = 'addedAt',
+    direction: string = 'DESC'
+  ): Promise<import('@/types').SeoKeywordListResponse> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeywordListResponse> = await apiClient.get(
+        '/v1/seo-keywords',
+        { params: { page, size, sortBy, direction } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch keywords');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch keywords:', error);
+      throw error;
+    }
+  },
+
+  // 根据ID查询关键词 - GET /api/v1/seo-keywords/{id}
+  async getKeywordById(id: number): Promise<import('@/types').SeoKeyword> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeyword> = await apiClient.get(
+        `/v1/seo-keywords/${id}`
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch keyword');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch keyword:', error);
+      throw error;
+    }
+  },
+
+  // 创建关键词 - POST /api/v1/seo-keywords
+  async createKeyword(keyword: Partial<import('@/types').SeoKeyword>): Promise<import('@/types').SeoKeyword> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeyword> = await apiClient.post(
+        '/v1/seo-keywords',
+        keyword
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create keyword');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create keyword:', error);
+      throw error;
+    }
+  },
+
+  // 更新关键词 - PUT /api/v1/seo-keywords/{id}
+  async updateKeyword(
+    id: number,
+    keywordData: Partial<import('@/types').SeoKeyword>
+  ): Promise<import('@/types').SeoKeyword> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeyword> = await apiClient.put(
+        `/v1/seo-keywords/${id}`,
+        keywordData
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update keyword');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update keyword:', error);
+      throw error;
+    }
+  },
+
+  // 删除关键词 - DELETE /api/v1/seo-keywords/{id}
+  async deleteKeyword(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/seo-keywords/${id}`
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete keyword');
+      }
+    } catch (error) {
+      console.error('Failed to delete keyword:', error);
+      throw error;
+    }
+  },
+
+  // 根据状态查询关键词 - GET /api/v1/seo-keywords/status/{status}
+  async getKeywordsByStatus(
+    status: string,
+    page: number = 0,
+    size: number = 20
+  ): Promise<import('@/types').SeoKeywordListResponse> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeywordListResponse> = await apiClient.get(
+        `/v1/seo-keywords/status/${status}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch keywords by status');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch keywords by status:', error);
+      throw error;
+    }
+  },
+
+  // 根据目标页面类型查询 - GET /api/v1/seo-keywords/page-type/{pageType}
+  async getKeywordsByPageType(
+    pageType: string,
+    page: number = 0,
+    size: number = 20
+  ): Promise<import('@/types').SeoKeywordListResponse> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeywordListResponse> = await apiClient.get(
+        `/v1/seo-keywords/page-type/${pageType}`,
+        { params: { page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch keywords by page type');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch keywords by page type:', error);
+      throw error;
+    }
+  },
+
+  // 搜索关键词 - GET /api/v1/seo-keywords/search
+  async searchKeywords(
+    keyword: string,
+    page: number = 0,
+    size: number = 20
+  ): Promise<import('@/types').SeoKeywordListResponse> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeywordListResponse> = await apiClient.get(
+        '/v1/seo-keywords/search',
+        { params: { keyword, page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Search failed');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Search failed:', error);
+      throw error;
+    }
+  },
+
+  // 批量导入关键词（Excel/CSV） - POST /api/v1/seo-keywords/import
+  async importKeywords(file: File): Promise<any> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const apiResult: ApiResult<any> = await apiClient.post(
+        '/v1/seo-keywords/import',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Import failed');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to import keywords:', error);
+      throw error;
+    }
+  },
+
+  // 获取统计信息 - GET /api/v1/seo-keywords/statistics
+  async getStatistics(): Promise<Record<string, any>> {
+    try {
+      const apiResult: ApiResult<Record<string, any>> = await apiClient.get(
+        '/v1/seo-keywords/statistics'
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch statistics');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch statistics:', error);
+      throw error;
+    }
+  },
+
+  // 获取高优先级关键词 - GET /api/v1/seo-keywords/high-priority
+  async getHighPriorityKeywords(limit: number = 10): Promise<import('@/types').SeoKeyword[]> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeyword[]> = await apiClient.get(
+        '/v1/seo-keywords/high-priority',
+        { params: { limit } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch high priority keywords');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch high priority keywords:', error);
+      throw error;
+    }
+  },
+
+  // 获取有排名的关键词 - GET /api/v1/seo-keywords/ranked
+  async getRankedKeywords(limit: number = 20): Promise<import('@/types').SeoKeyword[]> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeyword[]> = await apiClient.get(
+        '/v1/seo-keywords/ranked',
+        { params: { limit } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch ranked keywords');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch ranked keywords:', error);
+      throw error;
+    }
+  },
+
+  // ========== 新增：关键词-页面关联 API ==========
+
+  // 根据 URL 查询使用了该 URL 的所有关键词（反向查询）
+  async findKeywordsByUrl(url: string): Promise<import('@/types').SeoKeyword[]> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeyword[]> = await apiClient.get(
+        '/v1/seo-keywords/findByUrl',
+        { params: { url } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to find keywords by URL');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to find keywords by URL:', error);
+      throw error;
+    }
+  },
+
+  // 根据关键词查询完整记录（包含 URL 列表）
+  async findKeywordWithUrls(keyword: string): Promise<import('@/types').SeoKeyword[]> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeyword[]> = await apiClient.get(
+        '/v1/seo-keywords/findWithUrls',
+        { params: { keyword } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to find keyword with URLs');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to find keyword with URLs:', error);
+      throw error;
+    }
+  },
+
+  // 批量关联关键词到URL - POST /api/v1/seo-keywords/linkToUrl
+  async linkKeywordsToUrl(request: import('@/types').LinkKeywordRequest): Promise<{ linkedCount: number; pageUrl: string }> {
+    try {
+      const apiResult: ApiResult<{ linkedCount: number; pageUrl: string }> = await apiClient.post(
+        '/v1/seo-keywords/linkToUrl',
+        request
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to link keywords');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to link keywords:', error);
+      throw error;
+    }
+  },
+
+  // 查询URL关联的所有关键词详情 - GET /api/v1/seo-keywords/findByUrl
+  async getKeywordsByUrl(url: string): Promise<import('@/types').KeywordDetailDTO[]> {
+    try {
+      const apiResult: ApiResult<import('@/types').KeywordDetailDTO[]> = await apiClient.get(
+        '/v1/seo-keywords/findByUrl',
+        { params: { url } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch keywords by URL');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch keywords by URL:', error);
+      throw error;
+    }
+  },
+
+  // 查询关键词关联的所有URL - GET /api/v1/seo-keywords/findUrls
+  async getUrlsByKeywordId(keywordId: number): Promise<string[]> {
+    try {
+      const apiResult: ApiResult<string[]> = await apiClient.get(
+        '/v1/seo-keywords/findUrls',
+        { params: { keywordId } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch URLs');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch URLs:', error);
+      throw error;
+    }
+  },
+
+  // 取消URL的所有关键词关联 - DELETE /api/v1/seo-keywords/unlinkByUrl
+  async unlinkKeywordsFromUrl(url: string): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        '/v1/seo-keywords/unlinkByUrl',
+        { params: { url } }
+      );
+      
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to unlink keywords');
+      }
+    } catch (error) {
+      console.error('Failed to unlink keywords:', error);
+      throw error;
+    }
+  },
+};
+
+// 导出类型（方便其他模块使用）
+export type { 
+  Inquiry, 
+  InquiryItem,
+  FollowUpRecord,
+  Lead,
+  Admin,
+  OperationAccount,
+  Distributor,
+  Product,
+  ProductSku,
+  SeoKeyword
+} from '@/types';

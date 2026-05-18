@@ -7,9 +7,9 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     company: '',
-    website: '',
-    businessType: '',
+    country: '',
     message: '',
   });
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,7 @@ export default function ContactPage() {
     
     console.log('[ContactPage] Form submitted');
     
-    if (!formData.name || !formData.email || !formData.company || !formData.businessType || !formData.message) {
+    if (!formData.name || !formData.email || !formData.company || !formData.message) {
       setError('Please fill in all required fields');
       return;
     }
@@ -41,11 +41,11 @@ export default function ContactPage() {
     try {
       // Build inquiry data
       const inquiryData = {
-        customerName: formData.name,
-        customerEmail: formData.email,
-        companyName: formData.company,
-        website: formData.website,
-        businessType: formData.businessType,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        company: formData.company,
+        country: formData.country,
         message: formData.message,
         source: 'WEBSITE_FORM',
       };
@@ -58,7 +58,7 @@ export default function ContactPage() {
       console.log('[ContactPage] Inquiry submitted successfully:', result);
 
       setSuccess(true);
-      setFormData({ name: '', email: '', company: '', website: '', businessType: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', company: '', country: '', message: '' });
     } catch (err) {
       console.error('[ContactPage] Failed to submit inquiry:', err);
       setError(err instanceof Error ? err.message : 'Failed to send inquiry');
@@ -105,8 +105,8 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-medium text-[#1A1A1A] mb-1">WhatsApp</h3>
-                    <a href="https://wa.me/17620189025" target="_blank" rel="noopener noreferrer" className="text-[#6C757D] hover:text-[#0056B3] transition-colors text-sm">
-                      +86 176 2018 9025
+                    <a href="https://wa.me/13824423871" target="_blank" rel="noopener noreferrer" className="text-[#6C757D] hover:text-[#0056B3] transition-colors text-sm">
+                      +86 138 2442 3871
                     </a>
                   </div>
                 </div>
@@ -218,6 +218,21 @@ export default function ContactPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-[#1A1A1A] mb-2">
+                      Phone / WhatsApp
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-[#0056B3] transition-colors"
+                      placeholder="+86 138 2442 3871"
+                    />
+                  </div>
+
+                  <div>
                     <label htmlFor="company" className="block text-sm font-medium text-[#1A1A1A] mb-2">
                       Company / Store Name <span className="text-red-500">*</span>
                     </label>
@@ -231,40 +246,43 @@ export default function ContactPage() {
                       required
                     />
                   </div>
-
-                  <div>
-                    <label htmlFor="website" className="block text-sm font-medium text-[#1A1A1A] mb-2">
-                      Website URL (Optional)
-                    </label>
-                    <input
-                      type="url"
-                      id="website"
-                      name="website"
-                      value={formData.website}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-[#0056B3] transition-colors"
-                      placeholder="https://"
-                    />
-                  </div>
                 </div>
 
                 <div>
-                  <label htmlFor="businessType" className="block text-sm font-medium text-[#1A1A1A] mb-2">
-                    Business Type <span className="text-red-500">*</span>
+                  <label htmlFor="country" className="block text-sm font-medium text-[#1A1A1A] mb-2">
+                    Country
                   </label>
                   <select
-                    id="businessType"
-                    name="businessType"
-                    value={formData.businessType}
+                    id="country"
+                    name="country"
+                    value={formData.country}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-[#0056B3] transition-colors"
-                    required
                   >
-                    <option value="">Select your business type</option>
-                    <option value="online_store">Online Store</option>
-                    <option value="physical_retail">Physical Retail</option>
-                    <option value="dropshipper">Dropshipper</option>
-                    <option value="distributor">Distributor</option>
+                    <option value="">Select your country</option>
+                    <option value="US">United States</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="CA">Canada</option>
+                    <option value="AU">Australia</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="IT">Italy</option>
+                    <option value="ES">Spain</option>
+                    <option value="NL">Netherlands</option>
+                    <option value="JP">Japan</option>
+                    <option value="KR">South Korea</option>
+                    <option value="SG">Singapore</option>
+                    <option value="MY">Malaysia</option>
+                    <option value="TH">Thailand</option>
+                    <option value="VN">Vietnam</option>
+                    <option value="IN">India</option>
+                    <option value="BR">Brazil</option>
+                    <option value="MX">Mexico</option>
+                    <option value="AE">UAE</option>
+                    <option value="SA">Saudi Arabia</option>
+                    <option value="ZA">South Africa</option>
+                    <option value="CN">China</option>
+                    <option value="OTHER">Other</option>
                   </select>
                 </div>
 

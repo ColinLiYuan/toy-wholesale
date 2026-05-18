@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { leadAdminService } from '@/services';
 import type { Lead, FollowUpRecord } from '@/types';
+import AttachmentManager from '@/components/AttachmentManager';
 
 export default function LeadDetailPage() {
   const router = useRouter();
@@ -13,8 +14,6 @@ export default function LeadDetailPage() {
 
   const [lead, setLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<Lead>>({});
   const [followUpRecords, setFollowUpRecords] = useState<FollowUpRecord[]>([]);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [newFollowUp, setNewFollowUp] = useState<Partial<FollowUpRecord>>({
@@ -37,7 +36,6 @@ export default function LeadDetailPage() {
       setLoading(true);
       const data = await leadAdminService.getLeadById(leadId);
       setLead(data);
-      setFormData(data);
     } catch (error) {
       console.error('Failed to fetch lead:', error);
       alert('获取潜客信息失败');
@@ -64,17 +62,7 @@ export default function LeadDetailPage() {
     }
   };
 
-  const handleUpdate = async () => {
-    try {
-      await leadAdminService.updateLead(leadId, formData);
-      setEditing(false);
-      fetchLead();
-      alert('更新成功');
-    } catch (error) {
-      console.error('Failed to update lead:', error);
-      alert('更新失败');
-    }
-  };
+
 
   const handleAddFollowUp = async () => {
     try {
@@ -214,34 +202,6 @@ export default function LeadDetailPage() {
           <h1 className="text-2xl font-bold text-gray-900">潜客详情</h1>
           <p className="text-gray-600 mt-1">{lead.companyName || '未填写公司名称'}</p>
         </div>
-        <div className="flex space-x-3">
-          {!editing ? (
-            <button
-              onClick={() => setEditing(true)}
-              className="px-6 py-3 bg-[#00F2FE] text-[#050505] rounded-lg font-semibold hover:bg-[#00C4CC] transition-colors"
-            >
-              编辑
-            </button>
-          ) : (
-            <>
-              <button
-                onClick={handleUpdate}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
-              >
-                保存
-              </button>
-              <button
-                onClick={() => {
-                  setEditing(false);
-                  setFormData(lead);
-                }}
-                className="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors"
-              >
-                取消
-              </button>
-            </>
-          )}
-        </div>
       </div>
 
       {/* 基本信息 */}
@@ -250,159 +210,53 @@ export default function LeadDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">公司名称</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.companyName || ''}
-                onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.companyName || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.companyName || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">联系人</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.contactPerson || ''}
-                onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.contactPerson || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.contactPerson || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">职位</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.position || ''}
-                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.position || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.position || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
-            {editing ? (
-              <input
-                type="email"
-                value={formData.email || ''}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.email || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.email || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">电话</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.phone || ''}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.phone || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.phone || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp/微信</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.imAccount || ''}
-                onChange={(e) => setFormData({ ...formData, imAccount: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.imAccount || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.imAccount || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">网站</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.website || ''}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
+            {lead.website ? (
+              <a href={lead.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                {lead.website}
+              </a>
             ) : (
-              lead.website ? (
-                <a href={lead.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  {lead.website}
-                </a>
-              ) : (
-                <p className="text-gray-900">-</p>
-              )
+              <p className="text-gray-900">-</p>
             )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">状态</label>
-            {editing ? (
-              <select
-                value={formData.status || 'NEW'}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              >
-                <option value="NEW">新线索</option>
-                <option value="CONTACTED">已联系</option>
-                <option value="INTERESTED">有意向</option>
-                <option value="QUOTED">已报价</option>
-                <option value="NEGOTIATING">谈判中</option>
-                <option value="CONVERTED">已成交</option>
-                <option value="INVALID">无效</option>
-              </select>
-            ) : (
-              <span className="inline-flex px-3 py-1 text-sm rounded-full font-medium bg-blue-100 text-blue-800">
-                {getStatusText(lead.status || 'NEW')}
-              </span>
-            )}
+            <span className="inline-flex px-3 py-1 text-sm rounded-full font-medium bg-blue-100 text-blue-800">
+              {getStatusText(lead.status || 'NEW')}
+            </span>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">优先级</label>
-            {editing ? (
-              <select
-                value={formData.priority || 'MEDIUM'}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              >
-                <option value="HIGH">高</option>
-                <option value="MEDIUM">中</option>
-                <option value="LOW">低</option>
-              </select>
-            ) : (
-              <span className="inline-flex px-3 py-1 text-sm rounded-full font-medium bg-yellow-100 text-yellow-800">
-                {getPriorityText(lead.priority || 'MEDIUM')}
-              </span>
-            )}
+            <span className="inline-flex px-3 py-1 text-sm rounded-full font-medium bg-yellow-100 text-yellow-800">
+              {getPriorityText(lead.priority || 'MEDIUM')}
+            </span>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">来源</label>
-            {editing ? (
-              <select
-                value={formData.source || ''}
-                onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              >
-                <option value="">请选择</option>
-                <option value="EMAIL">邮件开发</option>
-                <option value="EXHIBITION">展会</option>
-                <option value="WEBSITE">网站询盘</option>
-                <option value="REFERRAL">推荐</option>
-                <option value="COLD_CALL">电话开发</option>
-              </select>
-            ) : (
-              <p className="text-gray-900">{getSourceText(lead.source || '')}</p>
-            )}
+            <p className="text-gray-900">{getSourceText(lead.source || '')}</p>
           </div>
         </div>
       </div>
@@ -413,42 +267,15 @@ export default function LeadDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">国家</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.country || ''}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.country || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.country || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">省份/州</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.region || ''}
-                onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.region || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.region || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">城市</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.city || ''}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.city || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.city || '-'}</p>
           </div>
         </div>
       </div>
@@ -459,42 +286,15 @@ export default function LeadDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">预计采购量</label>
-            {editing ? (
-              <input
-                type="number"
-                value={formData.estimatedQuantity || ''}
-                onChange={(e) => setFormData({ ...formData, estimatedQuantity: Number(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.estimatedQuantity || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.estimatedQuantity || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">预算范围（USD）</label>
-            {editing ? (
-              <input
-                type="text"
-                value={formData.budgetRange || ''}
-                onChange={(e) => setFormData({ ...formData, budgetRange: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900">{lead.budgetRange || '-'}</p>
-            )}
+            <p className="text-gray-900">{lead.budgetRange || '-'}</p>
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">备注</label>
-            {editing ? (
-              <textarea
-                value={formData.notes || ''}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-              />
-            ) : (
-              <p className="text-gray-900 whitespace-pre-wrap">{lead.notes || '-'}</p>
-            )}
+            <p className="text-gray-900 whitespace-pre-wrap">{lead.notes || '-'}</p>
           </div>
         </div>
       </div>
@@ -676,6 +476,9 @@ export default function LeadDetailPage() {
           )}
         </div>
       </div>
+
+      {/* 附件管理 */}
+      <AttachmentManager entityType="LEAD" entityId={leadId} />
     </div>
   );
 }

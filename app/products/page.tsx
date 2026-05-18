@@ -2,10 +2,12 @@ import { productService } from '@/services';
 import type { Product, ProductListResponse } from '@/types';
 import { categories, findCategoryBySlug, getParentCategory } from '@/lib/categories';
 import WholesaleBreadcrumbs from '@/components/WholesaleBreadcrumbs';
+import WholesaleFilter from '@/components/WholesaleFilter';
 import ProductCardClient from '@/components/ProductCardClient';
 import PaginationClient from '@/components/PaginationClient';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Wholesale Adult Toys Products | LuxeAdult Wholesale',
@@ -90,31 +92,41 @@ export default async function ProductsPage({
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <WholesaleBreadcrumbs currentCategory={categoryParam === 'all' ? undefined : categoryParam} />
 
-          <div className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product) => (
-                <ProductCardClient key={product.id} product={product} />
-              ))}
+          <div className="mt-6 flex gap-8">
+            {/* Left Sidebar: Filters */}
+            <div className="hidden lg:block w-72 flex-shrink-0">
+              <Suspense fallback={<div className="w-72 h-96 bg-gray-100 animate-pulse rounded-lg"></div>}>
+                <WholesaleFilter selectedCategory={categoryParam === 'all' ? undefined : categoryParam} />
+              </Suspense>
+            </div>
+
+            {/* Right: Product Grid */}
+            <div className="flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {products.map((product) => (
+                  <ProductCardClient key={product.id} product={product} />
+                ))}
+              </div>
+
+              {pagination.totalPages > 1 && (
+                <PaginationClient 
+                  currentPage={pagination.currentPage} 
+                  totalPages={pagination.totalPages}
+                  category={categoryParam !== 'all' ? categoryParam : undefined}
+                />
+              )}
+
+              {products.length === 0 && (
+                <div className="text-center py-16">
+                  <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  <p className="text-[#6C757D] text-lg mb-2">No products found in this category</p>
+                  <p className="text-gray-400 text-sm">Try selecting a different category or browse all products</p>
+                </div>
+              )}
             </div>
           </div>
-
-          {pagination.totalPages > 1 && (
-            <PaginationClient 
-              currentPage={pagination.currentPage} 
-              totalPages={pagination.totalPages}
-              category={categoryParam !== 'all' ? categoryParam : undefined}
-            />
-          )}
-
-          {products.length === 0 && (
-            <div className="text-center py-16">
-              <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-              <p className="text-[#6C757D] text-lg mb-2">No products found in this category</p>
-              <p className="text-gray-400 text-sm">Try selecting a different category or browse all products</p>
-            </div>
-          )}
         </div>
       </section>
     </div>
