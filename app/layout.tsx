@@ -5,19 +5,19 @@ import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: {
-    default: "Silvibe - Medical-Grade Silicone Adult Toys Wholesale",
+    default: "Wholesale Adult Toys | Sex Toys Wholesale Supplier",
     template: "%s | Silvibe",
   },
-  description: "Certified medical-grade silicone adult toys from Dongguan factory. Low MOQ for global retailers. FDA, CE, RoHS compliant with OEM/ODM services.",
+  description: "Premium wholesale sex toys and adult toys wholesale supplier. Luxury adult toys at wholesale prices from China. Low MOQ, FDA/CE/RoHS certified.",
   keywords: [
-    "medical-grade silicone toys",
+    "wholesale sex toys",
     "adult toys wholesale",
-    "dongguan supplier",
-    "low MOQ adult products",
+    "wholesale adult toys",
+    "luxury sex toys wholesale",
+    "sex toys wholesale supplier",
+    "adult wellness wholesale",
     "OEM adult toys",
-    "FDA certified sex toys",
-    "silicone vibrator wholesale",
-    "dropshipping adult toys",
+    "low MOQ adult products",
   ],
   authors: [{ name: "Silvibe" }],
   creator: "Silvibe",

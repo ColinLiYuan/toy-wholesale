@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: ContactPageProps): Promise<Me
       type: 'website',
     },
     alternates: {
-      canonical: `https://luxeadult.com/${locale}/contact`,
+      canonical: `https://www.adult-toy-wholesale.com/contact`,
     },
   };
 }

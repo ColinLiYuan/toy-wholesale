@@ -5,7 +5,6 @@ export async function GET() {
 
     const staticPages = [
         { loc: '', priority: 1.0, changefreq: 'daily' }, // 首页
-        { loc: '/products', priority: 0.9, changefreq: 'weekly' }, // 产品列表
         { loc: '/blog', priority: 0.9, changefreq: 'daily' }, // 博客首页
         { loc: '/contact', priority: 0.5, changefreq: 'monthly' },
         { loc: '/content/solutions', priority: 0.8, changefreq: 'monthly' },

@@ -10,9 +10,9 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Wholesale Adult Toys Products | LuxeAdult Wholesale',
-  description: 'Browse our premium collection of adult wellness products at wholesale prices. Low MOQ, fast shipping worldwide.',
-  keywords: ['adult toys wholesale', 'silicone toys', 'liquid silicone', 'solid silicone', 'TPE TPR', 'wholesale distributor'],
+  title: 'Wholesale Sex Toys Products | Adult Toys Wholesale Catalog',
+  description: 'Browse wholesale sex toys and adult toys wholesale collection. Premium wholesale adult toys at luxury prices. Low MOQ, fast global shipping.',
+  keywords: ['wholesale sex toys', 'adult toys wholesale', 'wholesale adult toys', 'sex toys catalog', 'luxury sex toys wholesale', 'adult wellness products'],
 };
 
 export default async function ProductsPage({
@@ -79,10 +79,10 @@ export default async function ProductsPage({
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-[#1A1A1A] mb-6">
-              Shop Wholesale Adult Toys
+              Wholesale Sex Toys & Adult Toys Catalog
             </h1>
             <p className="text-xl text-[#6C757D] max-w-3xl mx-auto">
-              Browse our curated collection of premium adult wellness products. Low MOQ, competitive pricing, fast shipping.
+              Browse premium wholesale adult toys collection. Luxury sex toys wholesale prices, low MOQ, competitive pricing, fast worldwide shipping.
             </p>
           </div>
         </div>

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: VerifyPageProps): Promise<Met
       follow: true,
     },
     alternates: {
-      canonical: `https://luxeadult.com/${locale}/verify`,
+      canonical: `https://www.adult-toy-wholesale.com/verify`,
     },
   };
 }

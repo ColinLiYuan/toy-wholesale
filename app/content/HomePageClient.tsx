@@ -58,13 +58,13 @@ export default function HomePageClient() {
             <div className="space-y-8">
               <div className="space-y-6">
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-[#1A1A1A]">
-                  Silvibe Supply<br />
-                  Premium Medical-Grade<br />
-                  Adult Wellness.
+                  Wholesale Sex Toys &<br />
+                  Premium Adult Toys<br />
+                  Wholesale Supply.
                 </h1>
                 
                 <p className="text-xl md:text-2xl text-[#6C757D] leading-relaxed max-w-2xl">
-                  Wholesale-only platform for professional retailers and health brands.
+                  Leading wholesale adult toys supplier offering luxury sex toys wholesale prices. Medical-grade silicone, low MOQ, OEM/ODM for global retailers.
                 </p>
               </div>
 
