@@ -22,6 +22,7 @@ export default function EditSeoKeywordPage() {
     kd: '' as string | number,
     intent: '',
     category: '',
+    topic: '',
     status: 0,
     notes: '',
   });
@@ -40,6 +41,33 @@ export default function EditSeoKeywordPage() {
     { value: 'long_tail', label: '长尾词' },
     { value: 'article', label: '文章词' },
     { value: 'brand', label: '品牌词' },
+  ];
+
+  // 主题选项（SEO话题分类）
+  const topicOptions = [
+    { value: 'CLIT', label: '阴蒂相关 (Clit)' },
+    { value: 'ANAL', label: '肛门相关 (Anal)' },
+    { value: 'DILDO', label: '假阳具 (Dildo)' },
+    { value: 'COUPLES', label: '情侣用品 (Couples)' },
+    { value: 'BEGINNER', label: '初学者 (Beginner)' },
+    { value: 'PREMATURE', label: '早泄相关 (Premature)' },
+    { value: 'STAMINA', label: '耐力持久 (Stamina)' },
+    { value: 'WAND', label: '按摩棒 (Wand)' },
+    { value: 'BULLET', label: '跳蛋/迷你震动器 (Bullet)' },
+    { value: 'RABBIT', label: '兔型双震 (Rabbit)' },
+    { value: 'GSPOT', label: 'G点震动器 (GSpot)' },
+    { value: 'MASTURBATOR', label: '男用自慰器 (Masturbator)' },
+    { value: 'COCKRING', label: '阴茎环 (CockRing)' },
+    { value: 'PROSTATE', label: '前列腺玩具 (Prostate)' },
+    { value: 'DISCREET', label: '隐蔽/静音 (Discreet)' },
+    { value: 'LUBE', label: '润滑液 (Lube)' },
+    { value: 'CLEANER', label: '玩具清洁 (Cleaner)' },
+    { value: 'BODYSAFE', label: '身体安全材料 (BodySafe)' },
+    { value: 'PELVIC', label: '盆底肌训练 (Pelvic)' },
+    { value: 'LIBIDO', label: '女性性欲 (Libido)' },
+    { value: 'ORGASM', label: '女性高潮 (Orgasm)' },
+    { value: 'NIPPLE', label: '乳头玩具 (Nipple)' },
+    { value: 'EDUCATION', label: '性教育科普 (Education)' },
   ];
 
   // 状态选项
@@ -63,6 +91,7 @@ export default function EditSeoKeywordPage() {
           kd: data.kd !== undefined && data.kd !== null ? data.kd : '',
           intent: data.intent || '',
           category: data.category || '',
+          topic: data.topic || '',
           status: data.status || 0,
           notes: data.notes || '',
         });
@@ -129,6 +158,12 @@ export default function EditSeoKeywordPage() {
         keywordData.category = formData.category;
       } else {
         keywordData.category = null;
+      }
+      
+      if (formData.topic) {
+        keywordData.topic = formData.topic;
+      } else {
+        keywordData.topic = null;
       }
       
       keywordData.status = formData.status;
@@ -258,6 +293,23 @@ export default function EditSeoKeywordPage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">SEO主题</label>
+              <select
+                value={formData.topic}
+                onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">请选择</option>
+                {topicOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500">用于SEO内容组织和分组</p>
             </div>
 
             <div>

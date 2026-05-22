@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { leadAdminService } from '@/services';
 import type { Lead } from '@/types';
+import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -329,7 +330,7 @@ export default function LeadsPage() {
                       <td className="px-6 py-4">
                         <div className="text-sm">
                           {lead.email && <p className="text-gray-900">{lead.email}</p>}
-                          {lead.phone && <p className="text-gray-600">{lead.phone}</p>}
+                          {lead.phone && <p className="text-gray-600">{formatPhoneWithCountryCode(lead.phone)}</p>}
                           {lead.imAccount && <p className="text-xs text-gray-500">IM: {lead.imAccount}</p>}
                         </div>
                       </td>

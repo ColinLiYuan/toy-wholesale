@@ -6,6 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { distributorAdminService } from '@/services';
 import { Distributor, FollowUpRecord } from '@/types';
 import AttachmentManager from '@/components/AttachmentManager';
+import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
 
 export default function DistributorDetailPage() {
   const router = useRouter();
@@ -270,7 +271,7 @@ export default function DistributorDetailPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900">{distributor.phone || '-'}</p>
+                    <p className="text-gray-900">{formatPhoneWithCountryCode(distributor.phone)}</p>
                   )}
                 </div>
               </div>

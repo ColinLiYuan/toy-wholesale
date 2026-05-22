@@ -20,6 +20,33 @@ const categoryMap: Record<string, string> = {
   brand: '品牌词',
 };
 
+// 主题映射
+const topicMap: Record<string, string> = {
+  CLIT: '阴蒂相关',
+  ANAL: '肛门相关',
+  DILDO: '假阳具',
+  COUPLES: '情侣用品',
+  BEGINNER: '初学者',
+  PREMATURE: '早泄相关',
+  STAMINA: '耐力持久',
+  WAND: '按摩棒',
+  BULLET: '跳蛋/迷你震动器',
+  RABBIT: '兔型双震',
+  GSPOT: 'G点震动器',
+  MASTURBATOR: '男用自慰器',
+  COCKRING: '阴茎环',
+  PROSTATE: '前列腺玩具',
+  DISCREET: '隐蔽/静音',
+  LUBE: '润滑液',
+  CLEANER: '玩具清洁',
+  BODYSAFE: '身体安全材料',
+  PELVIC: '盆底肌训练',
+  LIBIDO: '女性性欲',
+  ORGASM: '女性高潮',
+  NIPPLE: '乳头玩具',
+  EDUCATION: '性教育科普',
+};
+
 // 状态映射
 const statusMap: Record<number, { label: string; color: string }> = {
   0: { label: '未使用', color: 'bg-gray-100 text-gray-800' },
@@ -34,6 +61,8 @@ export default function SeoKeywordsPage() {
   const [totalElements, setTotalElements] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [topicFilter, setTopicFilter] = useState<string>('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('');
   
   // URL关联功能状态
   const [showUrlLinkModal, setShowUrlLinkModal] = useState(false);
@@ -49,19 +78,26 @@ export default function SeoKeywordsPage() {
     setLoading(true);
     try {
       let response;
-      if (searchKeyword) {
-        response = await seoKeywordService.searchKeywords(searchKeyword, currentPage, 20);
-      } else if (statusFilter) {
-        response = await seoKeywordService.getKeywordsByStatus(statusFilter, currentPage, 20);
-      } else {
-        response = await seoKeywordService.getAllKeywords(currentPage, 20);
-      }
+      console.log('Loading keywords with filters:', { searchKeyword, statusFilter, topicFilter, categoryFilter, currentPage });
       
+      // 使用通用搜索接口，支持多条件筛选
+      const params: any = { page: currentPage, size: 20 };
+      if (searchKeyword) params.keyword = searchKeyword;
+      if (statusFilter) params.status = Number(statusFilter);
+      if (topicFilter) params.topic = topicFilter;
+      if (categoryFilter) params.category = categoryFilter;
+      
+      console.log('Search params:', params);
+      response = await seoKeywordService.searchKeywordsWithFilters(params);
+      
+      console.log('Keywords loaded:', response.content?.length, 'items');
       setKeywords(response.content || []);
       setTotalPages(response.totalPages || 0);
       setTotalElements(response.totalElements || 0);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load keywords:', error);
+      console.error('Error details:', error.message, error.response?.status);
+      alert('加载失败：' + (error.message || '未知错误'));
       setKeywords([]);
     } finally {
       setLoading(false);
@@ -70,7 +106,7 @@ export default function SeoKeywordsPage() {
 
   useEffect(() => {
     loadKeywords();
-  }, [currentPage]);
+  }, [currentPage, statusFilter, topicFilter, categoryFilter]);
 
   // 删除关键词
   const handleDelete = async (id: number) => {
@@ -228,19 +264,60 @@ export default function SeoKeywordsPage() {
             />
           </div>
           <select
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setCurrentPage(0); // 重置到第一页
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">所有分类</option>
+            {Object.entries(categoryMap).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+          <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(0); // 重置到第一页
+            }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">所有状态</option>
             <option value="0">未使用</option>
             <option value="1">已使用</option>
           </select>
+          <select
+            value={topicFilter}
+            onChange={(e) => {
+              setTopicFilter(e.target.value);
+              setCurrentPage(0); // 重置到第一页
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">所有主题</option>
+            {Object.entries(topicMap).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
           <button
             onClick={loadKeywords}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             搜索
+          </button>
+          <button
+            onClick={() => {
+              setSearchKeyword('');
+              setStatusFilter('');
+              setTopicFilter('');
+              setCategoryFilter('');
+              setCurrentPage(0);
+            }}
+            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            重置
           </button>
         </div>
       </div>
@@ -266,6 +343,7 @@ export default function SeoKeywordsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">难度</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">意图</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">主题</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">添加时间</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
@@ -310,6 +388,15 @@ export default function SeoKeywordsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
                         {keyword.category ? categoryMap[keyword.category] || keyword.category : '-'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {keyword.topic ? (
+                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                            {topicMap[keyword.topic] || keyword.topic}
+                          </span>
+                        ) : '-'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

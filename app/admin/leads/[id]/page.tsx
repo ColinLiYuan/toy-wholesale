@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { leadAdminService } from '@/services';
 import type { Lead, FollowUpRecord } from '@/types';
 import AttachmentManager from '@/components/AttachmentManager';
+import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
 
 export default function LeadDetailPage() {
   const router = useRouter();
@@ -226,7 +227,7 @@ export default function LeadDetailPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">电话</label>
-            <p className="text-gray-900">{lead.phone || '-'}</p>
+            <p className="text-gray-900">{formatPhoneWithCountryCode(lead.phone)}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp/微信</label>

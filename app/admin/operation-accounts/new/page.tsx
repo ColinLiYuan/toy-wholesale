@@ -14,7 +14,7 @@ export default function NewOperationAccountPage() {
     businessLine: 'GENERAL',
     platform: 'LINKEDIN',
     status: 'ACTIVE',
-    followersCount: 0,
+    followersCount: undefined,
     twoFactorEnabled: false,
   });
 
@@ -101,12 +101,71 @@ export default function NewOperationAccountPage() {
     
     try {
       setLoading(true);
-      await operationAccountService.createAccount(formData);
+      
+      // 清理数据：移除空值和undefined字段
+      const cleanData: any = { ...formData };
+      
+      // 处理平台字段：空字符串转为undefined
+      if (cleanData.platform === '' || cleanData.platform === undefined) {
+        delete cleanData.platform;
+      }
+      
+      // 处理数字字段
+      if (cleanData.leadId === '' || cleanData.leadId === undefined) {
+        delete cleanData.leadId;
+      }
+      if (cleanData.followersCount === 0 && cleanData.accountType !== 'SOCIAL_MEDIA') {
+        delete cleanData.followersCount;
+      }
+      
+      // 处理可选字段
+      if (!cleanData.displayName) delete cleanData.displayName;
+      if (!cleanData.password) delete cleanData.password;
+      if (!cleanData.purpose) delete cleanData.purpose;
+      if (!cleanData.projectName) delete cleanData.projectName;
+      if (!cleanData.backupContact) delete cleanData.backupContact;
+      if (!cleanData.phoneNumber) delete cleanData.phoneNumber;
+      if (!cleanData.profileUrl) delete cleanData.profileUrl;
+      if (!cleanData.notes) delete cleanData.notes;
+      
+      console.log('提交数据:', cleanData);
+      
+      await operationAccountService.createAccount(cleanData);
       alert('账号创建成功！');
       router.push('/admin/operation-accounts');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create account:', error);
-      alert('创建账号失败，请重试。');
+      console.error('Error response:', error.response?.data);
+      console.error('Error backend message:', error.backendMessage);
+      console.error('Error backend data:', error.backendData);
+      
+      // 显示更详细的错误信息
+      let errorMessage = '创建账号失败，请重试。';
+      
+      // 优先使用后端返回的具体错误信息
+      if (error.backendMessage) {
+        errorMessage = error.backendMessage;
+      } else if (error.backendData?.message) {
+        errorMessage = error.backendData.message;
+      } else if (error.backendData?.error) {
+        errorMessage = error.backendData.error;
+      } else if (error.userMessage) {
+        errorMessage = error.userMessage;
+      } else if (error.responseMessage) {
+        errorMessage = error.responseMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // 如果有字段验证错误，显示详细信息
+      if (error.backendData?.errors && Array.isArray(error.backendData.errors)) {
+        const fieldErrors = error.backendData.errors.map((e: any) => 
+          `${e.field || e.path}: ${e.message || e.reason}`
+        ).join('\n');
+        errorMessage = `创建账号失败：\n${fieldErrors}`;
+      }
+      
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

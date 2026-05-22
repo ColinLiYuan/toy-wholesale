@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { distributorAdminService } from '@/services';
 import { Distributor } from '@/types';
+import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
 
 export default function DistributorsPage() {
   const [loading, setLoading] = useState(true);
@@ -269,7 +270,7 @@ export default function DistributorsPage() {
                       <td className="px-6 py-4">
                         <div className="space-y-1">
                           {distributor.email && <p className="text-sm text-blue-600">{distributor.email}</p>}
-                          {distributor.phone && <p className="text-sm text-gray-600">{distributor.phone}</p>}
+                          {distributor.phone && <p className="text-sm text-gray-600">{formatPhoneWithCountryCode(distributor.phone)}</p>}
                         </div>
                       </td>
                       <td className="px-6 py-4">

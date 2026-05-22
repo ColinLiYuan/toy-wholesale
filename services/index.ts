@@ -1282,12 +1282,19 @@ export const operationAccountService = {
       );
       
       if (apiResult.code !== 200 || !apiResult.data) {
-        throw new Error(apiResult.message || 'Failed to create account');
+        const error = new Error(apiResult.message || 'Failed to create account');
+        (error as any).responseMessage = apiResult.message;
+        throw error;
       }
       
       return apiResult.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create account:', error);
+      // 如果是axios错误，保留原始的response data
+      if (error.response?.data) {
+        error.backendMessage = error.response.data.message || error.response.data.error;
+        error.backendData = error.response.data;
+      }
       throw error;
     }
   },
@@ -2606,7 +2613,7 @@ export const seoKeywordService = {
     }
   },
 
-  // 根据状态查询关键词 - GET /api/v1/seo-keywords/status/{status}
+  // 根据状态查询关键词 - GET /api/v1/seo-keywords/search?status={status}
   async getKeywordsByStatus(
     status: string,
     page: number = 0,
@@ -2614,8 +2621,8 @@ export const seoKeywordService = {
   ): Promise<import('@/types').SeoKeywordListResponse> {
     try {
       const apiResult: ApiResult<import('@/types').SeoKeywordListResponse> = await apiClient.get(
-        `/v1/seo-keywords/status/${status}`,
-        { params: { page, size } }
+        '/v1/seo-keywords/search',
+        { params: { status: Number(status), page, size } }
       );
       
       if (apiResult.code !== 200 || !apiResult.data) {
@@ -2652,7 +2659,30 @@ export const seoKeywordService = {
     }
   },
 
-  // 搜索关键词 - GET /api/v1/seo-keywords/search
+  // 根据主题查询关键词 - GET /api/v1/seo-keywords/search?topic={topic}
+  async getKeywordsByTopic(
+    topic: string,
+    page: number = 0,
+    size: number = 20
+  ): Promise<import('@/types').SeoKeywordListResponse> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeywordListResponse> = await apiClient.get(
+        '/v1/seo-keywords/search',
+        { params: { topic, page, size } }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch keywords by topic');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch keywords by topic:', error);
+      throw error;
+    }
+  },
+
+  // 搜索关键词 - GET /api/v1/seo-keywords/search?keyword={keyword}
   async searchKeywords(
     keyword: string,
     page: number = 0,
@@ -2671,6 +2701,32 @@ export const seoKeywordService = {
       return apiResult.data;
     } catch (error) {
       console.error('Search failed:', error);
+      throw error;
+    }
+  },
+
+  // 通用搜索（支持多条件筛选）- GET /api/v1/seo-keywords/search
+  async searchKeywordsWithFilters(params: {
+    keyword?: string;
+    status?: number;
+    category?: string;
+    topic?: string;
+    page?: number;
+    size?: number;
+  }): Promise<import('@/types').SeoKeywordListResponse> {
+    try {
+      const apiResult: ApiResult<import('@/types').SeoKeywordListResponse> = await apiClient.get(
+        '/v1/seo-keywords/search',
+        { params }
+      );
+      
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Search failed');
+      }
+      
+      return apiResult.data;
+    } catch (error) {
+      console.error('Search with filters failed:', error);
       throw error;
     }
   },

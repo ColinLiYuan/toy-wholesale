@@ -572,6 +572,7 @@ export interface SeoKeyword {
   kd?: number;  // 关键词难度 (0-100)
   intent?: string;  // 搜索意图: C(Commercial), T(Transaction), I(Informational), N(Navigational)
   category?: string;  // 关键词分类: core(核心词), long_tail(定制长尾词), article(信息文章词), brand(品牌词)
+  topic?: string;  // SEO主题/话题分类（用于内容组织和分组）
   status?: number;  // 使用状态: 0-未使用 (Unused), 1-已使用 (Used)
   usedInType?: number;  // 应用页面类型: 0-无, 1-产品详情页, 2-博客文章, 3-其他
   usedInId?: number;  // 关联的页面 ID（产品ID 或 博客文章ID）

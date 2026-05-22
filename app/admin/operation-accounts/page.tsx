@@ -15,11 +15,12 @@ export default function SocialMediaAccountsPage() {
   });
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedAccountType, setSelectedAccountType] = useState<string>('');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('');
   const [visiblePasswords, setVisiblePasswords] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchAccounts();
-  }, [pagination.currentPage, selectedAccountType]);
+  }, [pagination.currentPage, selectedAccountType, selectedPlatform]);
 
   const fetchAccounts = async () => {
     try {
@@ -32,6 +33,23 @@ export default function SocialMediaAccountsPage() {
           pagination.currentPage,
           20
         );
+      } else if (selectedPlatform) {
+        // 如果有平台筛选，使用 filter 接口
+        const data = await operationAccountService.getAccountsByFilter(
+          selectedAccountType || 'GENERAL',
+          selectedPlatform
+        );
+        response = {
+          content: data,
+          currentPage: 0,
+          totalPages: 1,
+          totalElements: data.length,
+          hasNext: false,
+          hasPrevious: false,
+          first: true,
+          last: true,
+          pageSize: 20,
+        };
       } else if (selectedAccountType) {
         const data = await operationAccountService.getAccountsByType(selectedAccountType);
         response = {
@@ -68,6 +86,43 @@ export default function SocialMediaAccountsPage() {
   const handleSearch = () => {
     setPagination({ ...pagination, currentPage: 0 });
     fetchAccounts();
+  };
+
+  // 根据账号类型获取平台选项
+  const getPlatformOptions = () => {
+    const platforms: Record<string, Array<{ value: string; label: string }>> = {
+      SOCIAL_MEDIA: [
+        { value: 'LINKEDIN', label: 'LinkedIn' },
+        { value: 'FACEBOOK', label: 'Facebook' },
+        { value: 'INSTAGRAM', label: 'Instagram' },
+        { value: 'TWITTER', label: 'Twitter' },
+        { value: 'TIKTOK', label: 'TikTok' },
+        { value: 'WHATSAPP', label: 'WhatsApp' },
+        { value: 'REDDIT', label: 'Reddit' },
+      ],
+      EMAIL: [
+        { value: 'GMAIL', label: 'Gmail' },
+        { value: 'OUTLOOK', label: 'Outlook' },
+        { value: 'YAHOO', label: 'Yahoo' },
+        { value: '163', label: '网易163' },
+        { value: 'QQ', label: 'QQ邮箱' },
+        { value: 'ALIYUN', label: '阿里云邮箱' },
+        { value: 'ZOHO', label: 'Zoho' },
+        { value: 'YANDEX', label: 'Yandex' },
+      ],
+      PAYMENT: [
+        { value: 'PAYPAL', label: 'PayPal' },
+        { value: 'STRIPE', label: 'Stripe' },
+        { value: 'WISE', label: 'Wise' },
+      ],
+    };
+    return platforms[selectedAccountType] || [];
+  };
+
+  const handleAccountTypeChange = (value: string) => {
+    setSelectedAccountType(value);
+    // 切换账号类型时清空平台筛选
+    setSelectedPlatform('');
   };
 
   const handleDelete = async (id: number) => {
@@ -260,7 +315,7 @@ export default function SocialMediaAccountsPage() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <input
                 type="text"
@@ -274,7 +329,7 @@ export default function SocialMediaAccountsPage() {
             <div>
               <select
                 value={selectedAccountType}
-                onChange={(e) => setSelectedAccountType(e.target.value)}
+                onChange={(e) => handleAccountTypeChange(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
               >
                 <option value="">所有账号类型</option>
@@ -284,6 +339,22 @@ export default function SocialMediaAccountsPage() {
                 <option value="OTHER">📦 其他</option>
               </select>
             </div>
+            {selectedAccountType && selectedAccountType !== 'OTHER' && (
+              <div>
+                <select
+                  value={selectedPlatform}
+                  onChange={(e) => setSelectedPlatform(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                >
+                  <option value="">所有平台</option>
+                  {getPlatformOptions().map((platform) => (
+                    <option key={platform.value} value={platform.value}>
+                      {platform.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <button
                 onClick={handleSearch}
