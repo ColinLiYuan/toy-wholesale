@@ -6,11 +6,11 @@ import { Metadata } from 'next';
 import BlogPagination from './BlogPagination';
 
 export const metadata: Metadata = {
-  title: 'Industry Insights & Business Tips | LuxeAdult Wholesale',
+  title: 'Industry Insights & Business Tips',
   description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs. Learn how to grow your business with our industry insights.',
   keywords: ['adult toys wholesale', 'business tips', 'retail advice', 'e-commerce strategies', 'wholesale distribution'],
   openGraph: {
-    title: 'Industry Insights & Business Tips | LuxeAdult Wholesale',
+    title: 'Industry Insights & Business Tips | Silvibe',
     description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs',
     type: 'website',
   },
@@ -21,9 +21,10 @@ const pageSize = 12;
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const currentPage = parseInt(searchParams.page || '0');
+  const params = await searchParams;
+  const currentPage = parseInt(params.page || '0');
 
   let blogs: BlogPost[] = [];
   let totalPages = 1;
@@ -84,7 +85,6 @@ export default async function BlogPage({
                         />
                       </div>
                     )}
-
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <span className="px-3 py-1 bg-[#0056B3]/10 text-[#0056B3] text-xs font-medium rounded-full">
@@ -94,26 +94,16 @@ export default async function BlogPage({
                           {blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString() : ''}
                         </span>
                       </div>
-
                       <h3 className="text-xl font-bold mb-3 text-[#1A1A1A] group-hover:text-[#0056B3] transition-colors line-clamp-2">
                         {blog.title}
                       </h3>
-
-                      <p className="text-[#6C757D] text-sm line-clamp-3 mb-4">
-                        {blog.excerpt}
-                      </p>
-
+                      <p className="text-[#6C757D] text-sm line-clamp-3 mb-4">{blog.excerpt}</p>
                       {blog.tags && (() => {
                         const tagsArray = parseTags(blog.tags);
                         return tagsArray.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
                             {tagsArray.slice(0, 3).map((tag) => (
-                              <span
-                                key={tag}
-                                className="px-2 py-1 bg-[#F8F9FA] text-[#6C757D] text-xs rounded border border-gray-200"
-                              >
-                                #{tag}
-                              </span>
+                              <span key={tag} className="px-2 py-1 bg-[#F8F9FA] text-[#6C757D] text-xs rounded border border-gray-200">#{tag}</span>
                             ))}
                           </div>
                         ) : null;
@@ -122,10 +112,7 @@ export default async function BlogPage({
                   </Link>
                 ))}
               </div>
-
-              {totalPages > 1 && (
-                <BlogPagination currentPage={currentPage} totalPages={totalPages} />
-              )}
+              {totalPages > 1 && <BlogPagination currentPage={currentPage} totalPages={totalPages} />}
             </>
           )}
         </div>

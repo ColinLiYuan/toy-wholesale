@@ -2,11 +2,11 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Request Product Samples - LuxeAdult Wholesale',
+  title: 'Request Product Samples — Evaluate Quality First',
   description: 'Request product samples to evaluate our premium adult wellness products before placing bulk orders. Quality guaranteed with competitive wholesale pricing.',
   keywords: ['product samples', 'adult toys samples', 'quality testing', 'wholesale samples', 'bulk order evaluation'],
   openGraph: {
-    title: 'Request Product Samples - LuxeAdult Wholesale',
+    title: 'Request Product Samples — Evaluate Quality First | Silvibe',
     description: 'Experience our premium adult wellness products with free samples',
     type: 'website',
   },

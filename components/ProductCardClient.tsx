@@ -38,7 +38,8 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
       skuCode: product.sku || product.productSkus?.[0]?.sku,
       color: product.productSkus?.[0]?.color,
     });
-    alert(`✅ Added to Inquiry Cart!\n\nProduct: ${product.title}\nMOQ: ${minOrder} pcs\n\nYou can submit inquiry from the Inquiry Cart.`);
+    const event = new CustomEvent('inquiryCartUpdated', { detail: { productId: product.id } });
+    window.dispatchEvent(event);
   };
 
   const getImageUrl = (imagePath: string) => {
@@ -152,17 +153,7 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
 
         <button
           onClick={handleAddToInquiry}
-          className="block w-full py-3 text-white font-semibold text-center transition-colors duration-200"
-          style={{ 
-            backgroundColor: '#6C5CE7',
-            borderRadius: '6px'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#5B4BC4';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#6C5CE7';
-          }}
+          className="block w-full py-3 text-white font-semibold text-center transition-colors duration-200 bg-[#0056B3] hover:bg-[#004494] rounded-lg"
         >
           Add to Inquiry
         </button>

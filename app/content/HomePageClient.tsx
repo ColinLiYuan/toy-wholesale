@@ -11,25 +11,14 @@ export default function HomePageClient() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 价格格式化工具函数：修复 19,50 → 19.50
-  const formatPrice = (price: string | number): string => {
-    const priceStr = String(price).replace(',', '.');
-    const num = parseFloat(priceStr);
-    return isNaN(num) ? priceStr : num.toFixed(2);
-  };
-
-  // 获取首页推荐产品
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
         setLoading(true);
         const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
         const response = await fetch(`${apiBaseUrl}/api/v1/products/featured?tag=首页推荐&limit=6`, {
-          headers: {
-            'X-Site-Id': 'toy',
-          },
+          headers: { 'X-Site-Id': 'toy' },
         });
-        
         if (response.ok) {
           const data = await response.json();
           if (data.code === 200 && data.data) {
@@ -42,59 +31,111 @@ export default function HomePageClient() {
         setLoading(false);
       }
     };
-
     fetchFeaturedProducts();
   }, []);
 
+  const stats = [
+    { value: '100+', label: 'Partner Factories', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+    { value: '50+', label: 'Countries Served', icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { value: '20 pcs', label: 'Low MOQ', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+    { value: '24h', label: 'Quick Response', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+  ];
+
+  const categories = [
+    { name: 'Silicone Vibrators', slug: 'silicone-vibrators', desc: 'Medical-grade silicone, waterproof, rechargeable, multiple stimulation modes.', gradient: 'from-[#0056B3] to-[#0077CC]' },
+    { name: 'Male Pleasure Tech', slug: 'male-pleasure-tech', desc: 'Prostate massagers, automatic masturbators, vibrating rings with remote control.', gradient: 'from-[#004494] to-[#0066B3]' },
+    { name: 'BDSM & Bondage', slug: 'bdsm-bondage', desc: 'Soft restraints, blindfolds, impact play, and beginner-to-advanced bondage kits.', gradient: 'from-[#003373] to-[#0056B3]' },
+    { name: 'Lingerie & Apparel', slug: 'lingerie-apparel', desc: 'Lace bodysuits, role-play costumes, adjustable sizing for diverse markets.', gradient: 'from-[#002252] to-[#004494]' },
+  ];
+
+  const advantages = [
+    { icon: 'M13 10V3L4 14h7v7l9-11h-7z', title: 'Factory-Direct Pricing', desc: 'Based in Dongguan, the manufacturing hub. No middlemen — you get genuine wholesale rates directly from source.' },
+    { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Certified & Compliant', desc: 'FDA, CE, RoHS compliant. Medical-grade silicone. Every batch QC inspected before leaving the factory.' },
+    { icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z', title: 'OEM / ODM Ready', desc: 'Custom logos, packaging, colors, materials. Full product development from concept to production. Your brand, built here.' },
+    { icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', title: 'Global Logistics', desc: 'DHL, UPS, YunExpress partnerships. Air and sea freight options. Discreet plain packaging with no exterior branding.' },
+    { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', title: 'Discreet Shipping', desc: 'Plain boxes, neutral sender info, secure inner wrapping. Your customers\' privacy is our top priority in every shipment.' },
+    { icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', title: 'Dedicated Support', desc: 'Personal account manager, multilingual team, WhatsApp communication. Real human support throughout your order journey.' },
+  ];
+
+  const steps = [
+    { step: 1, title: 'Browse & Select', desc: 'Explore our catalog. Pick products that match your market and customer profile.' },
+    { step: 2, title: 'Request a Quote', desc: 'Tell us quantities and destination. We respond with detailed wholesale pricing fast.' },
+    { step: 3, title: 'Confirm & Pay', desc: 'Review proforma invoice. Secure payment via T/T, PayPal, or wire transfer.' },
+    { step: 4, title: 'Production & Shipping', desc: 'We manufacture, QC, pack, and ship. Real-time tracking from factory to your door.' },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
+
       {/* ============================================
-          1. Hero Section - 白色极简视觉
+          1. Hero
       ============================================ */}
-      <section className="relative min-h-screen flex items-center pt-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* 左侧文字 */}
+      <section className="relative min-h-[90vh] flex items-center pt-16 bg-white overflow-hidden">
+        {/* Subtle background texture */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-[#0056B3]/3 to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#F8F9FA] to-transparent rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 w-full relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Left */}
             <div className="space-y-8">
-              <div className="space-y-6">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-[#1A1A1A]">
-                  Wholesale Sex Toys &<br />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#0056B3]/20 bg-[#0056B3]/5">
+                <span className="w-2 h-2 rounded-full bg-[#0056B3]" />
+                <span className="text-sm text-[#0056B3] font-semibold tracking-wide">Dongguan Factory Direct</span>
+              </div>
+
+              <div className="space-y-5">
+                <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.08] tracking-tight text-[#1A1A1A]">
                   Premium Adult Toys<br />
-                  Wholesale Supply.
+                  Wholesale, Direct<br />
+                  from Factory
                 </h1>
-                
-                <p className="text-xl md:text-2xl text-[#6C757D] leading-relaxed max-w-2xl">
-                  Leading wholesale adult toys supplier offering luxury sex toys wholesale prices. Medical-grade silicone, low MOQ, OEM/ODM for global retailers.
+                <p className="text-lg md:text-xl text-[#6C757D] leading-relaxed max-w-lg">
+                  Medical-grade silicone products for global retailers and distributors. Low MOQ, OEM/ODM branding, dedicated account support — all from Dongguan&apos;s manufacturing hub.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <Link
                   href="/products"
-                  className="group inline-flex items-center justify-center px-8 py-4 rounded-lg bg-[#6B46C1] text-white font-semibold text-lg hover:bg-[#553C9A] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                  className="group inline-flex items-center justify-center px-8 py-4 rounded-xl bg-[#0056B3] text-white font-semibold text-lg hover:bg-[#004494] transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 >
-                  Browse Wholesale Catalog
+                  Browse Catalog
                   <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </Link>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-[#1A1A1A] text-[#1A1A1A] font-semibold text-lg hover:bg-[#1A1A1A] hover:text-white transition-all duration-200"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-xl border-2 border-[#D1D5DB] text-[#1A1A1A] font-semibold text-lg hover:border-[#0056B3] hover:text-[#0056B3] transition-all duration-200"
                 >
-                  Request Catalog & Pricing
+                  Request Pricing
                 </button>
               </div>
             </div>
 
-            {/* 右侧产品图 */}
+            {/* Right — Product image */}
             <div className="relative hidden lg:block">
-              <div className="relative w-full aspect-[4/5] bg-white rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-[#F8F9FA] via-white to-[#E9ECEF] rounded-3xl overflow-hidden shadow-2xl ring-1 ring-gray-100">
                 <img
                   src={`${R2_BASE_URL}/toy/home_product.jpg`}
-                  alt="WL-020 Medical-grade silicone massager on marble surface"
-                  className="w-full h-full object-contain"
+                  alt="Medical-grade silicone product — wholesale supplier"
+                  className="w-full h-full object-contain p-6"
                 />
+              </div>
+              {/* Floating badge */}
+              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg border border-gray-100 px-5 py-3 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-[#1A1A1A]">FDA / CE Certified</div>
+                  <div className="text-xs text-[#6C757D]">Medical-grade quality</div>
+                </div>
               </div>
             </div>
           </div>
@@ -102,273 +143,225 @@ export default function HomePageClient() {
       </section>
 
       {/* ============================================
-          2. B2B Features - 模块化分割
+          2. Stats
       ============================================ */}
-      <section className="py-16 bg-[#F8F9FA]">
+      <section className="py-14 bg-white border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { icon: 'box', title: 'Flexible MOQ', desc: 'From 20 pcs' },
-              { icon: 'globe', title: 'Global Fulfillment', desc: 'Air & Sea shipping' },
-              { icon: 'customize', title: 'OEM/ODM Support', desc: 'Custom branding' },
-              { icon: 'shield', title: 'Full Compliance', desc: 'FDA / CE / RoHS' },
-            ].map((feature, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 border border-[#E0E0E0] text-center hover:shadow-md hover:-translate-y-1 transition-all duration-200">
-                <div className="w-14 h-14 rounded-lg bg-[#F8F9FA] flex items-center justify-center mx-auto mb-4">
-                  {feature.icon === 'box' && (
-                    <svg className="w-7 h-7 text-[#6B46C1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                  )}
-                  {feature.icon === 'globe' && (
-                    <svg className="w-7 h-7 text-[#6B46C1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  )}
-                  {feature.icon === 'customize' && (
-                    <svg className="w-7 h-7 text-[#6B46C1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                  )}
-                  {feature.icon === 'shield' && (
-                    <svg className="w-7 h-7 text-[#6B46C1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  )}
-                </div>
-                <h3 className="text-base font-bold text-[#1A1A1A] mb-1">{feature.title}</h3>
-                <p className="text-xs text-[#6C757D]">{feature.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Compliance Certifications - Trust Signals */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-lg text-[#6C757D] max-w-3xl mx-auto mb-4 font-medium">
-              Safety & Quality Guaranteed: All products meet medical-grade silicone standards.
-            </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A]">
-              Certified & Compliant
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { name: 'FDA', desc: 'Food Grade Silicone' },
-              { name: 'CE', desc: 'European Conformity' },
-              { name: 'RoHS', desc: 'Hazardous Substances' },
-              { name: 'Phthalate-Free', desc: 'Body-Safe Materials' },
-            ].map((cert, index) => (
-              <div key={index} className="bg-[#F8F9FA] rounded-xl p-6 border border-gray-200 text-center hover:border-[#0056B3] transition-colors">
-                <div className="w-20 h-20 rounded-full bg-[#0056B3]/10 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-10 h-10 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            {stats.map((s, i) => (
+              <div key={i} className="text-center group">
+                <div className="w-14 h-14 rounded-2xl bg-[#F8F9FA] group-hover:bg-[#0056B3]/10 flex items-center justify-center mx-auto mb-4 transition-colors">
+                  <svg className="w-6 h-6 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={s.icon} />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">{cert.name}</h3>
-                <p className="text-sm text-[#6C757D]">{cert.desc}</p>
+                <div className="text-3xl md:text-4xl font-extrabold text-[#1A1A1A] mb-1">{s.value}</div>
+                <div className="text-sm text-[#6C757D] font-medium">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Browse by Material - Key Differentiator */}
-      <section className="py-24 bg-[#F8F9FA]">
+      {/* ============================================
+          3. Product Categories
+      ============================================ */}
+      <section className="py-20 lg:py-28 bg-[#F8F9FA]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">
-              Browse by Material
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
+              Product Categories
             </h2>
-            <p className="text-xl text-[#6C757D] max-w-3xl mx-auto">
-              Professional-grade materials for every market segment
+            <p className="text-lg text-[#6C757D] max-w-xl mx-auto">
+              Full catalog organized by market segment. Every product available for OEM branding.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: 'Liquid Silicone',
-                grade: 'Medical Grade',
-                features: ['Ultra-soft texture', 'Hypoallergenic', 'Easy to clean', 'Premium feel'],
-                moq: 'MOQ: 50 pcs',
-                bestFor: 'High-end retail brands',
-              },
-              {
-                name: 'Solid Silicone',
-                grade: 'Food Grade',
-                features: ['Durable construction', 'Cost-effective', 'Good elasticity', 'Wide color range'],
-                moq: 'MOQ: 100 pcs',
-                bestFor: 'Mid-market retailers',
-              },
-              {
-                name: 'TPE/TPR',
-                grade: 'Standard Grade',
-                features: ['Budget-friendly', 'Soft touch', 'Realistic feel', 'Entry-level pricing'],
-                moq: 'MOQ: 200 pcs',
-                bestFor: 'Price-sensitive markets',
-              },
-            ].map((material, index) => (
-              <div key={index} className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-200">
-                {/* Material Image Placeholder */}
-                <div className="relative h-48 bg-gradient-to-br from-[#F8F9FA] to-[#E9ECEF] flex items-center justify-center">
-                  <div className="text-center">
-                    <svg className="w-20 h-20 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {categories.map((cat) => (
+              <Link
+                key={cat.slug}
+                href={`/products?category=${cat.slug}`}
+                className="group relative bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              >
+                {/* Top gradient accent */}
+                <div className={`h-1.5 w-full bg-gradient-to-r ${cat.gradient}`} />
+                <div className="p-7">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-5 shadow-sm`}>
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
-                    <p className="text-gray-400 text-xs">Material sample photo</p>
                   </div>
+                  <h3 className="text-lg font-bold text-[#1A1A1A] mb-2 group-hover:text-[#0056B3] transition-colors">{cat.name}</h3>
+                  <p className="text-sm text-[#6C757D] leading-relaxed mb-4">{cat.desc}</p>
+                  <span className="inline-flex items-center text-sm font-semibold text-[#0056B3]">
+                    Browse
+                    <svg className="ml-1.5 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
                 </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                {/* Material Info */}
-                <div className="p-6">
-                  <div className="mb-4">
-                    <h3 className="text-2xl font-bold text-[#1A1A1A] mb-1">{material.name}</h3>
-                    <span className="inline-block px-3 py-1 bg-[#0056B3]/10 text-[#0056B3] text-xs font-semibold rounded-full">
-                      {material.grade}
-                    </span>
-                  </div>
+      {/* ============================================
+          4. Why Partner With Us
+      ============================================ */}
+      <section className="py-20 lg:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
+              Why Partner With Silvibe
+            </h2>
+            <p className="text-lg text-[#6C757D] max-w-xl mx-auto">
+              Dongguan factory access. No middlemen. Personalized wholesale service to grow your business.
+            </p>
+          </div>
 
-                  <ul className="space-y-2 mb-6">
-                    {material.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start space-x-2 text-sm">
-                        <svg className="w-4 h-4 text-[#0056B3] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-[#6C757D]">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="pt-4 border-t border-gray-100 mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-[#6C757D]">Minimum Order:</span>
-                      <span className="text-sm font-semibold text-[#0056B3]">{material.moq}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-[#6C757D]">Best For:</span>
-                      <span className="text-sm font-medium text-[#1A1A1A]">{material.bestFor}</span>
-                    </div>
-                  </div>
-
-                  <Link
-                    href={`/products?material=${material.name.toLowerCase().replace('/', '-')}`}
-                    className="block w-full py-3 rounded-lg bg-[#0056B3] text-white font-semibold text-center hover:bg-[#004494] transition-colors duration-200"
-                  >
-                    View Products
-                  </Link>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {advantages.map((item, i) => (
+              <div key={i} className="group relative bg-white border border-gray-100 rounded-2xl p-7 hover:border-[#0056B3]/20 hover:shadow-lg transition-all duration-200">
+                {/* Subtle left accent on hover */}
+                <div className="absolute left-0 top-6 bottom-6 w-0.5 bg-[#0056B3] opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
+                <div className="w-11 h-11 rounded-xl bg-[#0056B3]/8 flex items-center justify-center mb-5 group-hover:bg-[#0056B3]/12 transition-colors">
+                  <svg className="w-5 h-5 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
+                  </svg>
                 </div>
+                <h3 className="text-lg font-bold text-[#1A1A1A] mb-2">{item.title}</h3>
+                <p className="text-sm text-[#6C757D] leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Products - Clean Grid Layout */}
-      <section className="py-24 bg-white">
+      {/* ============================================
+          5. How to Order
+      ============================================ */}
+      <section className="py-20 lg:py-28 bg-[#F8F9FA]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
+              How to Order
+            </h2>
+            <p className="text-lg text-[#6C757D] max-w-xl mx-auto">
+              Simple process from browsing to delivery. We handle the complexity.
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Connecting line — desktop only */}
+            <div className="hidden lg:block absolute top-12 left-[12.5%] right-[12.5%] h-0.5 bg-gray-200" />
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {steps.map((s, i) => (
+                <div key={i} className="relative bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-md transition-all duration-200 text-center">
+                  {/* Step circle */}
+                  <div className="w-12 h-12 rounded-full bg-[#0056B3] text-white flex items-center justify-center mx-auto mb-5 text-lg font-extrabold shadow-md relative z-10">
+                    {s.step}
+                  </div>
+                  <h3 className="text-lg font-bold text-[#1A1A1A] mb-2">{s.title}</h3>
+                  <p className="text-sm text-[#6C757D] leading-relaxed">{s.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          6. Hot Products
+      ============================================ */}
+      <section className="py-20 lg:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
               Hot Selling Products
             </h2>
-            <p className="text-xl text-[#6C757D] max-w-3xl mx-auto">
-              Browse our premium collection of medical-grade silicone products
+            <p className="text-lg text-[#6C757D] max-w-xl mx-auto">
+              Proven sellers across global markets. Medical-grade silicone, competitive wholesale pricing.
             </p>
           </div>
 
           {loading ? (
-            // 加载状态
             <div className="grid md:grid-cols-3 gap-8">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse">
-                  <div className="h-64 bg-gray-200"></div>
+                <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse">
+                  <div className="h-72 bg-gray-200" />
                   <div className="p-6 space-y-4">
-                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-6 bg-gray-200 rounded w-3/4" />
                     <div className="space-y-2">
-                      <div className="h-4 bg-gray-200 rounded"></div>
-                      <div className="h-4 bg-gray-200 rounded"></div>
-                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 rounded" />
+                      <div className="h-4 bg-gray-200 rounded" />
+                      <div className="h-4 bg-gray-200 rounded w-1/2" />
                     </div>
-                    <div className="h-12 bg-gray-200 rounded"></div>
+                    <div className="h-12 bg-gray-200 rounded-xl" />
                   </div>
                 </div>
               ))}
             </div>
           ) : featuredProducts.length > 0 ? (
-            // 显示推荐产品
             <div className="grid md:grid-cols-3 gap-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200">
-                  {/* Product Image */}
-                  <Link href={`/products/${product.slug}`} className="relative h-64 bg-white flex items-center justify-center overflow-hidden block">
+                <div key={product.id} className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <Link href={`/products/${product.slug}`} className="relative h-72 bg-[#F8F9FA] flex items-center justify-center overflow-hidden block">
                     <img
                       src={product.image?.startsWith('http') ? product.image : `${R2_BASE_URL}/${product.image}`}
                       alt={product.alt || product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder-product.svg';
-                      }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
                     />
-                    {/* Tag Badge - 如果有标签 */}
                     {product.tags && (() => {
                       const tagList = Array.isArray(product.tags) ? product.tags : (typeof product.tags === 'string' ? JSON.parse(product.tags) : []);
                       const firstTag = tagList[0];
                       return firstTag ? (
-                        <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-[#0056B3] to-purple-600 text-white text-xs font-semibold rounded-full">
+                        <div className="absolute top-4 left-4 px-3 py-1.5 bg-[#0056B3] text-white text-xs font-semibold rounded-lg shadow-md">
                           {firstTag}
                         </div>
                       ) : null;
                     })()}
                   </Link>
-
-                  {/* Product Info */}
                   <div className="p-6">
                     <Link href={`/products/${product.slug}`}>
-                      <h3 className="text-lg font-bold text-[#1A1A1A] mb-4 hover:text-[#0056B3] transition-colors">
+                      <h3 className="text-lg font-bold text-[#1A1A1A] mb-3 hover:text-[#0056B3] transition-colors line-clamp-1">
                         {product.title}
                       </h3>
                     </Link>
-
-                    {/* Technical Specs */}
                     <div className="space-y-2 mb-4">
                       {product.material && (
                         <div className="flex justify-between text-sm">
-                          <span className="text-[#6C757D]">Material:</span>
+                          <span className="text-[#6C757D]">Material</span>
                           <span className="text-[#1A1A1A] font-medium">{product.material}</span>
                         </div>
                       )}
                       {product.shortDescription && (
                         <div className="flex justify-between text-sm">
-                          <span className="text-[#6C757D]">Feature:</span>
+                          <span className="text-[#6C757D]">Feature</span>
                           <span className="text-[#1A1A1A] font-medium line-clamp-1">{product.shortDescription}</span>
                         </div>
                       )}
                       {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
                         <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
-                          <span className="text-[#6C757D]">MOQ:</span>
+                          <span className="text-[#6C757D]">MOQ</span>
                           <span className="text-[#0056B3] font-semibold">{product.minOrder} pcs</span>
                         </div>
                       )}
                     </div>
-
-                    {/* OEM Badge */}
-                    <div className="mb-4 p-3 bg-[#0056B3]/5 rounded-lg border border-[#0056B3]/20">
-                      <div className="flex items-center space-x-2">
-                        <svg className="w-4 h-4 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="mb-4 p-3 bg-[#0056B3]/5 rounded-xl border border-[#0056B3]/10">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-[#0056B3] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
-                        <span className="text-xs font-semibold text-[#0056B3]">Custom Branding (OEM) Available</span>
+                        <span className="text-xs font-semibold text-[#0056B3]">OEM Branding Available</span>
                       </div>
                     </div>
-
-                    {/* CTA Button */}
                     <Link
                       href={`/contact?product=${product.slug}`}
-                      className="block w-full py-3 rounded-lg bg-gradient-to-r from-[#0056B3] to-purple-600 text-white font-semibold hover:from-[#004494] hover:to-purple-700 transition-all duration-200 text-center"
+                      className="block w-full py-3 rounded-xl bg-[#0056B3] text-white font-semibold text-center hover:bg-[#004494] transition-colors duration-200"
                     >
                       Get Bulk Quote
                     </Link>
@@ -377,136 +370,54 @@ export default function HomePageClient() {
               ))}
             </div>
           ) : (
-            // 无数据提示
-            <div className="text-center py-16">
-              <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            <div className="text-center py-20">
+              <svg className="w-20 h-20 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
-              <p className="text-[#6C757D] text-lg mb-2">No featured products available</p>
-              <p className="text-gray-400 text-sm">Check back later for new arrivals</p>
+              <p className="text-[#6C757D] text-lg mb-1">No featured products yet</p>
+              <p className="text-gray-400 text-sm">New arrivals coming soon</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* Trust & Logistics Section */}
-      <section className="py-24 bg-[#F8F9FA]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">
-              Global Trade Assurance
-            </h2>
-            <p className="text-xl text-[#6C757D]">
-              Certified quality with secure worldwide shipping
-            </p>
-          </div>
+      {/* ============================================
+          7. CTA
+      ============================================ */}
+      <section className="relative py-20 lg:py-28 bg-[#0056B3] overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 pointer-events-none opacity-10">
+          <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white" />
+          <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-white" />
+        </div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left - Factory/Packaging Image */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="aspect-video bg-[#F8F9FA] rounded-xl flex items-center justify-center mb-6">
-                <div className="text-center">
-                  <svg className="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <p className="text-gray-400 text-sm">Factory / Packaging Sample Photo</p>
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Premium Custom Packaging</h3>
-              <p className="text-[#6C757D] text-sm">
-                Black-gold gift boxes, white-label options, and fully customizable packaging to match your brand identity.
-              </p>
-            </div>
-
-            {/* Right - Logistics Partners */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 border border-gray-200">
-                <h4 className="text-lg font-bold text-[#1A1A1A] mb-4">Shipping Partners</h4>
-                <div className="grid grid-cols-3 gap-4">
-                  {['DHL', 'UPS', 'YunExpress'].map((partner, idx) => (
-                    <div key={idx} className="h-16 bg-[#F8F9FA] rounded-lg flex items-center justify-center border border-gray-200">
-                      <span className="text-sm font-semibold text-[#6C757D]">{partner}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl p-6 border border-gray-200">
-                <h4 className="text-lg font-bold text-[#1A1A1A] mb-4">Key Benefits</h4>
-                <ul className="space-y-3">
-                  {[
-                    'Discreet packaging guaranteed',
-                    'Global fast shipping (3-7 days)',
-                    'Real-time order tracking',
-                    'Insurance options available',
-                  ].map((benefit, idx) => (
-                    <li key={idx} className="flex items-start space-x-3">
-                      <svg className="w-5 h-5 text-[#0056B3] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-sm text-[#6C757D]">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Ready to Stock Your Shelves?
+          </h2>
+          <p className="text-xl text-white/70 mb-10 max-w-xl mx-auto leading-relaxed">
+            Join retailers in 50+ countries sourcing premium adult toys from Dongguan. Competitive pricing, OEM branding, global delivery.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center px-10 py-4 rounded-xl bg-white text-[#0056B3] font-bold text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Contact Sales
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+            <Link
+              href="/sample-kit"
+              className="inline-flex items-center justify-center px-10 py-4 rounded-xl border-2 border-white/30 text-white font-bold text-lg hover:bg-white/10 transition-all"
+            >
+              Request Sample Kit
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Privacy Packaging Promise */}
-      <section className="py-20 bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-[#0056B3]/5 to-[#0056B3]/10 rounded-2xl p-8 md:p-12 border border-[#0056B3]/20">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#0056B3]/10 rounded-full mb-6">
-                  <svg className="w-5 h-5 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <span className="text-sm font-semibold text-[#0056B3]">Privacy Guaranteed</span>
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] mb-4">
-                  100% Discreet Packaging
-                </h2>
-                <p className="text-lg text-[#6C757D] mb-6">
-                  Your customers' privacy is our priority. All orders ship in plain, unmarked boxes with no product descriptions or branding visible on the exterior.
-                </p>
-                <ul className="space-y-3">
-                  {[
-                    'Plain brown boxes or white mailers',
-                    'No product names or images on packaging',
-                    'Generic sender information',
-                    'Secure inner wrapping for protection',
-                  ].map((item, idx) => (
-                    <li key={idx} className="flex items-start space-x-3">
-                      <svg className="w-5 h-5 text-[#0056B3] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-sm text-[#6C757D]">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="bg-white rounded-xl p-8 border border-gray-200">
-                <div className="aspect-square bg-[#F8F9FA] rounded-lg flex items-center justify-center mb-4">
-                  <div className="text-center">
-                    <svg className="w-32 h-32 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                    <p className="text-gray-400 text-sm">Discreet packaging example</p>
-                  </div>
-                </div>
-                <p className="text-center text-sm text-[#6C757D]">
-                  Example: Plain box with shipping label only
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Inquiry Modal */}
       <InquiryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );

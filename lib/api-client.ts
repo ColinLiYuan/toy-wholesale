@@ -1,6 +1,25 @@
 import axios from 'axios';
 import { API_BASE_URL, BACKEND_BASE_URL } from './api-config';
 
+// 动态站点标识（多租户隔离），支持运行时切换
+let currentSiteId = 'toy';
+
+export function setSiteId(siteId: string) {
+  currentSiteId = siteId;
+}
+
+export function getSiteId(): string {
+  return currentSiteId;
+}
+
+// 客户端初始化：从 localStorage 恢复上次选择的站点
+if (typeof window !== 'undefined') {
+  const saved = localStorage.getItem('admin_site_id');
+  if (saved === 'toy' || saved === 'myth') {
+    currentSiteId = saved;
+  }
+}
+
 // 获取后端 API 的绝对地址（用于 Server Component）
 const getAbsoluteBaseUrl = () => {
   if (typeof window === 'undefined') {
@@ -28,7 +47,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // 添加多租户标识
-    config.headers['X-Site-Id'] = 'toy';
+    config.headers['X-Site-Id'] = currentSiteId;
     
     // 调试日志：输出请求信息
     console.log('[API Request]', {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { setSiteId } from '@/lib/api-client';
 
 // 检查是否已登录
 const checkAuth = () => {
@@ -13,45 +14,78 @@ const checkAuth = () => {
   return false;
 };
 
-// 定义导航菜单，支持子菜单
-const navigation = [
-  { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
-  { name: '产品管理', href: '/admin/products', icon: '📦' },
-  { name: '潜客管理', href: '/admin/leads', icon: '👥' },
-  { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
-  { name: '订单管理', href: '/admin/orders', icon: '🛒' },
-  { name: '管理员管理', href: '/admin/admins', icon: '🔐' },
-  { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
-  { name: '博客管理', href: '/admin/blog', icon: '📝' },
-  { name: '运营账号', href: '/admin/operation-accounts', icon: '🌐' },
-  {
-    name: 'SEO 专题',
-    href: '/admin/seo-knowledge',
-    icon: '🔍',
-    children: [
-      { name: 'SEO 基础知识', href: '/admin/seo-knowledge/basics' },
-      { name: '关键词管理', href: '/admin/seo-keywords' },
-      { name: '技术 SEO', href: '/admin/seo-knowledge/technical' },
-      { name: '内容策略', href: '/admin/seo-knowledge/content' },
-      { name: '数据分析', href: '/admin/seo-knowledge/analytics' },
-      { name: '国际化 SEO', href: '/admin/seo-knowledge/international' },
+type MenuItem = {
+  name: string;
+  href: string;
+  icon: string;
+  children?: { name: string; href: string }[];
+};
+
+const siteConfig: Record<string, { label: string; adminName: string; menus: MenuItem[] }> = {
+  toy: {
+    label: 'LuxeAdult (Toy)',
+    adminName: 'LuxeAdult Admin',
+    menus: [
+      { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
+      { name: '产品管理', href: '/admin/products', icon: '📦' },
+      { name: '潜客管理', href: '/admin/leads', icon: '👥' },
+      { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
+      { name: '订单管理', href: '/admin/orders', icon: '🛒' },
+      { name: '管理员管理', href: '/admin/admins', icon: '🔐' },
+      { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
+      { name: '博客管理', href: '/admin/blog', icon: '📝' },
+      { name: '运营账号', href: '/admin/operation-accounts', icon: '🌐' },
+      {
+        name: 'SEO 专题',
+        href: '/admin/seo-knowledge',
+        icon: '🔍',
+        children: [
+          { name: 'SEO 基础知识', href: '/admin/seo-knowledge/basics' },
+          { name: '技术 SEO', href: '/admin/seo-knowledge/technical' },
+          { name: '内容策略', href: '/admin/seo-knowledge/content' },
+          { name: '数据分析', href: '/admin/seo-knowledge/analytics' },
+          { name: '国际化 SEO', href: '/admin/seo-knowledge/international' },
+        ],
+      },
+      { name: 'SEO关键字管理', href: '/admin/seo-keywords', icon: '🏷️' },
+      {
+        name: '外贸专题',
+        href: '/admin/trade-knowledge',
+        icon: '📚',
+        children: [
+          { name: '基础知识', href: '/admin/trade-knowledge/basics' },
+          { name: '报价管理', href: '/admin/trade-knowledge/quotation' },
+          { name: '跟单流程', href: '/admin/trade-knowledge/order-followup' },
+          { name: '支付与风控', href: '/admin/trade-knowledge/payment-risk' },
+          { name: '物流与通关', href: '/admin/trade-knowledge/logistics-customs' },
+          { name: '产品认证', href: '/admin/trade-knowledge/certifications' },
+          { name: '报价计算器', href: '/admin/quotation-calculator' },
+        ],
+      },
     ],
   },
-  {
-    name: '外贸专题',
-    href: '/admin/trade-knowledge',
-    icon: '📚',
-    children: [
-      { name: '基础知识', href: '/admin/trade-knowledge/basics' },
-      { name: '报价管理', href: '/admin/trade-knowledge/quotation' },
-      { name: '跟单流程', href: '/admin/trade-knowledge/order-followup' },
-      { name: '支付与风控', href: '/admin/trade-knowledge/payment-risk' },
-      { name: '物流与通关', href: '/admin/trade-knowledge/logistics-customs' },
-      { name: '产品认证', href: '/admin/trade-knowledge/certifications' },
-      { name: '报价计算器', href: '/admin/quotation-calculator' },
+  myth: {
+    label: 'Myth',
+    adminName: 'Myth Admin',
+    menus: [
+      { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
+      { name: '博客管理', href: '/admin/blog', icon: '📝' },
+      {
+        name: 'SEO 专题',
+        href: '/admin/seo-knowledge',
+        icon: '🔍',
+        children: [
+          { name: 'SEO 基础知识', href: '/admin/seo-knowledge/basics' },
+          { name: '技术 SEO', href: '/admin/seo-knowledge/technical' },
+          { name: '内容策略', href: '/admin/seo-knowledge/content' },
+          { name: '数据分析', href: '/admin/seo-knowledge/analytics' },
+          { name: '国际化 SEO', href: '/admin/seo-knowledge/international' },
+        ],
+      },
+      { name: 'SEO关键字管理', href: '/admin/seo-keywords', icon: '🏷️' },
     ],
   },
-];
+};
 
 export default function AdminLayout({
   children,
@@ -65,20 +99,29 @@ export default function AdminLayout({
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [currentSite, setCurrentSite] = useState('toy');
+  const navigation = siteConfig[currentSite]?.menus || siteConfig.toy.menus;
 
-  // 标记客户端渲染
+  // 标记客户端渲染，初始化站点
   useEffect(() => {
     setIsClient(true);
-    
+
+    // 从 localStorage 恢复站点选择
+    const savedSite = localStorage.getItem('admin_site_id');
+    if (savedSite && siteConfig[savedSite]) {
+      setCurrentSite(savedSite);
+      setSiteId(savedSite);
+    }
+
     // 排除登录页面
     if (pathname === '/admin/login') {
       setIsAuthenticated(true);
       return;
     }
-    
+
     const isLoggedIn = checkAuth();
     setIsAuthenticated(isLoggedIn);
-    
+
     if (!isLoggedIn) {
       router.push('/admin/login');
     }
@@ -153,7 +196,7 @@ export default function AdminLayout({
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
             <Link href="/admin/dashboard" className="text-xl font-bold text-[#0056B3]">
-              LuxeAdult Admin
+              {siteConfig[currentSite]?.adminName || 'Admin'}
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -257,6 +300,21 @@ export default function AdminLayout({
           </button>
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
+            <select
+              value={currentSite}
+              onChange={(e) => {
+                const newSite = e.target.value;
+                setCurrentSite(newSite);
+                localStorage.setItem('admin_site_id', newSite);
+                setSiteId(newSite);
+                window.location.reload();
+              }}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+            >
+              {Object.entries(siteConfig).map(([key, cfg]) => (
+                <option key={key} value={key}>{cfg.label}</option>
+              ))}
+            </select>
             <span className="text-sm text-gray-600">管理员</span>
             <button
               onClick={async () => {

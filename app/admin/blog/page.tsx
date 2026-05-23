@@ -8,6 +8,7 @@ import { BlogPost } from '@/types';
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,16 +79,25 @@ export default function BlogPage() {
 
       {/* 筛选和搜索 */}
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">搜索文章</label>
-            <input
-              type="text"
-              placeholder="搜索文章标题..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="搜索文章标题..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && setSearchTerm(searchInput)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              />
+              <button
+                onClick={() => setSearchTerm(searchInput)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                搜索
+              </button>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">状态筛选</label>
@@ -144,6 +154,7 @@ export default function BlogPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">文章标题</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">作者</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">分类</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">状态</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">发布时间</th>
@@ -155,6 +166,9 @@ export default function BlogPage() {
                     <tr key={blog.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <h3 className="font-semibold text-gray-900 line-clamp-1">{blog.title}</h3>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {blog.authorName || '-'}
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800 font-medium">

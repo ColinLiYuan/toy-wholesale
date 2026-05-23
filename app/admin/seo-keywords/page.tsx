@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { seoKeywordService, SeoKeyword } from '@/services';
+import type { KeywordDetailDTO } from '@/types';
 
 // 搜索意图映射
 const intentMap: Record<string, { label: string; color: string }> = {
@@ -72,6 +73,16 @@ export default function SeoKeywordsPage() {
   const [selectedKeywordIds, setSelectedKeywordIds] = useState<number[]>([]);
   const [linkLoading, setLinkLoading] = useState(false);
   const [keywordSearchTerm, setKeywordSearchTerm] = useState(''); // 关键词搜索
+
+  // Tab 切换
+  const [activeTab, setActiveTab] = useState<'keywords' | 'mappings'>('keywords');
+
+  // 映射查询状态
+  const [mappingUrl, setMappingUrl] = useState('');
+  const [mappingResults, setMappingResults] = useState<KeywordDetailDTO[]>([]);
+  const [mappingLoading, setMappingLoading] = useState(false);
+  const [mappingSearched, setMappingSearched] = useState(false);
+  const [unlinkLoading, setUnlinkLoading] = useState<Record<number, boolean>>({});
 
   // 加载关键词列表
   const loadKeywords = async () => {
@@ -193,6 +204,55 @@ export default function SeoKeywordsPage() {
     }
   };
 
+  // 查询映射（按URL查关联关键词）
+  const handleSearchMappings = async () => {
+    if (!mappingUrl.trim()) {
+      alert('请输入页面URL');
+      return;
+    }
+    setMappingLoading(true);
+    setMappingSearched(true);
+    try {
+      const results = await seoKeywordService.getKeywordsByUrl(mappingUrl.trim());
+      setMappingResults(results || []);
+    } catch (error: any) {
+      console.error('Failed to search mappings:', error);
+      alert('查询失败：' + (error.message || '未知错误'));
+      setMappingResults([]);
+    } finally {
+      setMappingLoading(false);
+    }
+  };
+
+  // 取消单个关键词与URL的关联
+  const handleUnlinkKeyword = async (keywordId: number) => {
+    if (!confirm('确定要取消该关键词与此URL的关联吗？')) return;
+    setUnlinkLoading(prev => ({ ...prev, [keywordId]: true }));
+    try {
+      // 调用后端删除该关键词的所有映射（通过unlinkByUrl做不到单个）
+      // 后端 unlinkByUrl 删的是该URL的所有关联，所以这里我们用 delete
+      // 但后端只有 unlinkByUrl(url) 和 deleteByKeywordId(keywordId)
+      // 暂时用 unlinkByUrl 重新关联保留的关键词
+      await seoKeywordService.unlinkKeywordsFromUrl(mappingUrl.trim());
+      // 重新关联除了被删除关键词之外的其他关键词
+      const remainingIds = mappingResults
+        .filter(k => k.id !== keywordId)
+        .map(k => k.id);
+      if (remainingIds.length > 0) {
+        await seoKeywordService.linkKeywordsToUrl({
+          pageUrl: mappingUrl.trim(),
+          keywordIds: remainingIds,
+        });
+      }
+      setMappingResults(prev => prev.filter(k => k.id !== keywordId));
+    } catch (error: any) {
+      console.error('Failed to unlink keyword:', error);
+      alert('取消关联失败：' + (error.message || '未知错误'));
+    } finally {
+      setUnlinkLoading(prev => ({ ...prev, [keywordId]: false }));
+    }
+  };
+
   // 格式化日期
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '-';
@@ -203,27 +263,56 @@ export default function SeoKeywordsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">SEO 关键词管理</h1>
+          <h1 className="text-2xl font-bold text-gray-900">SEO 关键字管理</h1>
           <p className="mt-1 text-sm text-gray-500">
-            管理和追踪 SEO 关键词，优化网站搜索引擎排名
+            管理关键词库与页面映射关系
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={handleOpenUrlLinkModal}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            🔗 通过 URL 关联关键词
-          </button>
-          <Link
-            href="/admin/seo-keywords/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            + 新建关键词
-          </Link>
-        </div>
+        {activeTab === 'keywords' && (
+          <div className="flex gap-3">
+            <button
+              onClick={handleOpenUrlLinkModal}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              🔗 通过 URL 关联关键词
+            </button>
+            <Link
+              href="/admin/seo-keywords/new"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              + 新建关键词
+            </Link>
+          </div>
+        )}
       </div>
 
+      {/* Tab 切换 */}
+      <div className="flex border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('keywords')}
+          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'keywords'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          关键词库
+        </button>
+        <button
+          onClick={() => setActiveTab('mappings')}
+          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'mappings'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          映射查询
+        </button>
+      </div>
+
+      {/* ========== Tab 1: 关键词库 ========== */}
+      {activeTab === 'keywords' && (
+      <>
       {/* 统计卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm p-4">
@@ -617,6 +706,122 @@ export default function SeoKeywordsPage() {
             </div>
           </div>
         </div>
+      )}
+      </>
+      )}
+
+      {/* ========== Tab 2: 映射查询 ========== */}
+      {activeTab === 'mappings' && (
+      <div className="space-y-6">
+        {/* URL 查询 */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">按 URL 查询关联关键词</h2>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={mappingUrl}
+              onChange={(e) => setMappingUrl(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearchMappings()}
+              placeholder="输入页面 URL，如 /blog/xxx 或完整地址"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              onClick={handleSearchMappings}
+              disabled={mappingLoading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {mappingLoading ? '查询中...' : '查询'}
+            </button>
+          </div>
+        </div>
+
+        {/* 查询结果 */}
+        {mappingLoading ? (
+          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-gray-600">查询中...</p>
+          </div>
+        ) : mappingSearched ? (
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            {mappingResults.length === 0 ? (
+              <div className="p-12 text-center">
+                <p className="text-gray-500">该 URL 没有关联任何关键词</p>
+                <button
+                  onClick={() => { setActiveTab('keywords'); handleOpenUrlLinkModal(); }}
+                  className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  🔗 去关联关键词
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                  <p className="text-sm text-gray-600">
+                    URL: <span className="font-mono text-gray-900">{mappingUrl}</span>
+                    <span className="ml-4">共 {mappingResults.length} 个关联关键词</span>
+                  </p>
+                </div>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">关键词</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">搜索量</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">难度</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">意图</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {mappingResults.map((kw) => (
+                      <tr key={kw.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-medium text-gray-900">{kw.keyword}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {kw.volume ? kw.volume.toLocaleString() : '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {kw.kd !== undefined && kw.kd !== null ? (
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              kw.kd < 30 ? 'bg-green-100 text-green-800' :
+                              kw.kd < 60 ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>{kw.kd}</span>
+                          ) : '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {kw.intent && intentMap[kw.intent] ? (
+                            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${intentMap[kw.intent].color}`}>
+                              {intentMap[kw.intent].label}
+                            </span>
+                          ) : <span className="text-sm text-gray-500">-</span>}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {kw.category ? categoryMap[kw.category] || kw.category : '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <button
+                            onClick={() => handleUnlinkKeyword(kw.id)}
+                            disabled={unlinkLoading[kw.id]}
+                            className="text-red-600 hover:text-red-900 text-sm font-medium disabled:opacity-50"
+                          >
+                            {unlinkLoading[kw.id] ? '取消中...' : '取消关联'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <p className="text-gray-400">输入 URL 并点击查询，查看该页面关联的关键词</p>
+          </div>
+        )}
+      </div>
       )}
     </div>
   );

@@ -11,25 +11,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   try {
     const product = await productService.getProductDetail(productSlug);
     return {
-      title: product.seoTitle || `${product.title} | LuxeAdult Wholesale`,
+      title: product.seoTitle || `${product.title} | Silvibe`,
       description: product.seoDescription || product.description || `Buy ${product.title} at wholesale prices. Premium adult wellness products for global distribution.`,
       keywords: product.seoKeywords ? product.seoKeywords.split(',').map(k => k.trim()) : [product.title, 'adult toys wholesale', 'wellness products'],
       openGraph: {
-        title: product.seoTitle || `${product.title} | LuxeAdult Wholesale`,
+        title: product.seoTitle || `${product.title} | Silvibe`,
         description: product.seoDescription || product.description || `Buy ${product.title} at wholesale prices. Premium adult wellness products for global distribution.`,
         images: product.image ? [{ url: product.image.startsWith('http') ? product.image : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${product.image}`, alt: product.alt || product.title }] : [],
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
-        title: product.seoTitle || `${product.title} | LuxeAdult Wholesale`,
+        title: product.seoTitle || `${product.title} | Silvibe`,
         description: product.seoDescription || product.description || `Buy ${product.title} at wholesale prices. Premium adult wellness products for global distribution.`,
         images: product.image ? [product.image.startsWith('http') ? product.image : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${product.image}`] : [],
       },
     };
   } catch (error) {
     return {
-      title: 'Product Not Found | LuxeAdult Wholesale',
+      title: 'Product Not Found | Silvibe',
       description: 'The requested product could not be found.',
     };
   }

@@ -4,12 +4,17 @@ export async function GET() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com'
 
     const staticPages = [
-        { loc: '', priority: 1.0, changefreq: 'daily' }, // 首页
-        { loc: '/blog', priority: 0.9, changefreq: 'daily' }, // 博客首页
-        { loc: '/contact', priority: 0.5, changefreq: 'monthly' },
-        { loc: '/content/solutions', priority: 0.8, changefreq: 'monthly' },
-        { loc: '/content/sample-kit', priority: 0.7, changefreq: 'monthly' },
-        { loc: '/content/verify', priority: 0.7, changefreq: 'monthly' },
+        { loc: '', priority: 1.0, changefreq: 'daily' },
+        { loc: '/products', priority: 0.9, changefreq: 'daily' },
+        { loc: '/showroom', priority: 0.8, changefreq: 'weekly' },
+        { loc: '/oem-odm', priority: 0.8, changefreq: 'weekly' },
+        { loc: '/solutions', priority: 0.8, changefreq: 'monthly' },
+        { loc: '/sample-kit', priority: 0.7, changefreq: 'monthly' },
+        { loc: '/about', priority: 0.7, changefreq: 'monthly' },
+        { loc: '/blog', priority: 0.9, changefreq: 'daily' },
+        { loc: '/contact', priority: 0.6, changefreq: 'monthly' },
+        { loc: '/privacy', priority: 0.3, changefreq: 'yearly' },
+        { loc: '/terms', priority: 0.3, changefreq: 'yearly' },
     ];
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
