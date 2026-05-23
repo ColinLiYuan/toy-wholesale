@@ -9,6 +9,14 @@ export const metadata: Metadata = {
     title: 'Request Product Samples — Evaluate Quality First | Silvibe',
     description: 'Experience our premium adult wellness products with free samples',
     type: 'website',
+    images: [
+      {
+        url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Silvibe - Request Product Samples',
+      },
+    ],
   },
   alternates: {
     canonical: '/sample-kit',

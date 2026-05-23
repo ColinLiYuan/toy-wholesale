@@ -1,8 +1,15 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: '产品目录下载 | 产品报价单',
-  description: '下载最新产品目录，包含产品编号、图片、尺寸、重量等详细信息',
+export const metadata: Metadata = {
+  title: 'Product Catalog Download — Wholesale Price List | Silvibe',
+  description: 'Download our latest product catalog with SKUs, images, dimensions, weight, materials and wholesale pricing. 62 products across 3 categories.',
+  keywords: ['product catalog', 'wholesale price list', 'adult toys catalog', 'product specifications', 'bulk pricing'],
+  openGraph: {
+    title: 'Product Catalog Download — Wholesale Price List | Silvibe',
+    description: 'Download the complete product catalog with specifications and wholesale pricing',
+    type: 'website',
+  },
   alternates: {
     canonical: '/catalog',
   },

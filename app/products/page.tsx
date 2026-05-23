@@ -13,6 +13,19 @@ export const metadata: Metadata = {
   title: 'Wholesale Adult Toys Catalog — Bulk Orders from Factory',
   description: 'Browse our full wholesale catalog. Medical-grade silicone adult toys, low MOQ from 20 pcs, OEM/ODM available. Direct from Dongguan factory.',
   keywords: ['wholesale adult toys', 'adult toys catalog', 'bulk sex toys', 'OEM adult products', 'wholesale silicone toys'],
+  openGraph: {
+    title: 'Wholesale Adult Toys Catalog | Silvibe',
+    description: 'Browse our full wholesale catalog with medical-grade silicone adult toys from Dongguan factory',
+    type: 'website',
+    images: [
+      {
+        url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Silvibe - Wholesale Adult Toys Catalog',
+      },
+    ],
+  },
   alternates: {
     canonical: '/products',
   },
@@ -63,6 +76,30 @@ export default async function ProductsPage({
 
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            name: currentCategory ? `${currentCategory.name} - Wholesale Products` : 'Wholesale Product Catalog',
+            description: 'Browse our full wholesale catalog of medical-grade silicone adult toys.',
+            url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com'}/products${categoryParam !== 'all' ? `?category=${categoryParam}` : ''}`,
+            numberOfItems: products.length,
+            itemListElement: products.map((product, index) => ({
+              '@type': 'ListItem',
+              position: index + 1,
+              item: {
+                '@type': 'Product',
+                name: product.title,
+                url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com'}/products/${product.slug}`,
+                image: product.image?.startsWith('http') ? product.image : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${product.image}`,
+                ...(product.description ? { description: product.description.replace(/###|\*\*/g, '').substring(0, 300) } : {}),
+              },
+            })),
+          }),
+        }}
+      />
       {/* Top Title Bar — compact, not a huge hero */}
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">

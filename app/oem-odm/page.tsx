@@ -4,6 +4,19 @@ export const metadata: Metadata = {
   title: 'OEM/ODM Services — Custom Adult Toy Branding',
   description: 'Professional OEM/ODM services for adult toys. Custom branding, logo printing, packaging design, and product development from our Dongguan factory. Low MOQ, fast turnaround.',
   keywords: ['OEM adult toys', 'ODM services', 'custom branding', 'private label adult toys', 'product customization', 'custom packaging'],
+  openGraph: {
+    title: 'OEM/ODM Services — Custom Adult Toy Branding | Silvibe',
+    description: 'Professional OEM/ODM services for adult toys. Custom branding, logo printing, packaging design from our Dongguan factory.',
+    type: 'website',
+    images: [
+      {
+        url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Silvibe - OEM/ODM Services',
+      },
+    ],
+  },
   alternates: {
     canonical: '/oem-odm',
   },

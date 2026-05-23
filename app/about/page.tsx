@@ -9,6 +9,14 @@ export const metadata: Metadata = {
     title: 'About Us — Silvibe Wholesale',
     description: 'Your trusted wholesale partner with direct Dongguan factory access. Low MOQ, quality guaranteed.',
     type: 'website',
+    images: [
+      {
+        url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Silvibe - About Us',
+      },
+    ],
   },
   alternates: {
     canonical: '/about',

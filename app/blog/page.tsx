@@ -13,6 +13,14 @@ export const metadata: Metadata = {
     title: 'Industry Insights & Business Tips | Silvibe',
     description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs',
     type: 'website',
+    images: [
+      {
+        url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Silvibe - Industry Insights & Business Tips',
+      },
+    ],
   },
   alternates: {
     canonical: '/blog',
@@ -52,6 +60,25 @@ export default async function BlogPage({
 
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'Industry Insights & Business Tips',
+            description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs.',
+            url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com'}/blog`,
+            hasPart: blogs.map(blog => ({
+              '@type': 'BlogPosting',
+              headline: blog.title,
+              url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com'}/blog/${blog.slug}`,
+              description: blog.excerpt,
+              ...(blog.publishedAt ? { datePublished: blog.publishedAt } : {}),
+            })),
+          }),
+        }}
+      />
       <section className="relative py-20 px-6 bg-[#F8F9FA] border-b border-gray-200">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-[#1A1A1A]">
@@ -84,6 +111,7 @@ export default async function BlogPage({
                         <img
                           src={formatImageUrl(blog.coverImage)}
                           alt={blog.title}
+                          loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>

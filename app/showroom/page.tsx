@@ -9,6 +9,14 @@ export const metadata: Metadata = {
     title: 'Product Showroom — Real Video Demonstrations | Silvibe',
     description: 'Watch authentic product videos showcasing premium quality',
     type: 'website',
+    images: [
+      {
+        url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Silvibe - Product Showroom',
+      },
+    ],
   },
   alternates: {
     canonical: '/showroom',
