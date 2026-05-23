@@ -14,6 +14,7 @@ export default function ProductImage({ src, alt, className }: {
       src={src}
       alt={alt}
       className={className}
+      loading="lazy"
       onError={handleError}
     />
   );

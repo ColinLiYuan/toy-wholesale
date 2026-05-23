@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: 'OEM/ODM Services — Custom Adult Toy Branding',
   description: 'Professional OEM/ODM services for adult toys. Custom branding, logo printing, packaging design, and product development from our Dongguan factory. Low MOQ, fast turnaround.',
   keywords: ['OEM adult toys', 'ODM services', 'custom branding', 'private label adult toys', 'product customization', 'custom packaging'],
+  alternates: {
+    canonical: '/oem-odm',
+  },
 };
 
 export default function OemOdmPage() {

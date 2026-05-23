@@ -7,8 +7,6 @@ export async function GET() {
 
     let blogs: BlogPost[] = []
     try {
-        // 获取所有已发布的博客
-        // 注意：后端路径需要 /api 前缀
         const blogUrl = `${apiBaseUrl}/api/v1/blog/posts?page=0&size=1000`
         console.log('Fetching blogs from:', blogUrl)
         const res = await fetch(blogUrl, {
@@ -38,16 +36,18 @@ export async function GET() {
         console.error('❌ 获取博客失败:', error)
     }
 
-    // 生成 XML
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${blogs.map(blog => `
+  ${blogs.map(blog => {
+    const lastmod = blog.updatedAt || blog.publishedAt
+      ? new Date((blog.updatedAt || blog.publishedAt)!).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0]
+    return `
   <url>
     <loc>${baseUrl}/blog/${blog.slug}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  `).join('')}
+    <lastmod>${lastmod}</lastmod>
+  </url>`
+  }).join('')}
 </urlset>`
 
     return new NextResponse(xml, {

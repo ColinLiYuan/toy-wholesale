@@ -27,6 +27,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  alternates: {
+    canonical: '/content',
+  },
 };
 
 export default function Home() {

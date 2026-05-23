@@ -7,8 +7,6 @@ export async function GET() {
 
     let products: Product[] = []
     try {
-        // 在 Server Component 中，需要直接调用后端 API，不能使用代理
-        // 注意：后端路径需要 /api 前缀
         const productUrl = `${apiBaseUrl}/api/v1/products?page=0&size=100`
         console.log('Fetching products from:', productUrl)
         const res = await fetch(productUrl, {
@@ -38,16 +36,18 @@ export async function GET() {
         console.error('❌ 获取商品失败:', error)
     }
 
-    // 生成 XML
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${products.map(product => `
+  ${products.map(product => {
+    const lastmod = product.updatedAt
+      ? new Date(product.updatedAt).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0]
+    return `
   <url>
     <loc>${baseUrl}/products/${product.slug}</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  `).join('')}
+    <lastmod>${lastmod}</lastmod>
+  </url>`
+  }).join('')}
 </urlset>`
 
     return new NextResponse(xml, {

@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     description: 'Experience our premium adult wellness products with free samples',
     type: 'website',
   },
+  alternates: {
+    canonical: '/sample-kit',
+  },
 };
 
 export default function SampleKitPage() {

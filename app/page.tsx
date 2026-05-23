@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import HomePageClient from '@/app/content/HomePageClient';
+import { productService } from '@/services';
+import type { Product } from '@/types';
 
 export const metadata: Metadata = {
   title: 'Premium Adult Toys Wholesale | Medical-Grade Supplier',
@@ -16,8 +18,18 @@ export const metadata: Metadata = {
     title: 'Silvibe — Medical-Grade Adult Toys Wholesale',
     description: 'Medical-grade silicone adult toys from Dongguan. Low MOQ for global retailers.',
   },
+  alternates: {
+    canonical: '/',
+  },
 };
 
-export default function HomePage() {
-  return <HomePageClient />;
+export default async function HomePage() {
+  let featuredProducts: Product[] = [];
+  try {
+    featuredProducts = await productService.getFeaturedProducts('首页推荐', 6);
+  } catch (error) {
+    console.error('Failed to fetch featured products for homepage:', error);
+  }
+
+  return <HomePageClient initialFeaturedProducts={featuredProducts} />;
 }

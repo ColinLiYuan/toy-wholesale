@@ -7,8 +7,70 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com';
+
 interface BlogDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+function ArticleJsonLd({ blog }: { blog: BlogPost }) {
+  const imageUrl = blog.coverImage
+    ? (blog.coverImage.startsWith('http') ? blog.coverImage : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${blog.coverImage}`)
+    : undefined;
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: blog.title,
+    description: blog.seoDescription || blog.excerpt,
+    ...(imageUrl ? { image: imageUrl } : {}),
+    datePublished: blog.publishedAt,
+    dateModified: blog.updatedAt || blog.publishedAt,
+    author: {
+      '@type': 'Person',
+      name: blog.authorName || 'Silvibe Editorial Team',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Silvibe',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${baseUrl}/favicon.ico`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${baseUrl}/blog/${blog.slug}`,
+    },
+    ...(blog.tags ? { keywords: Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags } : {}),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+function BlogBreadcrumbJsonLd({ items }: { items: { name: string; url: string }[] }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}`,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
 }
 
 // 生成静态参数（可选，用于 SSG）
@@ -19,10 +81,10 @@ export async function generateStaticParams() {
 // 生成元数据
 export async function generateMetadata({ params }: BlogDetailPageProps) {
   const { slug } = await params;
-  
+
   try {
     const blog = await blogService.getBlogBySlug(slug);
-    
+
     // 处理 tags：支持字符串和数组
     let keywords: string[] = [];
     if (blog.tags) {
@@ -33,7 +95,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps) {
         keywords = tags;
       }
     }
-    
+
     return {
       title: `${blog.seoTitle || blog.title} | LuxeAdult Wholesale`,
       description: blog.seoDescription || blog.excerpt,
@@ -52,6 +114,9 @@ export async function generateMetadata({ params }: BlogDetailPageProps) {
         description: blog.seoDescription || blog.excerpt,
         images: blog.coverImage ? [blog.coverImage.startsWith('http') ? blog.coverImage : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${blog.coverImage}`] : [],
       },
+      alternates: {
+        canonical: `/blog/${slug}`,
+      },
     };
   } catch {
     return {
@@ -62,10 +127,10 @@ export async function generateMetadata({ params }: BlogDetailPageProps) {
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params;
-  
+
   let blog: BlogPost | null = null;
   let error: string | null = null;
-  
+
   try {
     blog = await blogService.getBlogBySlug(slug);
   } catch (err: any) {
@@ -88,9 +153,18 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       </div>
     );
   }
-  
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#141414] to-[#0a0a0a] text-[#E5E5E5]">
+    <>
+      <ArticleJsonLd blog={blog} />
+      <BlogBreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Blog', url: '/blog' },
+          { name: blog.title, url: `/blog/${slug}` },
+        ]}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#141414] to-[#0a0a0a] text-[#E5E5E5]">
       {/* Hero */}
       <section className="relative py-16 px-6">
         <div className="max-w-4xl mx-auto">
@@ -267,5 +341,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         ) : null;
       })()}
     </div>
+    </>
   );
 }

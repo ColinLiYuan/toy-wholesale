@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: 'Wholesale Adult Toys Catalog — Bulk Orders from Factory',
   description: 'Browse our full wholesale catalog. Medical-grade silicone adult toys, low MOQ from 20 pcs, OEM/ODM available. Direct from Dongguan factory.',
   keywords: ['wholesale adult toys', 'adult toys catalog', 'bulk sex toys', 'OEM adult products', 'wholesale silicone toys'],
+  alternates: {
+    canonical: '/products',
+  },
 };
 
 export default async function ProductsPage({

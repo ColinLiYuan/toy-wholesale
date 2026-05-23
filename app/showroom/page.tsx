@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     description: 'Watch authentic product videos showcasing premium quality',
     type: 'website',
   },
+  alternates: {
+    canonical: '/showroom',
+  },
 };
 
 export default function ShowroomPage() {

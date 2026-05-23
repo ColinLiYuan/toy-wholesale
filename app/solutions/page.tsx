@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     description: 'Tailored wholesale solutions for retailers, distributors, and e-commerce businesses worldwide',
     type: 'website',
   },
+  alternates: {
+    canonical: '/solutions',
+  },
 };
 
 export default function SolutionsPage() {

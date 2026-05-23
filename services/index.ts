@@ -193,6 +193,25 @@ export const productService = {
     }
   },
 
+  // 获取首页推荐产品 - GET /v1/products/featured
+  async getFeaturedProducts(tag: string = '首页推荐', limit: number = 6): Promise<Product[]> {
+    try {
+      const apiResult: ApiResult<Product[]> = await apiClient.get(
+        `${API_ENDPOINTS.PRODUCTS}/featured`,
+        { params: { tag, limit } }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch featured products');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch featured products:', error);
+      throw error;
+    }
+  },
+
   // 搜索产品 - GET /v1/products/search
   async searchProducts(keyword: string, page: number = 0, size: number = 12): Promise<ProductListResponse> {
     try {

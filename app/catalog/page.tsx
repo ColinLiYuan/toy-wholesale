@@ -3,6 +3,9 @@ import Link from 'next/link';
 export const metadata = {
   title: '产品目录下载 | 产品报价单',
   description: '下载最新产品目录，包含产品编号、图片、尺寸、重量等详细信息',
+  alternates: {
+    canonical: '/catalog',
+  },
 };
 
 export default function ProductCatalogPage() {

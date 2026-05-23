@@ -3,6 +3,13 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Terms of Service - Silvibe',
   description: 'Terms and conditions for purchasing wholesale adult toys from Silvibe. Read our terms of service before placing orders.',
+  alternates: {
+    canonical: '/terms',
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function TermsOfServicePage() {

@@ -9,6 +9,9 @@ export const metadata: Metadata = {
     description: 'Reach out to our sales team for catalogs, bulk pricing, and shipping quotes',
     type: 'website',
   },
+  alternates: {
+    canonical: '/contact',
+  },
 };
 
 export default function ContactLayout({

@@ -27,9 +27,6 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL("https://www.adult-toy-wholesale.com"),
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     type: "website",
     locale: "en_US",

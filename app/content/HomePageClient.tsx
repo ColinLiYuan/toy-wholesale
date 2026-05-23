@@ -6,10 +6,10 @@ import InquiryModal from '@/components/InquiryModal';
 import { R2_BASE_URL } from '@/lib/r2-config';
 import type { Product } from '@/types';
 
-export default function HomePageClient() {
+export default function HomePageClient({ initialFeaturedProducts = [] }: { initialFeaturedProducts?: Product[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>(initialFeaturedProducts);
+  const [loading, setLoading] = useState(initialFeaturedProducts.length === 0);
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {

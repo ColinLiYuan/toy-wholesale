@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs',
     type: 'website',
   },
+  alternates: {
+    canonical: '/blog',
+  },
 };
 
 const pageSize = 12;

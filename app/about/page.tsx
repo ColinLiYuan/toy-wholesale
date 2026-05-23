@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     description: 'Your trusted wholesale partner with direct Dongguan factory access. Low MOQ, quality guaranteed.',
     type: 'website',
   },
+  alternates: {
+    canonical: '/about',
+  },
 };
 
 export default function AboutPage() {
