@@ -2961,3 +2961,6 @@ export type {
   ProductSku,
   SeoKeyword
 } from '@/types';
+
+// 导出站点服务
+export * from '@/lib/site-service';

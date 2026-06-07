@@ -163,6 +163,7 @@ export default function LeadsPage() {
       REFERRAL: '推荐',
       COLD_CALL: '电话开发',
       MYTH_TOY: 'MythToy',
+      MADE_IN_CHINA: '中国制造网',
     };
     return sourceMap[source] || source || '-';
   };

@@ -150,6 +150,8 @@ export default function LeadDetailPage() {
       WEBSITE: '网站询盘',
       REFERRAL: '推荐',
       COLD_CALL: '电话开发',
+      MYTH_TOY: 'MythToy',
+      MADE_IN_CHINA: '中国制造网',
     };
     return sourceMap[source] || source;
   };

@@ -5,10 +5,10 @@ import { inquiryService } from '@/services';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+    companyName: '',
     country: '',
     message: '',
   });
@@ -29,7 +29,7 @@ export default function ContactPage() {
     
     console.log('[ContactPage] Form submitted');
     
-    if (!formData.name || !formData.email || !formData.company || !formData.message) {
+    if (!formData.customerName || !formData.customerEmail || !formData.companyName || !formData.message) {
       setError('Please fill in all required fields');
       return;
     }
@@ -39,26 +39,22 @@ export default function ContactPage() {
     setSuccess(false);
 
     try {
-      // Build inquiry data
       const inquiryData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        company: formData.company,
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        customerPhone: formData.customerPhone,
+        companyName: formData.companyName,
         country: formData.country,
         message: formData.message,
         source: 'WEBSITE_FORM',
       };
 
       console.log('[ContactPage] Submitting inquiry:', inquiryData);
-
-      // Submit inquiry to backend
       const result = await inquiryService.submitInquiry(inquiryData as any);
-
       console.log('[ContactPage] Inquiry submitted successfully:', result);
 
       setSuccess(true);
-      setFormData({ name: '', email: '', phone: '', company: '', country: '', message: '' });
+      setFormData({ customerName: '', customerEmail: '', customerPhone: '', companyName: '', country: '', message: '' });
     } catch (err) {
       console.error('[ContactPage] Failed to submit inquiry:', err);
       setError(err instanceof Error ? err.message : 'Failed to send inquiry');
@@ -186,14 +182,14 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-[#1A1A1A] mb-2">
+                    <label htmlFor="customerName" className="block text-sm font-medium text-[#1A1A1A] mb-2">
                       Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
+                      id="customerName"
+                      name="customerName"
+                      value={formData.customerName}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-[#0056B3] transition-colors"
                       required
@@ -201,14 +197,14 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-[#1A1A1A] mb-2">
+                    <label htmlFor="customerEmail" className="block text-sm font-medium text-[#1A1A1A] mb-2">
                       Business Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
+                      id="customerEmail"
+                      name="customerEmail"
+                      value={formData.customerEmail}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-[#0056B3] transition-colors"
                       required
@@ -218,14 +214,14 @@ export default function ContactPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-[#1A1A1A] mb-2">
+                    <label htmlFor="customerPhone" className="block text-sm font-medium text-[#1A1A1A] mb-2">
                       Phone / WhatsApp
                     </label>
                     <input
                       type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
+                      id="customerPhone"
+                      name="customerPhone"
+                      value={formData.customerPhone}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-[#0056B3] transition-colors"
                       placeholder="+86 138 2442 3871"
@@ -233,14 +229,14 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="company" className="block text-sm font-medium text-[#1A1A1A] mb-2">
+                    <label htmlFor="companyName" className="block text-sm font-medium text-[#1A1A1A] mb-2">
                       Company / Store Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      id="company"
-                      name="company"
-                      value={formData.company}
+                      id="companyName"
+                      name="companyName"
+                      value={formData.companyName}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-[#0056B3] transition-colors"
                       required

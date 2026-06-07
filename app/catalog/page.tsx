@@ -2,13 +2,21 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Product Catalog Download — Wholesale Price List | Silvibe',
+  title: 'Product Catalog Download — Wholesale Price List',
   description: 'Download our latest product catalog with SKUs, images, dimensions, weight, materials and wholesale pricing. 62 products across 3 categories.',
   keywords: ['product catalog', 'wholesale price list', 'adult toys catalog', 'product specifications', 'bulk pricing'],
   openGraph: {
-    title: 'Product Catalog Download — Wholesale Price List | Silvibe',
+    title: 'Product Catalog Download — Wholesale Price List',
     description: 'Download the complete product catalog with specifications and wholesale pricing',
     type: 'website',
+    images: [
+      {
+        url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Silvibe - Product Catalog Download',
+      },
+    ],
   },
   alternates: {
     canonical: '/catalog',

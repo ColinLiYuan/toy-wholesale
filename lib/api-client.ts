@@ -4,8 +4,15 @@ import { API_BASE_URL, BACKEND_BASE_URL } from './api-config';
 // 动态站点标识（多租户隔离），支持运行时切换
 let currentSiteId = 'toy';
 
+// 支持的站点列表
+const SUPPORTED_SITES = ['toy', 'myth', 'seric'];
+
 export function setSiteId(siteId: string) {
-  currentSiteId = siteId;
+  if (SUPPORTED_SITES.includes(siteId)) {
+    currentSiteId = siteId;
+  } else {
+    console.warn(`Site ID "${siteId}" is not supported. Supported sites: ${SUPPORTED_SITES.join(', ')}`);
+  }
 }
 
 export function getSiteId(): string {
@@ -15,7 +22,7 @@ export function getSiteId(): string {
 // 客户端初始化：从 localStorage 恢复上次选择的站点
 if (typeof window !== 'undefined') {
   const saved = localStorage.getItem('admin_site_id');
-  if (saved === 'toy' || saved === 'myth') {
+  if (saved && SUPPORTED_SITES.includes(saved)) {
     currentSiteId = saved;
   }
 }

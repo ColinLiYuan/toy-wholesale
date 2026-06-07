@@ -4,25 +4,36 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { inquiryAdminService, Inquiry } from '@/services';
+import { getSiteId } from '@/lib/api-client';
 
 export default function NewInquiryPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
 
-  // 询盘来源选项
-  const sourceOptions = [
+  // 获取当前站点
+  const currentSite = typeof window !== 'undefined' ? getSiteId() : 'toy';
+
+  // 所有询盘来源选项
+  const allSourceOptions = [
     { value: 'WEBSITE_FORM', label: '网站表单' },
     { value: 'EMAIL', label: '邮件' },
     { value: 'ALIBABA', label: '阿里巴巴' },
     { value: 'WHATSAPP', label: 'WhatsApp' },
     { value: 'TRADE_SHOW', label: '展会' },
     { value: 'MYTH_TOY', label: 'MythToy转移' },
+    { value: 'MADE_IN_CHINA', label: '中国制造网' },
   ];
 
-  // 表单数据
+  // 根据站点筛选来源选项
+  // toy 展示全部来源，seric 只展示中国制造网
+  const sourceOptions = currentSite === 'seric'
+    ? allSourceOptions.filter(option => option.value === 'MADE_IN_CHINA')
+    : allSourceOptions;
+
+  // 表单数据 - 根据站点设置默认来源
   const [formData, setFormData] = useState<Partial<Inquiry>>({
     status: 'NEW',
-    source: 'WEBSITE_FORM',
+    source: currentSite === 'seric' ? 'MADE_IN_CHINA' : 'WEBSITE_FORM',
     customerName: '',
     customerEmail: '',
     customerPhone: '',

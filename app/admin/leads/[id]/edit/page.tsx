@@ -5,9 +5,28 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { leadAdminService } from '@/services';
 import type { Lead } from '@/types';
+import { getSiteId } from '@/lib/api-client';
 
 export default function EditLeadPage() {
   const router = useRouter();
+
+  // 获取当前站点
+  const currentSite = typeof window !== 'undefined' ? getSiteId() : 'toy';
+
+  // 所有潜客来源选项
+  const allSourceOptions = [
+    { value: 'WEBSITE', label: '网站询盘' },
+    { value: 'EMAIL', label: '邮件开发' },
+    { value: 'EXHIBITION', label: '展会' },
+    { value: 'REFERRAL', label: '推荐' },
+    { value: 'COLD_CALL', label: '电话开发' },
+    { value: 'MYTH_TOY', label: 'MythToy' },
+    { value: 'MADE_IN_CHINA', label: '中国制造网' },
+  ];
+
+  const sourceOptions = currentSite === 'seric'
+    ? allSourceOptions.filter(option => option.value === 'MADE_IN_CHINA')
+    : allSourceOptions;
   const params = useParams();
   const leadId = Number(params.id);
 
@@ -99,6 +118,8 @@ export default function EditLeadPage() {
       WEBSITE: '网站询盘',
       REFERRAL: '推荐',
       COLD_CALL: '电话开发',
+      MYTH_TOY: 'MythToy',
+      MADE_IN_CHINA: '中国制造网',
     };
     return sourceMap[source] || source;
   };
@@ -242,11 +263,9 @@ export default function EditLeadPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
             >
               <option value="">请选择</option>
-              <option value="EMAIL">邮件开发</option>
-              <option value="EXHIBITION">展会</option>
-              <option value="WEBSITE">网站询盘</option>
-              <option value="REFERRAL">推荐</option>
-              <option value="COLD_CALL">电话开发</option>
+              {sourceOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
               <option value="MYTH_TOY">MythToy</option>
             </select>
           </div>

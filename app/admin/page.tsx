@@ -3,12 +3,22 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+// 各站点的默认首页（第一个菜单页面）
+const siteDefaultPages: Record<string, string> = {
+  toy: '/admin/dashboard',
+  myth: '/admin/blog',
+  seric: '/admin/inquiries',
+};
+
 export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // 直接跳转到仪表板（不需要登录）
-    router.replace('/admin/dashboard');
+    // 从 localStorage 获取当前站点
+    const savedSite = typeof window !== 'undefined' ? localStorage.getItem('admin_site_id') : null;
+    // 根据站点获取默认首页，默认为 toy 的仪表板
+    const defaultPage = siteDefaultPages[savedSite || 'toy'] || '/admin/dashboard';
+    router.replace(defaultPage);
   }, [router]);
 
   return (

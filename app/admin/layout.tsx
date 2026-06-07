@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { setSiteId } from '@/lib/api-client';
+import { getAllSites, getCurrentSite, switchToSite, SiteConfig } from '@/lib/site-service';
+import SiteSwitcher from '@/components/SiteSwitcher';
 
 // 检查是否已登录
 const checkAuth = () => {
@@ -28,11 +30,11 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
     menus: [
       { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
       { name: '产品管理', href: '/admin/products', icon: '📦' },
+      { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
       { name: '潜客管理', href: '/admin/leads', icon: '👥' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
       { name: '管理员管理', href: '/admin/admins', icon: '🔐' },
-      { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
       { name: '博客管理', href: '/admin/blog', icon: '📝' },
       { name: '运营账号', href: '/admin/operation-accounts', icon: '🌐' },
       {
@@ -68,7 +70,6 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
     label: 'Myth',
     adminName: 'Myth Admin',
     menus: [
-      { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
       { name: '博客管理', href: '/admin/blog', icon: '📝' },
       {
         name: 'SEO 专题',
@@ -83,6 +84,16 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
         ],
       },
       { name: 'SEO关键字管理', href: '/admin/seo-keywords', icon: '🏷️' },
+    ],
+  },
+  seric: {
+    label: 'Seric',
+    adminName: 'Seric Admin',
+    menus: [
+      { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
+      { name: '潜客管理', href: '/admin/leads', icon: '👥' },
+      { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
+      { name: '订单管理', href: '/admin/orders', icon: '🛒' },
     ],
   },
 };
@@ -126,6 +137,9 @@ export default function AdminLayout({
       router.push('/admin/login');
     }
   }, [pathname, router]);
+
+  // 获取所有可用站点配置用于下拉菜单
+  const availableSites = getAllSites();
 
   // 当路由变化时，自动展开包含当前页面的父菜单
   useEffect(() => {
@@ -195,7 +209,7 @@ export default function AdminLayout({
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-            <Link href="/admin/dashboard" className="text-xl font-bold text-[#0056B3]">
+            <Link href={navigation[0]?.href || '/admin/dashboard'} className="text-xl font-bold text-[#0056B3]">
               {siteConfig[currentSite]?.adminName || 'Admin'}
             </Link>
             <button
@@ -300,21 +314,7 @@ export default function AdminLayout({
           </button>
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
-            <select
-              value={currentSite}
-              onChange={(e) => {
-                const newSite = e.target.value;
-                setCurrentSite(newSite);
-                localStorage.setItem('admin_site_id', newSite);
-                setSiteId(newSite);
-                window.location.reload();
-              }}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
-            >
-              {Object.entries(siteConfig).map(([key, cfg]) => (
-                <option key={key} value={key}>{cfg.label}</option>
-              ))}
-            </select>
+            <SiteSwitcher />
             <span className="text-sm text-gray-600">管理员</span>
             <button
               onClick={async () => {
