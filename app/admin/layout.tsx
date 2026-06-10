@@ -34,6 +34,18 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
       { name: '潜客管理', href: '/admin/leads', icon: '👥' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
+      {
+        name: '支出管理',
+        href: '/admin/expenses',
+        icon: '💰',
+        children: [
+          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
+          { name: '管理费用', href: '/admin/expenses?type=ADMIN' },
+          { name: '销售费用', href: '/admin/expenses?type=SALES' },
+          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
+          { name: '其他杂费', href: '/admin/expenses?type=OTHER' },
+        ],
+      },
       { name: '管理员管理', href: '/admin/admins', icon: '🔐' },
       { name: '博客管理', href: '/admin/blog', icon: '📝' },
       { name: '运营账号', href: '/admin/operation-accounts', icon: '🌐' },
@@ -84,6 +96,18 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
         ],
       },
       { name: 'SEO关键字管理', href: '/admin/seo-keywords', icon: '🏷️' },
+      {
+        name: '支出管理',
+        href: '/admin/expenses',
+        icon: '💰',
+        children: [
+          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
+          { name: '管理费用', href: '/admin/expenses?type=ADMIN' },
+          { name: '销售费用', href: '/admin/expenses?type=SALES' },
+          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
+          { name: '其他杂费', href: '/admin/expenses?type=OTHER' },
+        ],
+      },
     ],
   },
   seric: {
@@ -94,6 +118,18 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
       { name: '潜客管理', href: '/admin/leads', icon: '👥' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
+      {
+        name: '支出管理',
+        href: '/admin/expenses',
+        icon: '💰',
+        children: [
+          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
+          { name: '管理费用', href: '/admin/expenses?type=ADMIN' },
+          { name: '销售费用', href: '/admin/expenses?type=SALES' },
+          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
+          { name: '其他杂费', href: '/admin/expenses?type=OTHER' },
+        ],
+      },
     ],
   },
 };
