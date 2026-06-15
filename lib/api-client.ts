@@ -5,7 +5,7 @@ import { API_BASE_URL, BACKEND_BASE_URL } from './api-config';
 let currentSiteId = 'toy';
 
 // 支持的站点列表
-const SUPPORTED_SITES = ['toy', 'myth', 'seric'];
+const SUPPORTED_SITES = ['toy', 'myth', 'seric', 'general'];
 
 export function setSiteId(siteId: string) {
   if (SUPPORTED_SITES.includes(siteId)) {

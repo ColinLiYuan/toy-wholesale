@@ -5,10 +5,13 @@ export interface Expense {
   siteId?: string;
   type: string;       // PURCHASE / ADMIN / SALES / LOGISTICS / OTHER
   amount: number;
+  currency?: string;  // CNY / USD
   category: string;
   expenseDate: string;
   description?: string;
   expenseBy?: string;
+  source?: string;    // 来源类型：MANUAL / PURCHASE / ORDER
+  sourceId?: number;  // 来源记录ID
   createdAt?: string;
   updatedAt?: string;
 }

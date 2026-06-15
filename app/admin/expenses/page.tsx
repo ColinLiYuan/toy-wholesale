@@ -20,6 +20,16 @@ export default function ExpensesPage() {
   const title = EXPENSE_TYPE_LABELS[expenseType] || expenseType;
   const categories = EXPENSE_TYPE_CATEGORIES[expenseType] || [];
 
+  const [stats, setStats] = useState<{ total: Record<string,number>; monthTotal: Record<string,number> }>({ total: {}, monthTotal: {} });
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch(`/api/v1/expenses/stats?type=${expenseType}`);
+      const json = await res.json();
+      if (json.code === 200) setStats(json.data);
+    } catch (e) { console.error(e); }
+  };
+
   const fetchExpenses = async (pageNum: number) => {
     setLoading(true);
     try {
@@ -35,6 +45,7 @@ export default function ExpensesPage() {
   };
 
   useEffect(() => {
+    fetchStats();
     fetchExpenses(page);
   }, [page, expenseType]);
 
@@ -66,6 +77,24 @@ export default function ExpensesPage() {
         >
           + 新增支出
         </Link>
+      </div>
+
+      {/* 统计卡片 */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-white rounded-lg shadow p-4">
+          <p className="text-sm text-gray-500 mb-1">本月支出</p>
+          {Object.entries(stats.monthTotal || {}).map(([cur, amt]) => (
+            <p key={cur} className="text-xl font-bold text-red-600">{cur === 'CNY' ? '¥' : '$'}{(amt||0).toLocaleString()}</p>
+          ))}
+          {!Object.keys(stats.monthTotal||{}).length && <p className="text-xl font-bold text-gray-400">0</p>}
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <p className="text-sm text-gray-500 mb-1">累计支出</p>
+          {Object.entries(stats.total || {}).map(([cur, amt]) => (
+            <p key={cur} className="text-xl font-bold text-gray-900">{cur === 'CNY' ? '¥' : '$'}{(amt||0).toLocaleString()}</p>
+          ))}
+          {!Object.keys(stats.total||{}).length && <p className="text-xl font-bold text-gray-400">0</p>}
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

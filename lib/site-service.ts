@@ -33,6 +33,12 @@ const SITE_CONFIGS: Record<SiteId, SiteConfig> = {
     label: 'Seric',
     adminName: 'Seric Admin',
     domain: 'www.seric.com'
+  },
+  general: {
+    id: 'general',
+    label: '通用',
+    adminName: '通用 Admin',
+    domain: ''
   }
 };
 
