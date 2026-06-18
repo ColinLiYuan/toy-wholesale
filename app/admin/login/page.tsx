@@ -27,30 +27,25 @@ export default function LoginPage() {
 
     try {
       // 1. 调用后端 API 获取 token
-      console.log('Step 1: Calling backend login API...');
       const response = await adminService.login(username, password);
-      console.log('Backend login response:', response);
       
       if (!response.token) {
         throw new Error('未获取到认证令牌');
       }
       
       // 2. 设置 localStorage
-      console.log('Step 2: Setting localStorage...');
       localStorage.setItem('admin_token', response.token);
       if (response.admin) {
         localStorage.setItem('admin_info', JSON.stringify(response.admin));
       }
       
       // 3. 设置 cookie
-      console.log('Step 3: Setting cookie via API route...');
       const cookieResponse = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: response.token }),
       });
       
-      console.log('Cookie API response status:', cookieResponse.status);
       
       if (!cookieResponse.ok) {
         const errorData = await cookieResponse.json().catch(() => ({}));
@@ -58,10 +53,8 @@ export default function LoginPage() {
       }
       
       // 4. 验证 cookie 是否设置成功
-      console.log('Step 4: Verifying login...');
       
       // 5. 跳转到仪表板
-      console.log('Step 5: Redirecting to dashboard...');
       router.push('/admin/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
@@ -76,11 +69,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-surface flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#0056B3]">LuxeAdult Admin</h1>
+          <h1 className="text-3xl font-bold text-brand">LuxeAdult Admin</h1>
           <p className="text-gray-600 mt-2">管理后台登录</p>
         </div>
 
@@ -101,7 +94,7 @@ export default function LoginPage() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-brand focus:border-transparent"
                 placeholder="admin"
                 required
               />
@@ -115,7 +108,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-brand focus:border-transparent"
                 placeholder="••••••••"
                 required
               />
@@ -124,7 +117,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#0056B3] text-white rounded-lg font-bold hover:bg-[#004494] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-brand text-white rounded-lg font-bold hover:bg-brand-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? '登录中...' : '登录'}
             </button>
@@ -157,7 +150,7 @@ export default function LoginPage() {
         <div className="text-center mt-6">
           <a
             href="/"
-            className="text-[#0056B3] hover:underline text-sm"
+            className="text-brand hover:underline text-sm"
           >
             ← 返回网站前台
           </a>

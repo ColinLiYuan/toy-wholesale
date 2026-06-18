@@ -67,16 +67,16 @@ export default function SampleKitPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative py-20 bg-[#F8F9FA] border-b border-gray-200">
+      <section className="relative py-20 bg-surface border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 rounded-full border border-[#0056B3]/30 bg-[#0056B3]/5 mb-6">
-              <span className="text-sm text-[#0056B3] font-medium tracking-wide">Free Samples for Qualified Buyers</span>
+            <div className="inline-flex items-center px-4 py-2 rounded-full border border-brand/30 bg-brand/5 mb-6">
+              <span className="text-sm text-brand font-medium tracking-wide">Free Samples for Qualified Buyers</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-[#1A1A1A] mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-text-primary mb-6">
               Request Product Samples
             </h1>
-            <p className="text-xl text-[#6C757D] max-w-3xl mx-auto">
+            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               Evaluate our premium adult wellness products firsthand. Each sample kit contains carefully selected items to demonstrate our quality and variety.
             </p>
           </div>
@@ -89,16 +89,16 @@ export default function SampleKitPage() {
           {/* Overview Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             <div className="bg-white border border-gray-200 rounded-xl p-8 text-center shadow-sm">
-              <div className="text-4xl font-bold text-[#0056B3] mb-2">15+</div>
-              <div className="text-[#6C757D]">Product Samples</div>
+              <div className="text-4xl font-bold text-brand mb-2">15+</div>
+              <div className="text-text-secondary">Product Samples</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-xl p-8 text-center shadow-sm">
-              <div className="text-4xl font-bold text-[#0056B3] mb-2">3</div>
-              <div className="text-[#6C757D]">Product Categories</div>
+              <div className="text-4xl font-bold text-brand mb-2">3</div>
+              <div className="text-text-secondary">Product Categories</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-xl p-8 text-center shadow-sm">
-              <div className="text-4xl font-bold text-[#0056B3] mb-2">Free</div>
-              <div className="text-[#6C757D]">Shipping Worldwide</div>
+              <div className="text-4xl font-bold text-brand mb-2">Free</div>
+              <div className="text-text-secondary">Shipping Worldwide</div>
             </div>
           </div>
 
@@ -109,12 +109,12 @@ export default function SampleKitPage() {
                 {/* Category Header */}
                 <div className="p-8 border-b border-gray-200">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-[#0056B3]/10 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center">
                       <svg className="w-6 h-6" style={{ color: category.color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={category.icon} />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-bold text-[#1A1A1A]">{category.category}</h3>
+                    <h3 className="text-2xl font-bold text-text-primary">{category.category}</h3>
                   </div>
                 </div>
 
@@ -122,11 +122,11 @@ export default function SampleKitPage() {
                 <div className="p-8">
                   <div className="grid md:grid-cols-2 gap-4">
                     {category.items.map((item, idx) => (
-                      <div key={idx} className="flex items-start p-4 rounded-lg bg-[#F8F9FA] hover:bg-gray-100 transition-colors">
+                      <div key={idx} className="flex items-start p-4 rounded-lg bg-surface hover:bg-gray-100 transition-colors">
                         <div className="w-2 h-2 rounded-full mt-2 mr-4 flex-shrink-0" style={{ backgroundColor: category.color }} />
                         <div>
-                          <div className="font-semibold text-[#1A1A1A] mb-1">{item.name}</div>
-                          <div className="text-sm text-[#6C757D]">{item.spec}</div>
+                          <div className="font-semibold text-text-primary mb-1">{item.name}</div>
+                          <div className="text-sm text-text-secondary">{item.spec}</div>
                         </div>
                       </div>
                     ))}
@@ -139,18 +139,18 @@ export default function SampleKitPage() {
       </section>
 
       {/* Request Section */}
-      <section className="py-20 bg-[#F8F9FA] border-t border-gray-200">
+      <section className="py-20 bg-surface border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-text-primary mb-6">
             Ready to Evaluate Our Products?
           </h2>
-          <p className="text-xl text-[#6C757D] mb-10">
+          <p className="text-xl text-text-secondary mb-10">
             Request your free sample kit today. Our team will prepare a customized selection based on your business needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-10 py-5 rounded-lg bg-[#0056B3] text-white font-bold text-lg hover:bg-[#004494] transition-all shadow-sm"
+              className="inline-flex items-center justify-center px-10 py-5 rounded-lg bg-brand text-white font-bold text-lg hover:bg-brand-hover transition-all shadow-sm"
             >
               Request Sample Kit
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export default function SampleKitPage() {
             </Link>
             <Link
               href="/products"
-              className="inline-flex items-center justify-center px-10 py-5 rounded-lg border-2 border-[#1A1A1A] text-[#1A1A1A] font-bold text-lg hover:bg-[#1A1A1A] hover:text-white transition-all"
+              className="inline-flex items-center justify-center px-10 py-5 rounded-lg border-2 border-text-primary text-text-primary font-bold text-lg hover:bg-text-primary hover:text-white transition-all"
             >
               View All Products
             </Link>

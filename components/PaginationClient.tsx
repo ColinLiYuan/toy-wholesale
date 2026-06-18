@@ -47,7 +47,7 @@ export default function PaginationClient({ currentPage, totalPages, category }: 
       <button
         onClick={handlePrev}
         disabled={currentPage === 0}
-        className="px-6 py-3 rounded-lg border border-gray-300 text-[#1A1A1A] hover:bg-[#F8F9FA] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="px-6 py-3 rounded-lg border border-gray-300 text-text-primary hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         Previous
       </button>
@@ -59,8 +59,8 @@ export default function PaginationClient({ currentPage, totalPages, category }: 
             onClick={() => handlePage(page)}
             className={`w-10 h-10 rounded-lg font-medium transition-colors ${
               page === currentPage
-                ? 'bg-[#0056B3] text-white'
-                : 'border border-gray-300 text-[#1A1A1A] hover:bg-[#F8F9FA]'
+                ? 'bg-brand text-white'
+                : 'border border-gray-300 text-text-primary hover:bg-surface'
             }`}
           >
             {page + 1}
@@ -71,7 +71,7 @@ export default function PaginationClient({ currentPage, totalPages, category }: 
       <button
         onClick={handleNext}
         disabled={currentPage === totalPages - 1}
-        className="px-6 py-3 rounded-lg border border-gray-300 text-[#1A1A1A] hover:bg-[#F8F9FA] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="px-6 py-3 rounded-lg border border-gray-300 text-text-primary hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         Next
       </button>

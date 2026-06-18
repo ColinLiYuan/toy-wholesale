@@ -52,7 +52,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl shadow-sm">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">最近产品</h2>
-            <Link href="/admin/products" className="text-sm text-[#0056B3] hover:underline">
+            <Link href="/admin/products" className="text-sm text-brand hover:underline">
               查看全部
             </Link>
           </div>
@@ -84,7 +84,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl shadow-sm">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">最近博客</h2>
-            <Link href="/admin/blog" className="text-sm text-[#0056B3] hover:underline">
+            <Link href="/admin/blog" className="text-sm text-brand hover:underline">
               查看全部
             </Link>
           </div>
@@ -118,7 +118,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href="/admin/products/new"
-            className="flex items-center justify-center px-6 py-4 bg-[#0056B3] text-white rounded-lg font-semibold hover:bg-[#004494] transition-colors"
+            className="flex items-center justify-center px-6 py-4 bg-brand text-white rounded-lg font-semibold hover:bg-brand-hover transition-colors"
           >
             <span className="mr-2">➕</span> 添加新产品
           </Link>

@@ -41,7 +41,6 @@ export default function NewBlogPage() {
         authorName: blog.authorName || undefined,
       };
 
-      console.log('Submitting blog data:', submitData);
 
       await blogAdminService.createBlog(submitData);
       alert('文章保存成功！');

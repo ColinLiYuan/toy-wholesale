@@ -9,7 +9,7 @@ export default function WholesaleBreadcrumbs({ currentCategory }: WholesaleBread
   if (!currentCategory) {
     return (
       <nav className="flex items-center space-x-2 text-sm">
-        <Link href="/products" className="text-gray-500 hover:text-[#0056B3] transition-colors">
+        <Link href="/products" className="text-gray-500 hover:text-brand transition-colors">
           Shop
         </Link>
       </nav>
@@ -29,7 +29,7 @@ export default function WholesaleBreadcrumbs({ currentCategory }: WholesaleBread
   return (
     <nav className="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
       {/* Home / Shop */}
-      <Link href="/products" className="text-gray-500 hover:text-[#0056B3] transition-colors">
+      <Link href="/products" className="text-gray-500 hover:text-brand transition-colors">
         Shop
       </Link>
       
@@ -42,7 +42,7 @@ export default function WholesaleBreadcrumbs({ currentCategory }: WholesaleBread
         <>
           <Link
             href={`/products?parent=${parent.slug}`}
-            className="text-gray-500 hover:text-[#0056B3] transition-colors"
+            className="text-gray-500 hover:text-brand transition-colors"
           >
             {parent.name}
           </Link>
@@ -54,7 +54,7 @@ export default function WholesaleBreadcrumbs({ currentCategory }: WholesaleBread
       ) : null}
 
       {/* 当前分类 */}
-      <span className="text-[#1A1A1A] font-semibold">
+      <span className="text-text-primary font-semibold">
         {category.name}
       </span>
     </nav>

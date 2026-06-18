@@ -22,14 +22,12 @@ export default function DebugPage() {
   const testApiConnection = async () => {
     setLoading(true);
     try {
-      console.log('[Debug] Testing API connection...');
       
       // 测试一个简单的 API 调用
       const response = await apiClient.get('/v1/products', {
         params: { page: 0, size: 1 }
       });
       
-      console.log('[Debug] API Test Result:', response);
       setTestResult({
         success: true,
         data: response,

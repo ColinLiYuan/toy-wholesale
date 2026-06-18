@@ -36,7 +36,7 @@ export default function ProductSpecsTable({ product }: ProductSpecsTableProps) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 bg-gradient-to-r from-[#0056B3] to-[#004494]">
+      <div className="px-6 py-4 bg-gradient-to-r from-brand to-brand-hover">
         <h2 className="text-lg font-bold text-white flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -57,16 +57,16 @@ export default function ProductSpecsTable({ product }: ProductSpecsTableProps) {
             }`}
           >
             <span className={`text-sm font-medium ${
-              spec.important ? 'text-[#0056B3]' : 'text-gray-600'
+              spec.important ? 'text-brand' : 'text-gray-600'
             }`}>
               {spec.key}
               {spec.important && (
-                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-[#0056B3]">
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-brand">
                   Important
                 </span>
               )}
             </span>
-            <span className={`text-sm font-semibold text-[#1A1A1A] ${
+            <span className={`text-sm font-semibold text-text-primary ${
               spec.highlight ? 'font-mono text-base' : ''
             }`}>
               {spec.value}

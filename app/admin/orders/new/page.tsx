@@ -79,7 +79,6 @@ export default function NewOrderPage() {
         // 加载产品列表
         const productsResponse = await productAdminService.getAllProducts(0, 1000);
         const loadedProducts = productsResponse.content || [];
-        console.log('Loaded products:', loadedProducts.slice(0, 2)); // 调试：查看前2个产品的数据结构
         setProducts(loadedProducts);
       } catch (error) {
         console.error('Failed to load data:', error);

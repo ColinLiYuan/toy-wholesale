@@ -37,7 +37,6 @@ export const supplierService = {
       return apiResult.data || [];
     } catch (error) {
       // API 尚未部署或网络错误，静默使用模拟数据
-      console.log('Supplier API not available, using fallback data');
       return getFallbackSuppliers();
     }
   },
@@ -69,7 +68,6 @@ export const authService = {
         { headers }
       );
       
-      console.log('API Result:', apiResult); // 调试日志
       
       if (apiResult.code !== 200) {
         throw new Error(apiResult.message || 'Login failed');
@@ -77,7 +75,6 @@ export const authService = {
       
       // apiResult.data 就是 AuthResponse 结构 {success, token, distributor}
       const authData = apiResult.data as AuthResponse;
-      console.log('Auth data:', authData); // 调试日志
       
       // 后端返回的是 distributor 字段，不是 user
       if (!authData || !authData.token || !authData.distributor) {
@@ -1642,13 +1639,11 @@ export const inquiryService = {
   // 提交询盘 - POST /api/v1/inquiries
   async submitInquiry(inquiry: Inquiry): Promise<Inquiry> {
     try {
-      console.log('[inquiryService] submitInquiry called with:', inquiry);
       const apiResult: ApiResult<Inquiry> = await apiClient.post(
         '/v1/inquiries',
         inquiry
       );
       
-      console.log('[inquiryService] submitInquiry response:', apiResult);
       
       if (apiResult.code !== 200 || !apiResult.data) {
         throw new Error(apiResult.message || 'Failed to submit inquiry');
@@ -2496,7 +2491,6 @@ export const salesOrderService = {
   // 添加跟进记录 - POST /api/v1/sales-orders/{id}/follow-ups
   async addFollowUp(id: number, followUpData: { content: string; followUpType?: string; result?: string }): Promise<FollowUpRecord> {
     try {
-      console.log('Adding follow-up for order:', id, 'with data:', followUpData);
       const apiResult: ApiResult<FollowUpRecord> = await apiClient.post(
         `/v1/sales-orders/${id}/follow-ups`,
         followUpData

@@ -42,10 +42,10 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
   ];
 
   const categories = [
-    { name: 'Silicone Vibrators', slug: 'silicone-vibrators', desc: 'Medical-grade silicone, waterproof, rechargeable, multiple stimulation modes.', gradient: 'from-[#0056B3] to-[#0077CC]' },
-    { name: 'Male Pleasure Tech', slug: 'male-pleasure-tech', desc: 'Prostate massagers, automatic masturbators, vibrating rings with remote control.', gradient: 'from-[#004494] to-[#0066B3]' },
-    { name: 'BDSM & Bondage', slug: 'bdsm-bondage', desc: 'Soft restraints, blindfolds, impact play, and beginner-to-advanced bondage kits.', gradient: 'from-[#003373] to-[#0056B3]' },
-    { name: 'Lingerie & Apparel', slug: 'lingerie-apparel', desc: 'Lace bodysuits, role-play costumes, adjustable sizing for diverse markets.', gradient: 'from-[#002252] to-[#004494]' },
+    { name: 'Silicone Vibrators', slug: 'silicone-vibrators', desc: 'Medical-grade silicone, waterproof, rechargeable, multiple stimulation modes.', gradient: 'from-brand to-blue-500' },
+    { name: 'Male Pleasure Tech', slug: 'male-pleasure-tech', desc: 'Prostate massagers, automatic masturbators, vibrating rings with remote control.', gradient: 'from-brand-hover to-blue-600' },
+    { name: 'BDSM & Bondage', slug: 'bdsm-bondage', desc: 'Soft restraints, blindfolds, impact play, and beginner-to-advanced bondage kits.', gradient: 'from-blue-900 to-brand' },
+    { name: 'Lingerie & Apparel', slug: 'lingerie-apparel', desc: 'Lace bodysuits, role-play costumes, adjustable sizing for diverse markets.', gradient: 'from-blue-950 to-brand-hover' },
   ];
 
   const advantages = [
@@ -73,26 +73,26 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       <section className="relative min-h-[90vh] flex items-center pt-16 bg-white overflow-hidden">
         {/* Subtle background texture */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-[#0056B3]/3 to-transparent rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#F8F9FA] to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-brand/3 to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-surface to-transparent rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 w-full relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Left */}
             <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#0056B3]/20 bg-[#0056B3]/5">
-                <span className="w-2 h-2 rounded-full bg-[#0056B3]" />
-                <span className="text-sm text-[#0056B3] font-semibold tracking-wide">Dongguan Factory Direct</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand/20 bg-brand/5">
+                <span className="w-2 h-2 rounded-full bg-brand" />
+                <span className="text-sm text-brand font-semibold tracking-wide">Dongguan Factory Direct</span>
               </div>
 
               <div className="space-y-5">
-                <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.08] tracking-tight text-[#1A1A1A]">
+                <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.08] tracking-tight text-text-primary">
                   Premium Adult Toys<br />
                   Wholesale, Direct<br />
                   from Factory
                 </h1>
-                <p className="text-lg md:text-xl text-[#6C757D] leading-relaxed max-w-lg">
+                <p className="text-lg md:text-xl text-text-secondary leading-relaxed max-w-lg">
                   Medical-grade silicone products for global retailers and distributors. Low MOQ, OEM/ODM branding, dedicated account support — all from Dongguan&apos;s manufacturing hub.
                 </p>
               </div>
@@ -100,7 +100,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <Link
                   href="/products"
-                  className="group inline-flex items-center justify-center px-8 py-4 rounded-xl bg-[#0056B3] text-white font-semibold text-lg hover:bg-[#004494] transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                  className="group inline-flex items-center justify-center px-8 py-4 rounded-xl bg-brand text-white font-semibold text-lg hover:bg-brand-hover transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 >
                   Browse Catalog
                   <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
                 </Link>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-xl border-2 border-[#D1D5DB] text-[#1A1A1A] font-semibold text-lg hover:border-[#0056B3] hover:text-[#0056B3] transition-all duration-200"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-xl border-2 border-[#D1D5DB] text-text-primary font-semibold text-lg hover:border-brand hover:text-brand transition-all duration-200"
                 >
                   Request Pricing
                 </button>
@@ -118,7 +118,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
 
             {/* Right — Product image */}
             <div className="relative hidden lg:block">
-              <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-[#F8F9FA] via-white to-[#E9ECEF] rounded-3xl overflow-hidden shadow-2xl ring-1 ring-gray-100">
+              <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-surface via-white to-gray-200 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-gray-100">
                 <img
                   src={`${R2_BASE_URL}/toy/home_product.jpg`}
                   alt="Medical-grade silicone product — wholesale supplier"
@@ -133,8 +133,8 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
                   </svg>
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-[#1A1A1A]">FDA / CE Certified</div>
-                  <div className="text-xs text-[#6C757D]">Medical-grade quality</div>
+                  <div className="text-sm font-bold text-text-primary">FDA / CE Certified</div>
+                  <div className="text-xs text-text-secondary">Medical-grade quality</div>
                 </div>
               </div>
             </div>
@@ -150,13 +150,13 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((s, i) => (
               <div key={i} className="text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-[#F8F9FA] group-hover:bg-[#0056B3]/10 flex items-center justify-center mx-auto mb-4 transition-colors">
-                  <svg className="w-6 h-6 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-14 h-14 rounded-2xl bg-surface group-hover:bg-brand/10 flex items-center justify-center mx-auto mb-4 transition-colors">
+                  <svg className="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={s.icon} />
                   </svg>
                 </div>
-                <div className="text-3xl md:text-4xl font-extrabold text-[#1A1A1A] mb-1">{s.value}</div>
-                <div className="text-sm text-[#6C757D] font-medium">{s.label}</div>
+                <div className="text-3xl md:text-4xl font-extrabold text-text-primary mb-1">{s.value}</div>
+                <div className="text-sm text-text-secondary font-medium">{s.label}</div>
               </div>
             ))}
           </div>
@@ -166,13 +166,13 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       {/* ============================================
           3. Product Categories
       ============================================ */}
-      <section className="py-20 lg:py-28 bg-[#F8F9FA]">
+      <section className="py-20 lg:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
               Product Categories
             </h2>
-            <p className="text-lg text-[#6C757D] max-w-xl mx-auto">
+            <p className="text-lg text-text-secondary max-w-xl mx-auto">
               Full catalog organized by market segment. Every product available for OEM branding.
             </p>
           </div>
@@ -192,9 +192,9 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[#1A1A1A] mb-2 group-hover:text-[#0056B3] transition-colors">{cat.name}</h3>
-                  <p className="text-sm text-[#6C757D] leading-relaxed mb-4">{cat.desc}</p>
-                  <span className="inline-flex items-center text-sm font-semibold text-[#0056B3]">
+                  <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-brand transition-colors">{cat.name}</h3>
+                  <p className="text-sm text-text-secondary leading-relaxed mb-4">{cat.desc}</p>
+                  <span className="inline-flex items-center text-sm font-semibold text-brand">
                     Browse
                     <svg className="ml-1.5 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -213,26 +213,26 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       <section className="py-20 lg:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
               Why Partner With Silvibe
             </h2>
-            <p className="text-lg text-[#6C757D] max-w-xl mx-auto">
+            <p className="text-lg text-text-secondary max-w-xl mx-auto">
               Dongguan factory access. No middlemen. Personalized wholesale service to grow your business.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {advantages.map((item, i) => (
-              <div key={i} className="group relative bg-white border border-gray-100 rounded-2xl p-7 hover:border-[#0056B3]/20 hover:shadow-lg transition-all duration-200">
+              <div key={i} className="group relative bg-white border border-gray-100 rounded-2xl p-7 hover:border-brand/20 hover:shadow-lg transition-all duration-200">
                 {/* Subtle left accent on hover */}
-                <div className="absolute left-0 top-6 bottom-6 w-0.5 bg-[#0056B3] opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
-                <div className="w-11 h-11 rounded-xl bg-[#0056B3]/8 flex items-center justify-center mb-5 group-hover:bg-[#0056B3]/12 transition-colors">
-                  <svg className="w-5 h-5 text-[#0056B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="absolute left-0 top-6 bottom-6 w-0.5 bg-brand opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
+                <div className="w-11 h-11 rounded-xl bg-brand/8 flex items-center justify-center mb-5 group-hover:bg-brand/12 transition-colors">
+                  <svg className="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
                   </svg>
                 </div>
-                <h3 className="text-lg font-bold text-[#1A1A1A] mb-2">{item.title}</h3>
-                <p className="text-sm text-[#6C757D] leading-relaxed">{item.desc}</p>
+                <h3 className="text-lg font-bold text-text-primary mb-2">{item.title}</h3>
+                <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -242,13 +242,13 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       {/* ============================================
           5. How to Order
       ============================================ */}
-      <section className="py-20 lg:py-28 bg-[#F8F9FA]">
+      <section className="py-20 lg:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
               How to Order
             </h2>
-            <p className="text-lg text-[#6C757D] max-w-xl mx-auto">
+            <p className="text-lg text-text-secondary max-w-xl mx-auto">
               Simple process from browsing to delivery. We handle the complexity.
             </p>
           </div>
@@ -261,11 +261,11 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
               {steps.map((s, i) => (
                 <div key={i} className="relative bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-md transition-all duration-200 text-center">
                   {/* Step circle */}
-                  <div className="w-12 h-12 rounded-full bg-[#0056B3] text-white flex items-center justify-center mx-auto mb-5 text-lg font-extrabold shadow-md relative z-10">
+                  <div className="w-12 h-12 rounded-full bg-brand text-white flex items-center justify-center mx-auto mb-5 text-lg font-extrabold shadow-md relative z-10">
                     {s.step}
                   </div>
-                  <h3 className="text-lg font-bold text-[#1A1A1A] mb-2">{s.title}</h3>
-                  <p className="text-sm text-[#6C757D] leading-relaxed">{s.desc}</p>
+                  <h3 className="text-lg font-bold text-text-primary mb-2">{s.title}</h3>
+                  <p className="text-sm text-text-secondary leading-relaxed">{s.desc}</p>
                 </div>
               ))}
             </div>
@@ -279,10 +279,10 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       <section className="py-20 lg:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
               Hot Selling Products
             </h2>
-            <p className="text-lg text-[#6C757D] max-w-xl mx-auto">
+            <p className="text-lg text-text-secondary max-w-xl mx-auto">
               Proven sellers across global markets. Medical-grade silicone, competitive wholesale pricing.
             </p>
           </div>
@@ -308,7 +308,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
             <div className="grid md:grid-cols-3 gap-8">
               {featuredProducts.map((product) => (
                 <div key={product.id} className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <Link href={`/products/${product.slug}`} className="relative h-72 bg-[#F8F9FA] flex items-center justify-center overflow-hidden block">
+                  <Link href={`/products/${product.slug}`} className="relative h-72 bg-surface flex items-center justify-center overflow-hidden block">
                     <img
                       src={product.image?.startsWith('http') ? product.image : `${R2_BASE_URL}/${product.image}`}
                       alt={product.alt || product.title}
@@ -319,7 +319,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
                       const tagList = Array.isArray(product.tags) ? product.tags : (typeof product.tags === 'string' ? JSON.parse(product.tags) : []);
                       const firstTag = tagList[0];
                       return firstTag ? (
-                        <div className="absolute top-4 left-4 px-3 py-1.5 bg-[#0056B3] text-white text-xs font-semibold rounded-lg shadow-md">
+                        <div className="absolute top-4 left-4 px-3 py-1.5 bg-brand text-white text-xs font-semibold rounded-lg shadow-md">
                           {firstTag}
                         </div>
                       ) : null;
@@ -327,41 +327,41 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
                   </Link>
                   <div className="p-6">
                     <Link href={`/products/${product.slug}`}>
-                      <h3 className="text-lg font-bold text-[#1A1A1A] mb-3 hover:text-[#0056B3] transition-colors line-clamp-1">
+                      <h3 className="text-lg font-bold text-text-primary mb-3 hover:text-brand transition-colors line-clamp-1">
                         {product.title}
                       </h3>
                     </Link>
                     <div className="space-y-2 mb-4">
                       {product.material && (
                         <div className="flex justify-between text-sm">
-                          <span className="text-[#6C757D]">Material</span>
-                          <span className="text-[#1A1A1A] font-medium">{product.material}</span>
+                          <span className="text-text-secondary">Material</span>
+                          <span className="text-text-primary font-medium">{product.material}</span>
                         </div>
                       )}
                       {product.shortDescription && (
                         <div className="flex justify-between text-sm">
-                          <span className="text-[#6C757D]">Feature</span>
-                          <span className="text-[#1A1A1A] font-medium line-clamp-1">{product.shortDescription}</span>
+                          <span className="text-text-secondary">Feature</span>
+                          <span className="text-text-primary font-medium line-clamp-1">{product.shortDescription}</span>
                         </div>
                       )}
                       {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
                         <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
-                          <span className="text-[#6C757D]">MOQ</span>
-                          <span className="text-[#0056B3] font-semibold">{product.minOrder} pcs</span>
+                          <span className="text-text-secondary">MOQ</span>
+                          <span className="text-brand font-semibold">{product.minOrder} pcs</span>
                         </div>
                       )}
                     </div>
-                    <div className="mb-4 p-3 bg-[#0056B3]/5 rounded-xl border border-[#0056B3]/10">
+                    <div className="mb-4 p-3 bg-brand/5 rounded-xl border border-brand/10">
                       <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-[#0056B3] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-brand flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
-                        <span className="text-xs font-semibold text-[#0056B3]">OEM Branding Available</span>
+                        <span className="text-xs font-semibold text-brand">OEM Branding Available</span>
                       </div>
                     </div>
                     <Link
                       href={`/contact?product=${product.slug}`}
-                      className="block w-full py-3 rounded-xl bg-[#0056B3] text-white font-semibold text-center hover:bg-[#004494] transition-colors duration-200"
+                      className="block w-full py-3 rounded-xl bg-brand text-white font-semibold text-center hover:bg-brand-hover transition-colors duration-200"
                     >
                       Get Bulk Quote
                     </Link>
@@ -374,7 +374,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
               <svg className="w-20 h-20 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
-              <p className="text-[#6C757D] text-lg mb-1">No featured products yet</p>
+              <p className="text-text-secondary text-lg mb-1">No featured products yet</p>
               <p className="text-gray-400 text-sm">New arrivals coming soon</p>
             </div>
           )}
@@ -384,7 +384,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       {/* ============================================
           7. CTA
       ============================================ */}
-      <section className="relative py-20 lg:py-28 bg-[#0056B3] overflow-hidden">
+      <section className="relative py-20 lg:py-28 bg-brand overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 pointer-events-none opacity-10">
           <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white" />
@@ -401,7 +401,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-10 py-4 rounded-xl bg-white text-[#0056B3] font-bold text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center px-10 py-4 rounded-xl bg-white text-brand font-bold text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               Contact Sales
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -77,12 +77,12 @@ export default function MyOrdersPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-[#F8F9FA] py-8">
+      <div className="min-h-screen bg-surface py-8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-[#1A1A1A]">My Orders</h1>
-            <p className="text-sm text-[#6C757D] mt-1">
+            <h1 className="text-2xl font-bold text-text-primary">My Orders</h1>
+            <p className="text-sm text-text-secondary mt-1">
               {totalElements > 0
                 ? `${totalElements} order${totalElements > 1 ? 's' : ''} total`
                 : 'Track your inquiries and orders'}
@@ -97,18 +97,18 @@ export default function MyOrdersPage() {
 
           {loading ? (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#0056B3] border-t-transparent" />
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-brand border-t-transparent" />
             </div>
           ) : orders.length === 0 ? (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
               <svg className="w-16 h-16 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <h2 className="text-lg font-semibold text-[#1A1A1A] mb-2">No orders yet</h2>
-              <p className="text-[#6C757D] text-sm mb-6">Start by adding products to your inquiry cart</p>
+              <h2 className="text-lg font-semibold text-text-primary mb-2">No orders yet</h2>
+              <p className="text-text-secondary text-sm mb-6">Start by adding products to your inquiry cart</p>
               <Link
                 href="/products"
-                className="inline-flex items-center px-6 py-2.5 rounded-lg bg-[#0056B3] text-white text-sm font-semibold hover:bg-[#004494] transition-colors"
+                className="inline-flex items-center px-6 py-2.5 rounded-lg bg-brand text-white text-sm font-semibold hover:bg-brand-hover transition-colors"
               >
                 Browse Products
               </Link>
@@ -126,21 +126,21 @@ export default function MyOrdersPage() {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                           <div>
                             <div className="flex items-center gap-3">
-                              <h3 className="text-lg font-semibold text-[#1A1A1A]">
+                              <h3 className="text-lg font-semibold text-text-primary">
                                 {order.orderNumber || `Inquiry #${order.inquiryNumber}`}
                               </h3>
                               <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusConfig.color}`}>
                                 {statusConfig.label}
                               </span>
                             </div>
-                            <p className="text-sm text-[#6C757D] mt-1">
+                            <p className="text-sm text-text-secondary mt-1">
                               {formatDate(order.createdAt)}
                               {order.confirmedAt && ` · Confirmed ${formatDate(order.confirmedAt)}`}
                             </p>
                           </div>
                           <Link
                             href={`/my-orders/${order.id}`}
-                            className="self-start sm:self-center inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-[#0056B3] bg-[#E8F0FE] hover:bg-[#0056B3] hover:text-white transition-colors"
+                            className="self-start sm:self-center inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-brand bg-brand-light hover:bg-brand hover:text-white transition-colors"
                           >
                             View Details
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,26 +152,26 @@ export default function MyOrdersPage() {
                         {/* Summary Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
                           <div>
-                            <p className="text-xs text-[#6C757D] uppercase tracking-wide mb-1">Amount</p>
-                            <p className="text-base font-semibold text-[#1A1A1A]">
+                            <p className="text-xs text-text-secondary uppercase tracking-wide mb-1">Amount</p>
+                            <p className="text-base font-semibold text-text-primary">
                               {order.totalAmount != null ? `$${order.totalAmount.toFixed(2)}` : 'Pending'}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-[#6C757D] uppercase tracking-wide mb-1">Weight</p>
-                            <p className="text-base font-semibold text-[#1A1A1A]">
+                            <p className="text-xs text-text-secondary uppercase tracking-wide mb-1">Weight</p>
+                            <p className="text-base font-semibold text-text-primary">
                               {order.totalWeight != null ? `${order.totalWeight.toFixed(2)} kg` : '—'}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-[#6C757D] uppercase tracking-wide mb-1">Payment</p>
-                            <p className="text-sm font-medium text-[#1A1A1A]">
+                            <p className="text-xs text-text-secondary uppercase tracking-wide mb-1">Payment</p>
+                            <p className="text-sm font-medium text-text-primary">
                               {order.paymentStatus || '—'}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-[#6C757D] uppercase tracking-wide mb-1">Shipping</p>
-                            <p className="text-sm font-medium text-[#1A1A1A]">
+                            <p className="text-xs text-text-secondary uppercase tracking-wide mb-1">Shipping</p>
+                            <p className="text-sm font-medium text-text-primary">
                               {order.shippingStatus || '—'}
                             </p>
                           </div>
@@ -188,7 +188,7 @@ export default function MyOrdersPage() {
                   <button
                     onClick={() => setPage(Math.max(0, page - 1))}
                     disabled={page === 0}
-                    className="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-[#1A1A1A] bg-white hover:bg-[#F8F9FA] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-text-primary bg-white hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
                     Previous
                   </button>
@@ -210,8 +210,8 @@ export default function MyOrdersPage() {
                           onClick={() => setPage(pageNum)}
                           className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                             page === pageNum
-                              ? 'bg-[#0056B3] text-white'
-                              : 'border border-gray-300 text-[#1A1A1A] hover:bg-[#F8F9FA]'
+                              ? 'bg-brand text-white'
+                              : 'border border-gray-300 text-text-primary hover:bg-surface'
                           }`}
                         >
                           {pageNum + 1}
@@ -222,7 +222,7 @@ export default function MyOrdersPage() {
                   <button
                     onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                     disabled={page >= totalPages - 1}
-                    className="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-[#1A1A1A] bg-white hover:bg-[#F8F9FA] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-text-primary bg-white hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
                     Next
                   </button>

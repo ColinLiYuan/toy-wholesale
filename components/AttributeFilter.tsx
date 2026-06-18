@@ -92,11 +92,11 @@ export default function AttributeFilter({ onFilterChange }: AttributeFilterProps
     <div className="bg-white border border-gray-200 rounded-lg p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-        <h3 className="text-base font-bold text-[#1A1A1A]">Filters</h3>
+        <h3 className="text-base font-bold text-text-primary">Filters</h3>
         {hasActiveFilters && (
           <button
             onClick={handleClearAll}
-            className="text-sm text-[#0056B3] hover:text-[#004494] font-medium"
+            className="text-sm text-brand hover:text-brand-hover font-medium"
           >
             Clear All
           </button>
@@ -107,7 +107,7 @@ export default function AttributeFilter({ onFilterChange }: AttributeFilterProps
       <div className="space-y-6">
         {filterGroups.map((group) => (
           <div key={group.id}>
-            <h4 className="text-sm font-semibold text-[#1A1A1A] mb-3">{group.title}</h4>
+            <h4 className="text-sm font-semibold text-text-primary mb-3">{group.title}</h4>
             <div className="space-y-2">
               {group.options.map((option) => {
                 const isSelected = (selectedFilters[group.id] || []).includes(option.value);
@@ -120,13 +120,13 @@ export default function AttributeFilter({ onFilterChange }: AttributeFilterProps
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => handleFilterToggle(group.id, option.value)}
-                      className="w-4 h-4 text-[#0056B3] border-gray-300 rounded focus:ring-[#0056B3] cursor-pointer"
+                      className="w-4 h-4 text-brand border-gray-300 rounded focus:ring-brand cursor-pointer"
                     />
                     <span
                       className={`ml-2 text-sm transition-colors ${
                         isSelected
-                          ? 'text-[#0056B3] font-medium'
-                          : 'text-[#6C757D] group-hover:text-[#1A1A1A]'
+                          ? 'text-brand font-medium'
+                          : 'text-text-secondary group-hover:text-text-primary'
                       }`}
                     >
                       {option.label}
@@ -142,7 +142,7 @@ export default function AttributeFilter({ onFilterChange }: AttributeFilterProps
       {/* Active Filters Summary */}
       {hasActiveFilters && (
         <div className="mt-6 pt-4 border-t border-gray-200">
-          <h4 className="text-xs font-semibold text-[#6C757D] uppercase tracking-wider mb-2">
+          <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">
             Active Filters
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -153,12 +153,12 @@ export default function AttributeFilter({ onFilterChange }: AttributeFilterProps
                 return (
                   <span
                     key={`${groupId}-${value}`}
-                    className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-[#E8F0FE] text-[#0056B3]"
+                    className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-brand-light text-brand"
                   >
                     {option?.label || value}
                     <button
                       onClick={() => handleFilterToggle(groupId, value)}
-                      className="ml-1.5 hover:text-[#004494]"
+                      className="ml-1.5 hover:text-brand-hover"
                     >
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path

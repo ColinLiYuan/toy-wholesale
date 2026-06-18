@@ -39,8 +39,8 @@ export interface Product {
   categories?: string | string[];  // JSON 字符串或数组
   colors?: string | string[];  // JSON 字符串或数组
   tags?: string | string[];  // 标签（JSON数组，用于前端多选搜索）
-  features?: Record<string, any>;  // 特性（JSON对象）
-  featuresParsed?: Record<string, any>;  // 解析后的特性对象（前端用）
+  features?: Record<string, unknown> | string[];  // 特性（可以是键值对对象或字符串数组）
+  featuresParsed?: Record<string, unknown> | string[];  // 解析后的特性
   
   // SEO 字段
   seoTitle?: string;
@@ -56,7 +56,8 @@ export interface Product {
   supplierId?: number;  // 供应商 ID
   supplierName?: string;  // 供应商名称（冗余字段）
   badge?: string;  // 产品标签（如 NEW, HOT, SALE）
-  
+  priority?: number;  // 排序优先级（越大越靠前）
+
   createdAt?: string;
   updatedAt?: string;
   productSkus?: ProductSku[];
@@ -338,27 +339,36 @@ export interface FollowUpRecordListResponse {
   last: boolean;
 }
 
-// 运营账号类型 - 根据后端实体 OperationAccount
-// 统一管理所有业务线的运营账号，包括：社交媒体、邮箱、支付账号等
+// 运营账号类型 - 统一管理所有业务线的运营账号
+// 包括：社交媒体、邮箱、支付、云服务、域名、服务器、数据库、B2B平台、物流等
 export interface OperationAccount {
   id?: number;
-  accountType?: string;  // SOCIAL_MEDIA-社交媒体, EMAIL-邮箱, PAYMENT-支付账号, OTHER-其他
-  businessLine?: string;  // MYTH_TOY-MythToy零售, ADULT_PRODUCTS-成人用品外贸, ANTI_FAKE-防伪标签外贸, GENERAL-通用
+  accountType?: string;  // SOCIAL_MEDIA | EMAIL | PAYMENT | CLOUD_SERVICE | DOMAIN | SERVER | DATABASE | ANALYTICS | DEV_TOOL | B2B_PLATFORM | LOGISTICS | CUSTOMS | OTHER
+  businessLine?: string;  // MYTH_TOY | ADULT_PRODUCTS | ANTI_FAKE | GENERAL
   platform?: string;  // 平台/服务商
   accountIdentifier?: string;  // 账号标识（用户名/邮箱/账号ID）
   displayName?: string;  // 显示名称/备注名
   password?: string;
-  purpose?: string;  // MARKETING-营销推广, CUSTOMER_SERVICE-客户服务, SALES-销售开发, NOTIFICATION-通知接收, REGISTER-注册账号, PAYMENT-收款, OTHER-其他
+  purpose?: string;  // MARKETING | CUSTOMER_SERVICE | SALES | NOTIFICATION | REGISTER | PAYMENT | INFRASTRUCTURE | DEVELOPMENT | ANALYTICS | LOGISTICS | OTHER
   projectName?: string;
   leadId?: number;
-  status?: string;  // ACTIVE-活跃, INACTIVE-不活跃, BANNED-被封禁, SUSPENDED-暂停
-  backupContact?: string;  // 备用联系方式
+  status?: string;  // ACTIVE | INACTIVE | BANNED | SUSPENDED
+  backupContact?: string;
   phoneNumber?: string;
   twoFactorEnabled?: boolean;
   lastLoginAt?: string;
   lastActiveAt?: string;
-  followersCount?: number;  // 粉丝数/关注人数（社交媒体）
-  profileUrl?: string;  // 账号主页URL
+  followersCount?: number;
+  profileUrl?: string;
+  // 基础设施/云服务扩展字段
+  apiKey?: string;       // API Key / Access Key ID
+  secretKey?: string;    // Secret Key
+  loginUrl?: string;     // 登录/控制台地址
+  consoleUrl?: string;   // 管理后台地址
+  expiryDate?: string;   // 到期时间
+  port?: number;         // 端口号
+  region?: string;       // 区域/机房
+  relatedUrls?: string;  // 关联URL（JSON数组）
   notes?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -427,7 +437,7 @@ export interface InquiryCartItem {
   skuCode?: string;
   color?: string;
   quantity: number;
-  specifications?: Record<string, any>;
+  specifications?: Record<string, unknown> | string;  // 对象格式（前端）或 JSON 字符串（API）
   notes?: string;
 }
 

@@ -14,7 +14,7 @@ export default function SortSelect() {
 
   return (
     <select
-      className="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-[#1A1A1A] focus:ring-2 focus:ring-[#0056B3] focus:border-[#0056B3] outline-none"
+      className="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-text-primary focus:ring-2 focus:ring-brand focus:border-brand outline-none"
       defaultValue={searchParams.get('sort') || 'newest'}
       onChange={(e) => handleSort(e.target.value)}
     >

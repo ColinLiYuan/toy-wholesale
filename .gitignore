@@ -44,3 +44,12 @@ yarn-error.log*
 
 # OS
 Thumbs.db
+
+# Screenshots (SEO audit artifacts)
+/screenshots/
+
+# Claude
+.claude/
+
+# Python scripts
+/scripts/

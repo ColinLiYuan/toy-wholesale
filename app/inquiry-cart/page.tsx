@@ -86,7 +86,6 @@ export default function InquiryCartPage() {
   const handleSubmitInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('[InquiryCart] Form submitted');
 
     // Validate required fields
     if (!customerInfo.customerName || !customerInfo.customerEmail) {
@@ -118,12 +117,10 @@ export default function InquiryCartPage() {
         })),
       };
 
-      console.log('[InquiryCart] Submitting inquiry data:', inquiryData);
 
       // Submit inquiry
       const result = await inquiryService.submitInquiry(inquiryData as any);
 
-      console.log('[InquiryCart] Inquiry submitted successfully:', result);
 
       // Clear inquiry cart
       await inquiryCartUtils.clearCart();
@@ -145,7 +142,7 @@ export default function InquiryCartPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0056B3] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -175,7 +172,7 @@ export default function InquiryCartPage() {
             </p>
             <Link
               href="/products"
-              className="inline-block bg-[#0056B3] text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block bg-brand text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Browse Products
             </Link>
@@ -239,7 +236,7 @@ export default function InquiryCartPage() {
                                 parseInt(e.target.value) || 1
                               )
                             }
-                            className="w-20 px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                            className="w-20 px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent"
                           />
                           <button
                             onClick={() => handleRemoveItem(item.id!)}
@@ -278,7 +275,7 @@ export default function InquiryCartPage() {
                           customerName: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="Your Name"
                     />
                   </div>
@@ -298,7 +295,7 @@ export default function InquiryCartPage() {
                           customerEmail: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="your@email.com"
                     />
                   </div>
@@ -317,7 +314,7 @@ export default function InquiryCartPage() {
                           customerPhone: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="+86 138 0000 0000"
                     />
                   </div>
@@ -336,7 +333,7 @@ export default function InquiryCartPage() {
                           companyName: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="Your Company (Optional)"
                     />
                   </div>
@@ -355,7 +352,7 @@ export default function InquiryCartPage() {
                           country: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="China"
                     />
                   </div>
@@ -374,7 +371,7 @@ export default function InquiryCartPage() {
                           message: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0056B3] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="Please tell us your specific requirements..."
                     />
                   </div>
@@ -383,7 +380,7 @@ export default function InquiryCartPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-[#0056B3] text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                    className="w-full bg-brand text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                   >
                     {submitting ? 'Submitting...' : 'Submit Inquiry'}
                   </button>

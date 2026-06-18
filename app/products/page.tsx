@@ -75,7 +75,7 @@ export default async function ProductsPage({
   const currentCategory = categoryParam !== 'all' ? findCategoryBySlug(categoryParam) : undefined;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-surface">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -107,13 +107,13 @@ export default async function ProductsPage({
 
           <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
+              <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
                 {currentCategory ? currentCategory.name : 'Wholesale Product Catalog'}
               </h1>
               {currentCategory?.description && (
-                <p className="text-sm text-[#6C757D] mt-1">{currentCategory.description}</p>
+                <p className="text-sm text-text-secondary mt-1">{currentCategory.description}</p>
               )}
-              <p className="text-sm text-[#6C757D] mt-2">
+              <p className="text-sm text-text-secondary mt-2">
                 {pagination.totalElements > 0
                   ? `Showing ${pageNum * 12 + 1}–${Math.min((pageNum + 1) * 12, pagination.totalElements)} of ${pagination.totalElements} products`
                   : 'No products found'}
@@ -122,7 +122,7 @@ export default async function ProductsPage({
 
             {/* Sort dropdown */}
             <div className="flex items-center gap-3">
-              <label className="text-sm text-[#6C757D] hidden sm:inline">Sort by:</label>
+              <label className="text-sm text-text-secondary hidden sm:inline">Sort by:</label>
               <Suspense fallback={<div className="w-32 h-9 bg-gray-100 rounded-lg animate-pulse" />}>
                 <SortSelect />
               </Suspense>
@@ -169,7 +169,7 @@ export default async function ProductsPage({
                   <svg className="w-16 h-16 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
-                  <p className="text-[#6C757D] text-lg mb-1">No products found</p>
+                  <p className="text-text-secondary text-lg mb-1">No products found</p>
                   <p className="text-gray-400 text-sm">Try selecting a different category or browse all products</p>
                 </div>
               )}

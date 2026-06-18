@@ -41,9 +41,7 @@ export default function ProductDetailPage() {
         return;
       }
       
-      console.log('Fetching product detail for slug:', productSlug);
       const data = await productService.getProductDetail(productSlug);
-      console.log('Product detail received:', data);
       setProduct(data);
     } catch (err) {
       console.error('Failed to fetch product detail:', err);
@@ -66,7 +64,7 @@ export default function ProductDetailPage() {
           minOrder: 1,
           colors: [],
           categories: [],
-          features: [],
+          features: {},
           specifications: [],
           galleries: [],
           badge: undefined,
@@ -103,7 +101,7 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#0056B3] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand mx-auto mb-4"></div>
           <p className="text-gray-600">Loading product details...</p>
         </div>
       </div>
@@ -120,7 +118,7 @@ export default function ProductDetailPage() {
           <p className="text-red-600 text-lg mb-4">{error || 'Product not found'}</p>
           <Link
             href="/products"
-            className="inline-block bg-[#0056B3] text-white px-6 py-2 rounded-lg hover:bg-[#004494] transition-colors"
+            className="inline-block bg-brand text-white px-6 py-2 rounded-lg hover:bg-brand-hover transition-colors"
           >
             Back to Products
           </Link>
@@ -137,18 +135,18 @@ export default function ProductDetailPage() {
           <nav className="mb-12">
             <ol className="flex items-center space-x-2 text-sm">
               <li>
-                <Link href="/" className="text-[#6C757D] hover:text-[#0056B3] transition-colors">
+                <Link href="/" className="text-text-secondary hover:text-brand transition-colors">
                   Home
                 </Link>
               </li>
               <li className="text-gray-400">/</li>
               <li>
-                <Link href="/products" className="text-[#6C757D] hover:text-[#0056B3] transition-colors">
+                <Link href="/products" className="text-text-secondary hover:text-brand transition-colors">
                   Shop Wholesale
                 </Link>
               </li>
               <li className="text-gray-400">/</li>
-              <li className="text-[#1A1A1A] font-medium">
+              <li className="text-text-primary font-medium">
                 {product.title}
               </li>
             </ol>
@@ -159,7 +157,7 @@ export default function ProductDetailPage() {
             {/* Product Images Gallery */}
             <div className="space-y-4">
               {/* Main Image */}
-              <div className="relative aspect-square bg-[#F8F9FA] rounded-2xl overflow-hidden border border-gray-200">
+              <div className="relative aspect-square bg-surface rounded-2xl overflow-hidden border border-gray-200">
                 <img
                   src={getImageUrl(galleryImages[selectedImageIndex] || product.image)}
                   alt={product.alt || product.title}
@@ -179,7 +177,7 @@ export default function ProductDetailPage() {
                       onClick={() => setSelectedImageIndex(idx)}
                       className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                         selectedImageIndex === idx
-                          ? 'border-[#0056B3] shadow-md'
+                          ? 'border-brand shadow-md'
                           : 'border-gray-200 hover:border-gray-400'
                       }`}
                     >
@@ -201,35 +199,35 @@ export default function ProductDetailPage() {
             <div className="flex flex-col">
               {/* Brand */}
               <div className="mb-4">
-                <span className="text-sm font-medium text-[#0056B3] uppercase tracking-wider">
+                <span className="text-sm font-medium text-brand uppercase tracking-wider">
                   {product.brand}
                 </span>
               </div>
 
               {/* Title */}
-              <h1 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-6">
                 {product.title}
               </h1>
 
               {/* Description */}
-              <p className="text-[#6C757D] text-lg mb-8 leading-relaxed">
+              <p className="text-text-secondary text-lg mb-8 leading-relaxed">
                 {product.description ? product.description.replace(/###|\*\*/g, '') : 'No description available'}
               </p>
 
               {/* Price */}
-              <div className="mb-8 p-6 bg-[#F8F9FA] border border-gray-200 rounded-xl">
+              <div className="mb-8 p-6 bg-surface border border-gray-200 rounded-xl">
                 <div className="flex items-baseline gap-3 mb-2">
                   {product.originalPrice !== undefined && product.originalPrice !== null && product.originalPrice > product.currentPrice && (
                     <span className="text-xl text-gray-400 line-through">
                       ${product.originalPrice.toFixed(2)}
                     </span>
                   )}
-                  <span className="text-4xl font-bold text-[#0056B3]">
+                  <span className="text-4xl font-bold text-brand">
                     ${product.currentPrice.toFixed(2)}
                   </span>
                 </div>
                 {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
-                  <p className="text-sm text-[#6C757D]">
+                  <p className="text-sm text-text-secondary">
                     Minimum Order: {product.minOrder} pcs
                   </p>
                 )}
@@ -247,14 +245,14 @@ export default function ProductDetailPage() {
                 
                 return featuresArray.length > 0 ? (
                   <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">
+                    <h3 className="text-lg font-semibold text-text-primary mb-4">
                       Key Features:
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {featuresArray.map((feature: any, index: number) => (
                         <span
                           key={index}
-                          className="px-4 py-2 text-sm rounded-lg bg-[#F8F9FA] text-[#1A1A1A] border border-gray-200"
+                          className="px-4 py-2 text-sm rounded-lg bg-surface text-text-primary border border-gray-200"
                         >
                           {typeof feature === 'string' ? feature : `${feature.key || ''}: ${feature.value || ''}`}
                         </span>
@@ -267,14 +265,14 @@ export default function ProductDetailPage() {
               {/* Specifications */}
               {product.specifications && product.specifications.length > 0 && (
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">
+                  <h3 className="text-lg font-semibold text-text-primary mb-4">
                     Specifications:
                   </h3>
                   <div className="space-y-3">
                     {product.specifications.map((spec, index) => (
                       <div key={index} className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="text-[#6C757D]">{spec.specKey}</span>
-                        <span className="text-[#1A1A1A] font-medium">{spec.specValue}</span>
+                        <span className="text-text-secondary">{spec.specKey}</span>
+                        <span className="text-text-primary font-medium">{spec.specValue}</span>
                       </div>
                     ))}
                   </div>
@@ -283,11 +281,11 @@ export default function ProductDetailPage() {
 
               {/* MOQ (Minimum Order Quantity) */}
               {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
-                <div className="mb-8 p-4 bg-[#F8F9FA] border border-gray-200 rounded-lg">
-                  <h3 className="text-lg font-semibold text-[#1A1A1A] mb-2">
+                <div className="mb-8 p-4 bg-surface border border-gray-200 rounded-lg">
+                  <h3 className="text-lg font-semibold text-text-primary mb-2">
                     Minimum Order Quantity:
                   </h3>
-                  <p className="text-2xl font-bold text-[#0056B3]">
+                  <p className="text-2xl font-bold text-brand">
                     {product.minOrder} pcs
                   </p>
                 </div>
@@ -296,18 +294,18 @@ export default function ProductDetailPage() {
               {/* Available SKUs */}
               {product.productSkus && product.productSkus.length > 0 && (
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">
+                  <h3 className="text-lg font-semibold text-text-primary mb-4">
                     Available Options:
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {product.productSkus.map((sku, index) => (
-                      <div key={sku.id || index} className="p-4 bg-[#F8F9FA] border border-gray-200 rounded-lg">
+                      <div key={sku.id || index} className="p-4 bg-surface border border-gray-200 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-[#0056B3]">
+                          <span className="text-sm font-medium text-brand">
                             {sku.sku}
                           </span>
                           {sku.color && (
-                            <span className="text-xs text-[#6C757D]">
+                            <span className="text-xs text-text-secondary">
                               {sku.color}
                             </span>
                           )}
@@ -332,13 +330,13 @@ export default function ProductDetailPage() {
               <div className="mt-auto space-y-4">
                 <Link
                   href="/contact"
-                  className="block w-full bg-[#0056B3] text-white text-center py-4 px-6 rounded-lg font-bold text-lg hover:bg-[#004494] transition-all shadow-sm"
+                  className="block w-full bg-brand text-white text-center py-4 px-6 rounded-lg font-bold text-lg hover:bg-brand-hover transition-all shadow-sm"
                 >
                   Request Quote
                 </Link>
                 <Link
                   href="/products"
-                  className="block w-full border border-gray-300 text-[#1A1A1A] text-center py-4 px-6 rounded-lg font-semibold hover:bg-[#F8F9FA] transition-colors"
+                  className="block w-full border border-gray-300 text-text-primary text-center py-4 px-6 rounded-lg font-semibold hover:bg-surface transition-colors"
                 >
                   Back to Products
                 </Link>

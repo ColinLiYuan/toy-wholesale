@@ -66,7 +66,6 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
     const loadSuppliers = async () => {
       try {
         const data = await supplierService.getAllSuppliers();
-        console.log('Suppliers loaded:', data);
         setSuppliers(data);
       } catch (error) {
         console.error('API failed, using fallback suppliers:', error);
@@ -246,12 +245,12 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
         const selected = suppliers.find(s => String(s.id) === String(selectedSupplierId));
         const code = selected?.internalCode || 'SUP';
         return (
-          <div className="p-4 bg-[#E8F0FE] border-2 border-[#0056B3] rounded-lg">
-            <p className="text-sm text-[#0056B3] font-semibold mb-1">SKU 编码参考值：</p>
-            <p className="text-2xl font-mono font-bold text-[#0056B3]">
+          <div className="p-4 bg-brand-light border-2 border-brand rounded-lg">
+            <p className="text-sm text-brand font-semibold mb-1">SKU 编码参考值：</p>
+            <p className="text-2xl font-mono font-bold text-brand">
               {code}-{category}-{material}{sequence ? '-' + sequence : ''}{weight ? '-' + weight : ''}
             </p>
-            <p className="text-xs text-[#6C757D] mt-2">
+            <p className="text-xs text-text-secondary mt-2">
               格式：供应商代码-品类-材质-序列号-重量
             </p>
           </div>

@@ -72,7 +72,8 @@ export default function SocialMediaAccountsPage() {
 
       setAccounts(response.content);
       setPagination({
-        currentPage: response.currentPage,
+        // Spring Data Page uses "number" not "currentPage"
+        currentPage: (response as unknown as { number?: number }).number ?? 0,
         totalPages: response.totalPages,
         totalElements: response.totalElements,
       });
@@ -95,10 +96,13 @@ export default function SocialMediaAccountsPage() {
         { value: 'LINKEDIN', label: 'LinkedIn' },
         { value: 'FACEBOOK', label: 'Facebook' },
         { value: 'INSTAGRAM', label: 'Instagram' },
-        { value: 'TWITTER', label: 'Twitter' },
+        { value: 'TWITTER', label: 'Twitter / X' },
         { value: 'TIKTOK', label: 'TikTok' },
-        { value: 'WHATSAPP', label: 'WhatsApp' },
+        { value: 'YOUTUBE', label: 'YouTube' },
         { value: 'REDDIT', label: 'Reddit' },
+        { value: 'PINTEREST', label: 'Pinterest' },
+        { value: 'WHATSAPP', label: 'WhatsApp' },
+        { value: 'TELEGRAM', label: 'Telegram' },
       ],
       EMAIL: [
         { value: 'GMAIL', label: 'Gmail' },
@@ -106,7 +110,7 @@ export default function SocialMediaAccountsPage() {
         { value: 'YAHOO', label: 'Yahoo' },
         { value: '163', label: '网易163' },
         { value: 'QQ', label: 'QQ邮箱' },
-        { value: 'ALIYUN', label: '阿里云邮箱' },
+        { value: 'ALIYUN_MAIL', label: '阿里云邮箱' },
         { value: 'ZOHO', label: 'Zoho' },
         { value: 'YANDEX', label: 'Yandex' },
       ],
@@ -114,6 +118,70 @@ export default function SocialMediaAccountsPage() {
         { value: 'PAYPAL', label: 'PayPal' },
         { value: 'STRIPE', label: 'Stripe' },
         { value: 'WISE', label: 'Wise' },
+        { value: 'PAYONEER', label: 'Payoneer' },
+        { value: 'LIANLIAN', label: '连连支付' },
+        { value: 'WORLDFIRST', label: '万里汇' },
+      ],
+      B2B_PLATFORM: [
+        { value: 'ALIBABA_INTERNATIONAL', label: '阿里巴巴国际站' },
+        { value: 'ECER', label: 'ECER / 宜选网' },
+        { value: 'MADE_IN_CHINA', label: '中国制造网' },
+        { value: 'GLOBAL_SOURCES', label: 'Global Sources' },
+      ],
+      LOGISTICS: [
+        { value: 'DHL', label: 'DHL' },
+        { value: 'UPS', label: 'UPS' },
+        { value: 'FEDEX', label: 'FedEx' },
+        { value: 'YUNEXPRESS', label: '云途物流' },
+        { value: 'DEX', label: '递四方' },
+      ],
+      CUSTOMS: [
+        { value: 'CHINA_SINGLE_WINDOW', label: '单一窗口' },
+        { value: 'OTHER', label: '报关行/其他' },
+      ],
+      CLOUD_SERVICE: [
+        { value: 'ALIYUN_CLOUD', label: '阿里云' },
+        { value: 'CLOUDFLARE', label: 'Cloudflare' },
+        { value: 'AWS', label: 'AWS' },
+        { value: 'GOOGLE_CLOUD', label: 'Google Cloud' },
+      ],
+      DOMAIN: [
+        { value: 'ALIYUN_CLOUD', label: '阿里云' },
+        { value: 'CLOUDFLARE', label: 'Cloudflare' },
+        { value: 'NAMECHEAP', label: 'Namecheap' },
+        { value: 'GODADDY', label: 'GoDaddy' },
+      ],
+      SERVER: [
+        { value: 'ALIYUN_CLOUD', label: '阿里云 ECS' },
+        { value: 'AWS', label: 'AWS EC2' },
+        { value: 'VERCEL', label: 'Vercel' },
+        { value: 'NETLIFY', label: 'Netlify' },
+      ],
+      DATABASE: [
+        { value: 'ALIYUN_CLOUD', label: '阿里云 RDS' },
+        { value: 'AWS', label: 'AWS RDS' },
+        { value: 'OTHER', label: '自建/其他' },
+      ],
+      ANALYTICS: [
+        { value: 'GOOGLE_ANALYTICS', label: 'GA4' },
+        { value: 'GOOGLE_SEARCH_CONSOLE', label: 'Search Console' },
+        { value: 'BING_WEBMASTER', label: 'Bing Webmaster' },
+        { value: 'AHREFS', label: 'Ahrefs' },
+        { value: 'SEMRUSH', label: 'SEMrush' },
+      ],
+      DEV_TOOL: [
+        { value: 'GITHUB', label: 'GitHub' },
+        { value: 'GITLAB', label: 'GitLab' },
+        { value: 'DOCKER', label: 'Docker Hub' },
+        { value: 'VERCEL', label: 'Vercel' },
+        { value: 'NPM', label: 'npm' },
+        { value: 'FIGMA', label: 'Figma' },
+      ],
+      OTHER: [
+        { value: 'GOOGLE_WORKSPACE', label: 'Google Workspace' },
+        { value: 'NOTION', label: 'Notion' },
+        { value: 'CANVA', label: 'Canva' },
+        { value: 'OTHER', label: '其他' },
       ],
     };
     return platforms[selectedAccountType] || [];
@@ -152,9 +220,10 @@ export default function SocialMediaAccountsPage() {
 
   const getAccountTypeIcon = (accountType?: string) => {
     const icons: Record<string, string> = {
-      SOCIAL_MEDIA: '🌐',
-      EMAIL: '📧',
-      PAYMENT: '💳',
+      SOCIAL_MEDIA: '🌐', EMAIL: '📧', PAYMENT: '💳',
+      B2B_PLATFORM: '🏭', LOGISTICS: '🚚', CUSTOMS: '🛃',
+      CLOUD_SERVICE: '☁️', DOMAIN: '🔗', SERVER: '🖥️',
+      DATABASE: '🗄️', ANALYTICS: '📊', DEV_TOOL: '🔧',
       OTHER: '📦',
     };
     return icons[accountType || 'OTHER'] || '📦';
@@ -162,9 +231,10 @@ export default function SocialMediaAccountsPage() {
 
   const getAccountTypeText = (accountType?: string) => {
     const typeMap: Record<string, string> = {
-      SOCIAL_MEDIA: '社交媒体',
-      EMAIL: '邮箱',
-      PAYMENT: '支付账号',
+      SOCIAL_MEDIA: '社交媒体', EMAIL: '邮箱', PAYMENT: '支付收款',
+      B2B_PLATFORM: 'B2B平台', LOGISTICS: '物流', CUSTOMS: '海关报关',
+      CLOUD_SERVICE: '云服务', DOMAIN: '域名', SERVER: '服务器',
+      DATABASE: '数据库', ANALYTICS: '数据分析', DEV_TOOL: '开发工具',
       OTHER: '其他',
     };
     return typeMap[accountType || 'OTHER'] || accountType || '其他';
@@ -182,54 +252,52 @@ export default function SocialMediaAccountsPage() {
 
   const getPlatformIcon = (platform?: string) => {
     const icons: Record<string, string> = {
-      // 社交媒体
-      LINKEDIN: '💼',
-      FACEBOOK: '📘',
-      INSTAGRAM: '📷',
-      TWITTER: '🐦',
-      TIKTOK: '🎵',
-      WHATSAPP: '💬',
-      REDDIT: '🔴',
-      // 邮箱
-      GMAIL: '📧',
-      OUTLOOK: '📧',
-      YAHOO: '📧',
-      '163': '📧',
-      QQ: '📧',
-      ALIYUN: '📧',
-      ZOHO: '📧',
-      YANDEX: '📧',
-      // 支付
-      PAYPAL: '💳',
-      STRIPE: '💳',
-      WISE: '💳',
+      LINKEDIN: '💼', FACEBOOK: '📘', INSTAGRAM: '📷', TWITTER: '🐦',
+      TIKTOK: '🎵', YOUTUBE: '▶️', REDDIT: '🔴', PINTEREST: '📌',
+      WHATSAPP: '💬', TELEGRAM: '✈️',
+      GMAIL: '📧', OUTLOOK: '📧', YAHOO: '📧', '163': '📧', QQ: '📧',
+      ALIYUN_MAIL: '📧', ZOHO: '📧', YANDEX: '📧',
+      PAYPAL: '💳', STRIPE: '💳', WISE: '💳', PAYONEER: '💳',
+      LIANLIAN: '💳', WORLDFIRST: '💳',
+      ALIYUN_CLOUD: '☁️', CLOUDFLARE: '🌩️', AWS: '☁️', GOOGLE_CLOUD: '☁️',
+      NAMECHEAP: '🔗', GODADDY: '🔗',
+      VERCEL: '▲', NETLIFY: '🔺',
+      GITHUB: '🐙', GITLAB: '🦊', DOCKER: '🐳', NPM: '📦', FIGMA: '🎨',
+      GOOGLE_ANALYTICS: '📊', GOOGLE_SEARCH_CONSOLE: '🔍',
+      BING_WEBMASTER: '🔍', AHREFS: '📈', SEMRUSH: '📉',
+      ALIBABA_INTERNATIONAL: '🏭', ECER: '🏭',
+      MADE_IN_CHINA: '🏭', GLOBAL_SOURCES: '🏭',
+      DHL: '📦', UPS: '📦', FEDEX: '📦', YUNEXPRESS: '📦', DEX: '📦',
+      CHINA_SINGLE_WINDOW: '🛃',
+      GOOGLE_WORKSPACE: '📋', NOTION: '📝', CANVA: '🎨',
     };
     return icons[platform || ''] || '🌐';
   };
 
   const getPlatformText = (platform?: string) => {
     const platformMap: Record<string, string> = {
-      // 社交媒体
-      LINKEDIN: 'LinkedIn',
-      FACEBOOK: 'Facebook',
-      INSTAGRAM: 'Instagram',
-      TWITTER: 'Twitter',
-      TIKTOK: 'TikTok',
-      WHATSAPP: 'WhatsApp',
-      REDDIT: 'Reddit',
-      // 邮箱
-      GMAIL: 'Gmail',
-      OUTLOOK: 'Outlook',
-      YAHOO: 'Yahoo',
-      '163': '网易163',
-      QQ: 'QQ邮箱',
-      ALIYUN: '阿里云邮箱',
-      ZOHO: 'Zoho',
-      YANDEX: 'Yandex',
-      // 支付
-      PAYPAL: 'PayPal',
-      STRIPE: 'Stripe',
-      WISE: 'Wise',
+      LINKEDIN: 'LinkedIn', FACEBOOK: 'Facebook', INSTAGRAM: 'Instagram',
+      TWITTER: 'Twitter / X', TIKTOK: 'TikTok', YOUTUBE: 'YouTube',
+      REDDIT: 'Reddit', PINTEREST: 'Pinterest', WHATSAPP: 'WhatsApp', TELEGRAM: 'Telegram',
+      GMAIL: 'Gmail', OUTLOOK: 'Outlook', YAHOO: 'Yahoo',
+      '163': '网易163', QQ: 'QQ邮箱', ALIYUN_MAIL: '阿里云邮箱',
+      ZOHO: 'Zoho', YANDEX: 'Yandex',
+      PAYPAL: 'PayPal', STRIPE: 'Stripe', WISE: 'Wise',
+      PAYONEER: 'Payoneer', LIANLIAN: '连连支付', WORLDFIRST: '万里汇',
+      ALIYUN_CLOUD: '阿里云', CLOUDFLARE: 'Cloudflare',
+      AWS: 'AWS', GOOGLE_CLOUD: 'Google Cloud',
+      NAMECHEAP: 'Namecheap', GODADDY: 'GoDaddy',
+      VERCEL: 'Vercel', NETLIFY: 'Netlify',
+      GITHUB: 'GitHub', GITLAB: 'GitLab', DOCKER: 'Docker Hub',
+      NPM: 'npm', FIGMA: 'Figma',
+      GOOGLE_ANALYTICS: 'GA4', GOOGLE_SEARCH_CONSOLE: 'Search Console',
+      BING_WEBMASTER: 'Bing Webmaster', AHREFS: 'Ahrefs', SEMRUSH: 'SEMrush',
+      ALIBABA_INTERNATIONAL: '阿里巴巴国际站', ECER: '宜选网',
+      MADE_IN_CHINA: '中国制造网', GLOBAL_SOURCES: 'Global Sources',
+      DHL: 'DHL', UPS: 'UPS', FEDEX: 'FedEx',
+      YUNEXPRESS: '云途物流', DEX: '递四方',
+      CHINA_SINGLE_WINDOW: '单一窗口',
+      GOOGLE_WORKSPACE: 'Google Workspace', NOTION: 'Notion', CANVA: 'Canva',
     };
     return platformMap[platform || ''] || platform || '-';
   };
@@ -335,7 +403,16 @@ export default function SocialMediaAccountsPage() {
                 <option value="">所有账号类型</option>
                 <option value="SOCIAL_MEDIA">🌐 社交媒体</option>
                 <option value="EMAIL">📧 邮箱</option>
-                <option value="PAYMENT">💳 支付账号</option>
+                <option value="PAYMENT">💳 支付收款</option>
+                <option value="B2B_PLATFORM">🏭 B2B平台</option>
+                <option value="LOGISTICS">🚚 物流</option>
+                <option value="CUSTOMS">🛃 海关报关</option>
+                <option value="CLOUD_SERVICE">☁️ 云服务</option>
+                <option value="DOMAIN">🔗 域名</option>
+                <option value="SERVER">🖥️ 服务器</option>
+                <option value="DATABASE">🗄️ 数据库</option>
+                <option value="ANALYTICS">📊 数据分析</option>
+                <option value="DEV_TOOL">🔧 开发工具</option>
                 <option value="OTHER">📦 其他</option>
               </select>
             </div>

@@ -47,13 +47,13 @@ export default function DynamicBreadcrumbs({ parentSlug, childSlug }: Breadcrumb
               )}
               
               {isLast ? (
-                <span className="text-[#1A1A1A] font-medium">
+                <span className="text-text-primary font-medium">
                   {crumb.label}
                 </span>
               ) : (
                 <Link
                   href={crumb.href}
-                  className="text-[#6C757D] hover:text-[#0056B3] transition-colors"
+                  className="text-text-secondary hover:text-brand transition-colors"
                 >
                   {crumb.label}
                 </Link>

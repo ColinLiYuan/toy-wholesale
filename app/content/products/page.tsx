@@ -35,7 +35,6 @@ export default function ProductsPage() {
   const fetchProducts = async (page: number = 0) => {
     try {
       setLoading(true);
-      console.log('Fetching products, page:', page, 'category:', selectedCategory);
       const response: ProductListResponse = await productService.getProducts(page, 12);
       
       if (!response || !response.content) {
@@ -83,7 +82,7 @@ export default function ProductsPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#0056B3] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand mx-auto mb-4"></div>
           <p className="text-gray-600">Loading products...</p>
         </div>
       </div>
@@ -100,7 +99,7 @@ export default function ProductsPage() {
           <p className="text-red-600 text-lg mb-4">{error}</p>
           <button
             onClick={() => fetchProducts()}
-            className="px-6 py-2 bg-[#0056B3] text-white rounded-lg font-medium hover:bg-[#004494] transition-colors"
+            className="px-6 py-2 bg-brand text-white rounded-lg font-medium hover:bg-brand-hover transition-colors"
           >
             Retry
           </button>
@@ -112,13 +111,13 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative py-20 bg-[#F8F9FA] border-b border-gray-200">
+      <section className="relative py-20 bg-surface border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold text-[#1A1A1A] mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-text-primary mb-6">
               Shop Wholesale Adult Toys
             </h1>
-            <p className="text-xl text-[#6C757D] max-w-3xl mx-auto">
+            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               Browse our curated collection of premium adult wellness products. Low MOQ, competitive pricing, fast shipping.
             </p>
           </div>
@@ -135,8 +134,8 @@ export default function ProductsPage() {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-6 py-2.5 rounded-lg whitespace-nowrap transition-all flex-shrink-0 ${
                   selectedCategory === category.id
-                    ? 'bg-[#0056B3] text-white font-semibold shadow-md'
-                    : 'border border-gray-300 text-[#6C757D] hover:border-[#0056B3] hover:text-[#0056B3] hover:bg-[#F8F9FA]'
+                    ? 'bg-brand text-white font-semibold shadow-md'
+                    : 'border border-gray-300 text-text-secondary hover:border-brand hover:text-brand hover:bg-surface'
                 }`}
               >
                 {category.name}
@@ -159,14 +158,14 @@ export default function ProductsPage() {
                 {/* Badge */}
                 {product.badge && (
                   <div className="absolute top-4 left-4 z-10">
-                    <span className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#0056B3] text-white shadow-md">
+                    <span className="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand text-white shadow-md">
                       {product.badge}
                     </span>
                   </div>
                 )}
 
                 {/* Product Image - 占 70% 面积 */}
-                <div className="relative aspect-[4/3] bg-[#F8F9FA] overflow-hidden">
+                <div className="relative aspect-[4/3] bg-surface overflow-hidden">
                   <img
                     src={getImageUrl(product.image)}
                     alt={product.alt || product.title}
@@ -180,14 +179,14 @@ export default function ProductsPage() {
                 {/* Product Info */}
                 <div className="p-6 space-y-4">
                   {/* Title */}
-                  <h3 className="text-lg font-bold text-[#1A1A1A] group-hover:text-[#0056B3] transition-colors line-clamp-2 min-h-[56px] leading-tight">
+                  <h3 className="text-lg font-bold text-text-primary group-hover:text-brand transition-colors line-clamp-2 min-h-[56px] leading-tight">
                     {product.title}
                   </h3>
 
                   {/* SKU */}
                   {product.sku && (
-                    <div className="text-sm text-[#6C757D]">
-                      SKU: <span className="font-mono text-[#1A1A1A]">{product.sku}</span>
+                    <div className="text-sm text-text-secondary">
+                      SKU: <span className="font-mono text-text-primary">{product.sku}</span>
                     </div>
                   )}
 
@@ -199,7 +198,7 @@ export default function ProductsPage() {
                           ${product.originalPrice.toFixed(2)}
                         </span>
                       )}
-                      <span className="text-2xl font-bold text-[#0056B3]">
+                      <span className="text-2xl font-bold text-brand">
                         ${product.currentPrice.toFixed(2)}
                       </span>
                     </div>
@@ -215,18 +214,18 @@ export default function ProductsPage() {
                     {/* MOQ */}
                     {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
                       <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
-                        <svg className="w-4 h-4 text-[#6C757D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
-                        <p className="text-sm text-[#6C757D]">
-                          MOQ: <span className="font-semibold text-[#1A1A1A]">{product.minOrder} pcs</span>
+                        <p className="text-sm text-text-secondary">
+                          MOQ: <span className="font-semibold text-text-primary">{product.minOrder} pcs</span>
                         </p>
                       </div>
                     )}
                   </div>
 
                   {/* CTA Button */}
-                  <button className="w-full py-3 rounded-lg bg-[#0056B3] text-white font-semibold hover:bg-[#004494] transition-colors duration-200">
+                  <button className="w-full py-3 rounded-lg bg-brand text-white font-semibold hover:bg-brand-hover transition-colors duration-200">
                     Request Quote
                   </button>
                 </div>
@@ -240,7 +239,7 @@ export default function ProductsPage() {
               <button
                 onClick={() => handlePageChange(pagination.currentPage - 1)}
                 disabled={!pagination.hasPrevious}
-                className="px-6 py-3 rounded-lg border border-gray-300 text-[#1A1A1A] hover:bg-[#F8F9FA] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-3 rounded-lg border border-gray-300 text-text-primary hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
@@ -264,8 +263,8 @@ export default function ProductsPage() {
                       onClick={() => handlePageChange(pageNum)}
                       className={`w-10 h-10 rounded-lg font-medium transition-colors ${
                         pagination.currentPage === pageNum
-                          ? 'bg-[#0056B3] text-white'
-                          : 'border border-gray-300 text-[#1A1A1A] hover:bg-[#F8F9FA]'
+                          ? 'bg-brand text-white'
+                          : 'border border-gray-300 text-text-primary hover:bg-surface'
                       }`}
                     >
                       {pageNum + 1}
@@ -277,7 +276,7 @@ export default function ProductsPage() {
               <button
                 onClick={() => handlePageChange(pagination.currentPage + 1)}
                 disabled={!pagination.hasNext}
-                className="px-6 py-3 rounded-lg border border-gray-300 text-[#1A1A1A] hover:bg-[#F8F9FA] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-3 rounded-lg border border-gray-300 text-text-primary hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
@@ -290,7 +289,7 @@ export default function ProductsPage() {
               <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
-              <p className="text-[#6C757D] text-lg mb-2">No products found in this category</p>
+              <p className="text-text-secondary text-lg mb-2">No products found in this category</p>
               <p className="text-gray-400 text-sm">Try selecting a different category or browse all products</p>
             </div>
           )}

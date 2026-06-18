@@ -91,11 +91,11 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
   })();
 
   // 解析Features对象
-  const featuresObj = (() => {
-    if (product?.featuresParsed) return product.featuresParsed;
-    if (product?.features && typeof product.features === 'object' && !Array.isArray(product.features)) {
-      return product.features;
-    }
+  const featuresObj: Record<string, unknown> = (() => {
+    const fp = product?.featuresParsed;
+    if (fp && !Array.isArray(fp)) return fp;
+    const f = product?.features;
+    if (f && typeof f === 'object' && !Array.isArray(f)) return f;
     return {};
   })();
 

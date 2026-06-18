@@ -113,7 +113,7 @@ export default function MultilevelSidebar({ selectedCategory, onCategorySelect }
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-full overflow-y-auto">
       <div className="p-4">
-        <h2 className="text-lg font-bold text-[#1A1A1A] mb-4 px-2">Categories</h2>
+        <h2 className="text-lg font-bold text-text-primary mb-4 px-2">Categories</h2>
         
         <nav className="space-y-1">
           {categories.map((category) => (
@@ -122,8 +122,8 @@ export default function MultilevelSidebar({ selectedCategory, onCategorySelect }
               <div
                 className={`flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
                   isActive(category.slug) && !childSlug
-                    ? 'bg-[#0056B3] text-white'
-                    : 'text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#1A1A1A]'
+                    ? 'bg-brand text-white'
+                    : 'text-text-secondary hover:bg-surface hover:text-text-primary'
                 }`}
               >
                 {/* 分类名称 - 可点击区域 */}
@@ -180,8 +180,8 @@ export default function MultilevelSidebar({ selectedCategory, onCategorySelect }
                       onClick={() => onCategorySelect?.(child.slug)}
                       className={`block px-3 py-2 rounded-lg text-sm transition-all ${
                         isActive(child.slug)
-                          ? 'bg-[#E8F0FE] text-[#0056B3] font-semibold'
-                          : 'text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#1A1A1A]'
+                          ? 'bg-brand-light text-brand font-semibold'
+                          : 'text-text-secondary hover:bg-surface hover:text-text-primary'
                       }`}
                     >
                       {child.name}

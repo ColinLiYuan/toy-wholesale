@@ -8,7 +8,6 @@ export async function GET() {
     let blogs: BlogPost[] = []
     try {
         const blogUrl = `${apiBaseUrl}/api/v1/blog/posts?page=0&size=1000`
-        console.log('Fetching blogs from:', blogUrl)
         const res = await fetch(blogUrl, {
             method: 'GET',
             headers: {
@@ -20,12 +19,10 @@ export async function GET() {
 
         if (res.ok) {
             const responseData = await res.json()
-            console.log('Blogs API response:', JSON.stringify(responseData).substring(0, 200))
             const pageData = responseData.code === 200 ? responseData.data : responseData
 
             if (pageData?.content && Array.isArray(pageData.content)) {
                 blogs = pageData.content
-                console.log(`✅ 动态获取 ${blogs.length} 篇博客`)
             } else {
                 console.error('❌ Blogs API 返回格式错误:', pageData)
             }

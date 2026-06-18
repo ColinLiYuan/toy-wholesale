@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       const response = await authService.login(email, password, sessionId);
       
-      console.log('Login response:', response); // 调试日志
       
       if (response.token && response.distributor) {
         setToken(response.token);

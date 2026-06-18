@@ -91,7 +91,6 @@ export default function EditBlogPage() {
         authorName: blog.authorName || undefined,
       };
 
-      console.log('Submitting blog data:', submitData);
 
       if (isEditing) {
         await blogAdminService.updateBlog(parseInt(blogId), submitData);

@@ -104,19 +104,19 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
       <div className="p-5 space-y-5">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
-            <svg className="w-4 h-4 text-[#6C757D]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+          <h2 className="text-base font-bold text-text-primary flex items-center gap-2">
+            <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
             Filters
             {activeMaterialCount > 0 && (
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0056B3] text-white text-[10px] font-bold">
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand text-white text-[10px] font-bold">
                 {activeMaterialCount}
               </span>
             )}
           </h2>
           {hasActiveFilters && (
-            <button onClick={clearFilters} className="text-[11px] text-[#0056B3] hover:text-[#004494] font-medium uppercase tracking-wide transition-colors">
+            <button onClick={clearFilters} className="text-[11px] text-brand hover:text-brand-hover font-medium uppercase tracking-wide transition-colors">
               Clear All
             </button>
           )}
@@ -124,7 +124,7 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
 
         {/* 分类导航 */}
         <div>
-          <h3 className="text-[11px] font-semibold text-[#6C757D] mb-2 uppercase tracking-widest">Categories</h3>
+          <h3 className="text-[11px] font-semibold text-text-secondary mb-2 uppercase tracking-widest">Categories</h3>
           <nav className="space-y-0.5">
             {/* All Products */}
             <Link
@@ -138,8 +138,8 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
               })()}
               className={`block px-3 py-2 rounded-lg text-sm transition-all ${
                 !selectedCategory
-                  ? 'bg-[#E8F0FE] text-[#0056B3] font-semibold'
-                  : 'text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#1A1A1A]'
+                  ? 'bg-brand-light text-brand font-semibold'
+                  : 'text-text-secondary hover:bg-surface hover:text-text-primary'
               }`}
             >
               All Products
@@ -150,8 +150,8 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
                   href={buildCategoryHref(category.slug)}
                   className={`block px-3 py-2 rounded-lg text-sm transition-all ${
                     selectedCategory === category.slug
-                      ? 'bg-[#E8F0FE] text-[#0056B3] font-semibold'
-                      : 'text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#1A1A1A]'
+                      ? 'bg-brand-light text-brand font-semibold'
+                      : 'text-text-secondary hover:bg-surface hover:text-text-primary'
                   }`}
                 >
                   {category.name}
@@ -165,8 +165,8 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
                         href={buildCategoryHref(child.slug)}
                         className={`block px-3 py-1.5 rounded text-[13px] transition-all ${
                           selectedCategory === child.slug
-                            ? 'bg-[#E8F0FE] text-[#0056B3] font-medium'
-                            : 'text-[#999] hover:text-[#1A1A1A] hover:bg-gray-50'
+                            ? 'bg-brand-light text-brand font-medium'
+                            : 'text-text-muted hover:text-text-primary hover:bg-gray-50'
                         }`}
                       >
                         {child.name}
@@ -181,25 +181,25 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
 
         {/* 材质筛选 */}
         <div className="pt-4 border-t border-gray-100">
-          <h3 className="text-[11px] font-semibold text-[#6C757D] mb-2 uppercase tracking-widest">Material</h3>
+          <h3 className="text-[11px] font-semibold text-text-secondary mb-2 uppercase tracking-widest">Material</h3>
           <div className="space-y-0.5">
             {MATERIALS.map((material) => (
               <label
                 key={material}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all ${
                   (filters.materials || []).includes(material)
-                    ? 'bg-[#E8F0FE]'
-                    : 'hover:bg-[#F8F9FA]'
+                    ? 'bg-brand-light'
+                    : 'hover:bg-surface'
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={(filters.materials || []).includes(material)}
                   onChange={() => toggleMaterial(material)}
-                  className="w-4 h-4 rounded border-gray-300 text-[#0056B3] focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-0"
+                  className="w-4 h-4 rounded border-gray-300 text-brand focus:ring-2 focus:ring-brand focus:ring-offset-0"
                 />
                 <span className={`text-sm transition-colors ${
-                  (filters.materials || []).includes(material) ? 'text-[#0056B3] font-medium' : 'text-[#6C757D]'
+                  (filters.materials || []).includes(material) ? 'text-brand font-medium' : 'text-text-secondary'
                 }`}>
                   {material}
                 </span>
@@ -210,15 +210,15 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
 
         {/* 重量筛选 */}
         <div className="pt-4 border-t border-gray-100">
-          <h3 className="text-[11px] font-semibold text-[#6C757D] mb-2 uppercase tracking-widest">Weight Range</h3>
+          <h3 className="text-[11px] font-semibold text-text-secondary mb-2 uppercase tracking-widest">Weight Range</h3>
           <div className="space-y-0.5">
             {WEIGHT_RANGES.map((range) => (
               <label
                 key={range.value}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all ${
                   filters.weightRange === range.value
-                    ? 'bg-[#E8F0FE]'
-                    : 'hover:bg-[#F8F9FA]'
+                    ? 'bg-brand-light'
+                    : 'hover:bg-surface'
                 }`}
               >
                 <input
@@ -226,10 +226,10 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
                   name="weight"
                   checked={filters.weightRange === range.value}
                   onChange={() => updateFilters({ weightRange: range.value })}
-                  className="w-4 h-4 border-gray-300 text-[#0056B3] focus:ring-2 focus:ring-[#0056B3] focus:ring-offset-0"
+                  className="w-4 h-4 border-gray-300 text-brand focus:ring-2 focus:ring-brand focus:ring-offset-0"
                 />
                 <span className={`text-sm transition-colors ${
-                  filters.weightRange === range.value ? 'text-[#0056B3] font-medium' : 'text-[#6C757D]'
+                  filters.weightRange === range.value ? 'text-brand font-medium' : 'text-text-secondary'
                 }`}>
                   {range.label}
                 </span>
@@ -241,17 +241,17 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
         {/* 激活的筛选标签 */}
         {hasActiveFilters && (
           <div className="pt-4 border-t border-gray-100">
-            <h3 className="text-[11px] font-semibold text-[#6C757D] mb-2 uppercase tracking-widest">Active</h3>
+            <h3 className="text-[11px] font-semibold text-text-secondary mb-2 uppercase tracking-widest">Active</h3>
             <div className="flex flex-wrap gap-1.5">
               {(filters.materials || []).map((material) => (
                 <span
                   key={material}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#E8F0FE] text-[#0056B3]"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-brand-light text-brand"
                 >
                   {material}
                   <button
                     onClick={() => toggleMaterial(material)}
-                    className="w-3.5 h-3.5 flex items-center justify-center rounded-full hover:bg-[#0056B3]/20 transition-colors"
+                    className="w-3.5 h-3.5 flex items-center justify-center rounded-full hover:bg-brand/20 transition-colors"
                   >
                     <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -260,11 +260,11 @@ export default function WholesaleFilter({ selectedCategory, onFilterChange }: Wh
                 </span>
               ))}
               {filters.weightRange && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#E8F0FE] text-[#0056B3]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-brand-light text-brand">
                   {WEIGHT_RANGES.find(r => r.value === filters.weightRange)?.label}
                   <button
                     onClick={() => updateFilters({ weightRange: undefined })}
-                    className="w-3.5 h-3.5 flex items-center justify-center rounded-full hover:bg-[#0056B3]/20 transition-colors"
+                    className="w-3.5 h-3.5 flex items-center justify-center rounded-full hover:bg-brand/20 transition-colors"
                   >
                     <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

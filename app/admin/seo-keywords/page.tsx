@@ -89,7 +89,6 @@ export default function SeoKeywordsPage() {
     setLoading(true);
     try {
       let response;
-      console.log('Loading keywords with filters:', { searchKeyword, statusFilter, topicFilter, categoryFilter, currentPage });
       
       // 使用通用搜索接口，支持多条件筛选
       const params: any = { page: currentPage, size: 20 };
@@ -98,10 +97,8 @@ export default function SeoKeywordsPage() {
       if (topicFilter) params.topic = topicFilter;
       if (categoryFilter) params.category = categoryFilter;
       
-      console.log('Search params:', params);
       response = await seoKeywordService.searchKeywordsWithFilters(params);
       
-      console.log('Keywords loaded:', response.content?.length, 'items');
       setKeywords(response.content || []);
       setTotalPages(response.totalPages || 0);
       setTotalElements(response.totalElements || 0);

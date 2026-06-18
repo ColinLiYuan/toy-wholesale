@@ -28,12 +28,12 @@ export default function ShowroomPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative py-20 px-6 bg-[#F8F9FA] border-b border-gray-200">
+      <section className="relative py-20 px-6 bg-surface border-b border-gray-200">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-[#1A1A1A]">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-text-primary">
             Product Showroom
           </h1>
-          <p className="text-xl text-[#6C757D] max-w-3xl mx-auto">
+          <p className="text-xl text-text-secondary max-w-3xl mx-auto">
             Real product videos showcasing medical-grade silicone quality, texture details, and craftsmanship. Hover to play.
           </p>
         </div>
@@ -53,26 +53,26 @@ export default function ShowroomPage() {
               <svg className="w-24 h-24 mx-auto text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
-              <h3 className="text-xl font-semibold text-[#1A1A1A] mb-2">No Videos Yet</h3>
-              <p className="text-[#6C757D]">Check back soon for product demonstration videos</p>
+              <h3 className="text-xl font-semibold text-text-primary mb-2">No Videos Yet</h3>
+              <p className="text-text-secondary">Check back soon for product demonstration videos</p>
             </div>
           )}
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 bg-[#F8F9FA] border-t border-gray-200">
+      <section className="py-20 px-6 bg-surface border-t border-gray-200">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-6">
             Want to See More?
           </h2>
-          <p className="text-xl text-[#6C757D] mb-10">
+          <p className="text-xl text-text-secondary mb-10">
             Request custom product videos or schedule a live video call with our team
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/contact"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-[#0056B3] text-white font-semibold text-lg hover:bg-[#004494] transition-all shadow-sm"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-brand text-white font-semibold text-lg hover:bg-brand-hover transition-all shadow-sm"
             >
               Request Custom Videos
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@ export default function ShowroomPage() {
             </a>
             <a
               href="/products"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-[#1A1A1A] text-[#1A1A1A] font-semibold text-lg hover:bg-[#1A1A1A] hover:text-white transition-all"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 border-text-primary text-text-primary font-semibold text-lg hover:bg-text-primary hover:text-white transition-all"
             >
               Browse Products
             </a>

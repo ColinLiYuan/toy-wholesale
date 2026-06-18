@@ -136,11 +136,11 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
         <div className="px-6 py-5 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-[#1A1A1A]">
+              <h2 className="text-xl font-bold text-text-primary">
                 {submitted ? 'Inquiry Submitted!' : 'Request Wholesale Pricing'}
               </h2>
               {!submitted && (
-                <p className="text-sm text-[#6C757D] mt-1">
+                <p className="text-sm text-text-secondary mt-1">
                   Tell us what you need and we'll get back to you within 24 hours
                 </p>
               )}
@@ -162,13 +162,13 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                   <div key={s} className="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
                     <div
                       className={`h-full transition-all duration-300 rounded-full ${
-                        s <= step ? 'bg-[#0056B3]' : ''
+                        s <= step ? 'bg-brand' : ''
                       }`}
                     />
                   </div>
                 ))}
               </div>
-              <div className="mt-1.5 text-xs text-[#6C757D] text-right">
+              <div className="mt-1.5 text-xs text-text-secondary text-right">
                 Step {step} of 3
               </div>
             </>
@@ -183,13 +183,13 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-[#1A1A1A] mb-2">Thank you for your inquiry!</h3>
-            <p className="text-sm text-[#6C757D] mb-6">
+            <h3 className="text-lg font-semibold text-text-primary mb-2">Thank you for your inquiry!</h3>
+            <p className="text-sm text-text-secondary mb-6">
               Our sales team will contact you via {formData.contactMethod} within 24 hours.
             </p>
             <button
               onClick={handleClose}
-              className="px-8 py-3 rounded-lg bg-[#0056B3] text-white font-semibold hover:bg-[#004494] transition-colors"
+              className="px-8 py-3 rounded-lg bg-brand text-white font-semibold hover:bg-brand-hover transition-colors"
             >
               Close
             </button>
@@ -200,10 +200,10 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
             {step === 1 && (
               <div className="space-y-5">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#1A1A1A] mb-1">
+                  <h3 className="text-lg font-semibold text-text-primary mb-1">
                     What products are you interested in?
                   </h3>
-                  <p className="text-sm text-[#6C757D]">Select all that apply</p>
+                  <p className="text-sm text-text-secondary">Select all that apply</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2.5">
                   {PRODUCT_CATEGORIES.map((cat) => (
@@ -212,8 +212,8 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                       onClick={() => toggleArrayItem('categories', cat)}
                       className={`p-3 rounded-lg border text-left text-sm transition-all ${
                         formData.categories.includes(cat)
-                          ? 'border-[#0056B3] bg-[#E8F0FE] text-[#0056B3] font-medium'
-                          : 'border-gray-200 hover:border-gray-300 text-[#1A1A1A]'
+                          ? 'border-brand bg-brand-light text-brand font-medium'
+                          : 'border-gray-200 hover:border-gray-300 text-text-primary'
                       }`}
                     >
                       {cat}
@@ -227,10 +227,10 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
             {step === 2 && (
               <div className="space-y-5">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#1A1A1A] mb-1">
+                  <h3 className="text-lg font-semibold text-text-primary mb-1">
                     What are your business needs?
                   </h3>
-                  <p className="text-sm text-[#6C757D]">Select all that apply</p>
+                  <p className="text-sm text-text-secondary">Select all that apply</p>
                 </div>
                 <div className="space-y-2.5">
                   {BUSINESS_NEEDS.map((need) => (
@@ -239,8 +239,8 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                       onClick={() => toggleArrayItem('businessNeeds', need)}
                       className={`w-full p-3.5 rounded-lg border text-left text-sm transition-all ${
                         formData.businessNeeds.includes(need)
-                          ? 'border-[#0056B3] bg-[#E8F0FE] text-[#0056B3] font-medium'
-                          : 'border-gray-200 hover:border-gray-300 text-[#1A1A1A]'
+                          ? 'border-brand bg-brand-light text-brand font-medium'
+                          : 'border-gray-200 hover:border-gray-300 text-text-primary'
                       }`}
                     >
                       {need}
@@ -248,7 +248,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                   ))}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+                  <label className="block text-sm font-medium text-text-primary mb-1.5">
                     Estimated order quantity per SKU
                   </label>
                   <input
@@ -256,11 +256,11 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                     value={formData.estimatedQuantity}
                     onChange={(e) => setFormData({ ...formData, estimatedQuantity: e.target.value })}
                     placeholder="e.g., 200 pcs or 1,000+ pcs"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#0056B3] focus:ring-1 focus:ring-[#0056B3] transition-colors text-sm"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-text-primary placeholder-gray-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+                  <label className="block text-sm font-medium text-text-primary mb-1.5">
                     Additional notes (optional)
                   </label>
                   <textarea
@@ -268,7 +268,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Any specific requirements or questions..."
                     rows={3}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#0056B3] focus:ring-1 focus:ring-[#0056B3] transition-colors text-sm resize-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-text-primary placeholder-gray-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors text-sm resize-none"
                   />
                 </div>
               </div>
@@ -278,15 +278,15 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
             {step === 3 && (
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#1A1A1A] mb-1">
+                  <h3 className="text-lg font-semibold text-text-primary mb-1">
                     How can we reach you?
                   </h3>
-                  <p className="text-sm text-[#6C757D]">We'll respond within 24 hours</p>
+                  <p className="text-sm text-text-secondary">We'll respond within 24 hours</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       Your Name *
                     </label>
                     <input
@@ -294,11 +294,11 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Full name"
-                      className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#0056B3] focus:ring-1 focus:ring-[#0056B3] transition-colors text-sm"
+                      className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-text-primary placeholder-gray-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       Company
                     </label>
                     <input
@@ -306,13 +306,13 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       placeholder="Company name"
-                      className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#0056B3] focus:ring-1 focus:ring-[#0056B3] transition-colors text-sm"
+                      className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-text-primary placeholder-gray-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
+                  <label className="block text-sm font-medium text-text-primary mb-1">
                     Country
                   </label>
                   <input
@@ -320,12 +320,12 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                     value={formData.country}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                     placeholder="Your country"
-                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#0056B3] focus:ring-1 focus:ring-[#0056B3] transition-colors text-sm"
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-text-primary placeholder-gray-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+                  <label className="block text-sm font-medium text-text-primary mb-1.5">
                     Preferred Contact Method *
                   </label>
                   <div className="grid grid-cols-2 gap-2.5">
@@ -336,8 +336,8 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                         onClick={() => setFormData({ ...formData, contactMethod: method, contactInfo: '' })}
                         className={`p-2.5 rounded-lg border text-sm text-center transition-all ${
                           formData.contactMethod === method
-                            ? 'border-[#0056B3] bg-[#E8F0FE] text-[#0056B3] font-medium'
-                            : 'border-gray-200 hover:border-gray-300 text-[#1A1A1A]'
+                            ? 'border-brand bg-brand-light text-brand font-medium'
+                            : 'border-gray-200 hover:border-gray-300 text-text-primary'
                         }`}
                       >
                         {method}
@@ -347,7 +347,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#1A1A1A] mb-1">
+                  <label className="block text-sm font-medium text-text-primary mb-1">
                     {formData.contactMethod || 'Contact'} Info *
                   </label>
                   <input
@@ -360,7 +360,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
                       formData.contactMethod === 'WeChat' ? 'WeChat ID' :
                       'Enter your contact details'
                     }
-                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#0056B3] focus:ring-1 focus:ring-[#0056B3] transition-colors text-sm"
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-text-primary placeholder-gray-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors text-sm"
                   />
                 </div>
               </div>
@@ -370,14 +370,14 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
 
         {/* Footer */}
         {!submitted && (
-          <div className="px-6 py-4 border-t border-gray-200 flex justify-between bg-[#F8F9FA]">
+          <div className="px-6 py-4 border-t border-gray-200 flex justify-between bg-surface">
             <button
               onClick={handlePrevious}
               disabled={step === 1}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 step === 1
                   ? 'text-gray-300 cursor-not-allowed'
-                  : 'text-[#6C757D] hover:text-[#1A1A1A] hover:bg-white'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-white'
               }`}
             >
               Previous
@@ -387,7 +387,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
               <button
                 onClick={handleNext}
                 disabled={(step === 1 && !canProceedStep1) || (step === 2 && !canProceedStep2)}
-                className="px-6 py-2.5 rounded-lg bg-[#0056B3] text-white text-sm font-semibold hover:bg-[#004494] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 rounded-lg bg-brand text-white text-sm font-semibold hover:bg-brand-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next Step
               </button>
@@ -395,7 +395,7 @@ export default function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
               <button
                 onClick={handleSubmit}
                 disabled={!canSubmit || submitting}
-                className="px-6 py-2.5 rounded-lg bg-[#0056B3] text-white text-sm font-semibold hover:bg-[#004494] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 rounded-lg bg-brand text-white text-sm font-semibold hover:bg-brand-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <span className="flex items-center gap-2">

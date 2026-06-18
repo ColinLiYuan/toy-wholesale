@@ -50,7 +50,7 @@ export default function Header() {
         <div className="flex items-center h-14 gap-2">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 bg-[#0056B3] rounded flex items-center justify-center">
+            <div className="w-8 h-8 bg-brand rounded flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
             <span className="font-semibold text-gray-900 hidden sm:block">Silvibe</span>
@@ -81,7 +81,7 @@ export default function Header() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
               {inquiryCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#0056B3] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-brand text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {inquiryCount > 9 ? '9+' : inquiryCount}
                 </span>
               )}
@@ -104,20 +104,20 @@ export default function Header() {
             {isAuthenticated ? (
               <div className="hidden xl:flex items-center gap-1">
                 <span className="text-xs text-gray-500 whitespace-nowrap">Hi, {user?.name}</span>
-                <Link href="/my-orders" className="px-2 py-1.5 text-xs font-medium text-[#0056B3] hover:bg-gray-50 rounded whitespace-nowrap">My Orders</Link>
+                <Link href="/my-orders" className="px-2 py-1.5 text-xs font-medium text-brand hover:bg-gray-50 rounded whitespace-nowrap">My Orders</Link>
                 <button onClick={logout} className="px-2 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded whitespace-nowrap">Logout</button>
               </div>
             ) : (
               <div className="hidden xl:flex items-center gap-1">
-                <Link href="/login" className="px-2 py-1.5 text-xs font-medium text-[#0056B3] hover:bg-gray-50 rounded whitespace-nowrap">Login</Link>
-                <Link href="/register" className="px-2 py-1.5 text-xs font-medium text-white bg-[#0056B3] rounded hover:bg-[#004494] whitespace-nowrap">Register</Link>
+                <Link href="/login" className="px-2 py-1.5 text-xs font-medium text-brand hover:bg-gray-50 rounded whitespace-nowrap">Login</Link>
+                <Link href="/register" className="px-2 py-1.5 text-xs font-medium text-white bg-brand rounded hover:bg-brand-hover whitespace-nowrap">Register</Link>
               </div>
             )}
 
             {/* CTA Button */}
             <Link
               href="/contact"
-              className="px-3 py-1.5 bg-[#0056B3] text-white text-xs font-semibold rounded hover:bg-[#004494] whitespace-nowrap flex-shrink-0"
+              className="px-3 py-1.5 bg-brand text-white text-xs font-semibold rounded hover:bg-brand-hover whitespace-nowrap flex-shrink-0"
             >
               Get Price List
             </Link>
@@ -149,7 +149,7 @@ export default function Header() {
                   onClick={() => setIsMenuOpen(false)}
                   className={`px-4 py-2 rounded-md text-sm font-medium ${
                     pathname === item.href
-                      ? 'text-[#0056B3] bg-gray-50'
+                      ? 'text-brand bg-gray-50'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
@@ -161,11 +161,11 @@ export default function Header() {
               <Link
                 href="/inquiry-cart"
                 onClick={() => setIsMenuOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-[#0056B3] hover:bg-gray-50 flex items-center justify-between"
+                className="px-4 py-2 text-sm font-medium text-brand hover:bg-gray-50 flex items-center justify-between"
               >
                 <span>Inquiry Cart</span>
                 {inquiryCount > 0 && (
-                  <span className="bg-[#0056B3] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="bg-brand text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {inquiryCount > 9 ? '9+' : inquiryCount}
                   </span>
                 )}
@@ -188,17 +188,17 @@ export default function Header() {
               {isAuthenticated ? (
                 <>
                   <div className="px-4 py-2 text-sm text-gray-500">Hi, {user?.name}</div>
-                  <Link href="/my-orders" onClick={() => setIsMenuOpen(false)} className="px-4 py-2 text-sm font-medium text-[#0056B3] hover:bg-gray-50">My Orders</Link>
+                  <Link href="/my-orders" onClick={() => setIsMenuOpen(false)} className="px-4 py-2 text-sm font-medium text-brand hover:bg-gray-50">My Orders</Link>
                   <button onClick={() => { logout(); setIsMenuOpen(false); }} className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 text-left">Logout</button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" onClick={() => setIsMenuOpen(false)} className="px-4 py-2 text-sm font-medium text-[#0056B3] hover:bg-gray-50">Login</Link>
-                  <Link href="/register" onClick={() => setIsMenuOpen(false)} className="px-4 py-2 text-sm font-medium text-white bg-[#0056B3] rounded">Register</Link>
+                  <Link href="/login" onClick={() => setIsMenuOpen(false)} className="px-4 py-2 text-sm font-medium text-brand hover:bg-gray-50">Login</Link>
+                  <Link href="/register" onClick={() => setIsMenuOpen(false)} className="px-4 py-2 text-sm font-medium text-white bg-brand rounded">Register</Link>
                 </>
               )}
               
-              <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="mt-2 px-4 py-2 bg-[#0056B3] text-white text-sm font-semibold rounded text-center">Get Price List</Link>
+              <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="mt-2 px-4 py-2 bg-brand text-white text-sm font-semibold rounded text-center">Get Price List</Link>
             </nav>
           </div>
         )}

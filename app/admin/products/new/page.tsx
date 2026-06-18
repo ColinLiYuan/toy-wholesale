@@ -24,6 +24,7 @@ export default function NewProductPage() {
     status: 'ACTIVE',
     colors: [],
     tags: [],
+    priority: 0,
     features: {},
     minOrder: 1,
     material: '',
@@ -47,7 +48,7 @@ export default function NewProductPage() {
       return;
     }
     
-    const features = { ...(product.features || {}) };
+    const features: Record<string, unknown> = { ...((product.features as Record<string, unknown>) || {}) };
     features[featureKey] = featureValue;
     setProduct({ ...product, features });
     setFeatureKey('');
@@ -55,7 +56,7 @@ export default function NewProductPage() {
   };
 
   const removeFeature = (key: string) => {
-    const features = { ...(product.features || {}) };
+    const features: Record<string, unknown> = { ...((product.features as Record<string, unknown>) || {}) };
     delete features[key];
     setProduct({ ...product, features });
   };
@@ -334,7 +335,6 @@ export default function NewProductPage() {
         productData.features = JSON.stringify(product.features);
       }
       
-      console.log('Submitting product data:', JSON.stringify(productData, null, 2));
       
       // 创建产品
       const createdProduct = await productAdminService.createProduct(productData);
@@ -352,7 +352,6 @@ export default function NewProductPage() {
               body: JSON.stringify(gallery),
             });
           }
-          console.log('Galleries uploaded successfully');
         } catch (error) {
           console.error('Failed to upload galleries:', error);
         }
@@ -601,6 +600,19 @@ export default function NewProductPage() {
           ) : (
             <p className="text-sm text-gray-500">暂无标签</p>
           )}
+        </div>
+
+        {/* 排序优先级 */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">排序优先级</h2>
+          <p className="text-sm text-gray-500 mb-3">数值越大越靠前，用于控制首页推荐产品的展示顺序。</p>
+          <input
+            type="number"
+            value={product.priority ?? 0}
+            onChange={(e) => setProduct({ ...product, priority: parseInt(e.target.value) || 0 })}
+            placeholder="0"
+            className="w-48 px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+          />
         </div>
 
         {/* 主图 */}

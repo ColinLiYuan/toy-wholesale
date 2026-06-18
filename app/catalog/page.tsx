@@ -27,13 +27,13 @@ export default function ProductCatalogPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative py-20 bg-[#F8F9FA] border-b border-gray-200">
+      <section className="relative py-20 bg-surface border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold text-[#1A1A1A] mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-text-primary mb-6">
               产品目录下载
             </h1>
-            <p className="text-xl text-[#6C757D] max-w-3xl mx-auto">
+            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               下载最新产品报价单，包含完整的产品信息
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function ProductCatalogPage() {
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-50 rounded-full mb-4">
                 <svg 
-                  className="w-10 h-10 text-[#0056B3]" 
+                  className="w-10 h-10 text-brand" 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -60,35 +60,35 @@ export default function ProductCatalogPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-3xl font-bold text-[#1A1A1A] mb-4">
+              <h2 className="text-3xl font-bold text-text-primary mb-4">
                 产品目录 Excel
               </h2>
-              <p className="text-lg text-[#6C757D] mb-6">
+              <p className="text-lg text-text-secondary mb-6">
                 包含产品编号、名称、分类、尺寸、重量、材质、价格等完整信息
               </p>
             </div>
 
             {/* File Info */}
-            <div className="bg-[#F8F9FA] rounded-xl p-6 mb-8">
+            <div className="bg-surface rounded-xl p-6 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-sm text-[#6C757D] mb-1">文件格式</p>
-                  <p className="text-lg font-semibold text-[#1A1A1A]">Excel (.xlsx)</p>
+                  <p className="text-sm text-text-secondary mb-1">文件格式</p>
+                  <p className="text-lg font-semibold text-text-primary">Excel (.xlsx)</p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#6C757D] mb-1">产品数量</p>
-                  <p className="text-lg font-semibold text-[#1A1A1A]">62 个产品</p>
+                  <p className="text-sm text-text-secondary mb-1">产品数量</p>
+                  <p className="text-lg font-semibold text-text-primary">62 个产品</p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#6C757D] mb-1">文件大小</p>
-                  <p className="text-lg font-semibold text-[#1A1A1A]">约 50 KB</p>
+                  <p className="text-sm text-text-secondary mb-1">文件大小</p>
+                  <p className="text-lg font-semibold text-text-primary">约 50 KB</p>
                 </div>
               </div>
             </div>
 
             {/* Included Fields */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">包含字段：</h3>
+              <h3 className="text-lg font-semibold text-text-primary mb-4">包含字段：</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   '产品编号',
@@ -104,7 +104,7 @@ export default function ProductCatalogPage() {
                     className="flex items-center gap-2 px-4 py-3 bg-blue-50 rounded-lg"
                   >
                     <svg 
-                      className="w-5 h-5 text-[#0056B3]" 
+                      className="w-5 h-5 text-brand" 
                       fill="currentColor" 
                       viewBox="0 0 20 20"
                     >
@@ -114,7 +114,7 @@ export default function ProductCatalogPage() {
                         clipRule="evenodd" 
                       />
                     </svg>
-                    <span className="text-sm font-medium text-[#1A1A1A]">{field}</span>
+                    <span className="text-sm font-medium text-text-primary">{field}</span>
                   </div>
                 ))}
               </div>
@@ -125,7 +125,7 @@ export default function ProductCatalogPage() {
               <a
                 href="/产品目录.xlsx"
                 download
-                className="inline-flex items-center gap-3 px-8 py-4 bg-[#0056B3] text-white rounded-xl font-semibold text-lg hover:bg-[#004494] transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-brand text-white rounded-xl font-semibold text-lg hover:bg-brand-hover transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <svg 
                   className="w-6 h-6" 
@@ -142,17 +142,17 @@ export default function ProductCatalogPage() {
                 </svg>
                 立即下载产品目录
               </a>
-              <p className="mt-4 text-sm text-[#6C757D]">
+              <p className="mt-4 text-sm text-text-secondary">
                 点击按钮即可下载 Excel 文件
               </p>
             </div>
           </div>
 
           {/* Additional Info */}
-          <div className="mt-8 bg-[#F8F9FA] rounded-xl p-6 border border-gray-200">
-            <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4 flex items-center gap-2">
+          <div className="mt-8 bg-surface rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
               <svg 
-                className="w-5 h-5 text-[#0056B3]" 
+                className="w-5 h-5 text-brand" 
                 fill="currentColor" 
                 viewBox="0 0 20 20"
               >
@@ -164,25 +164,25 @@ export default function ProductCatalogPage() {
               </svg>
               温馨提示
             </h3>
-            <ul className="space-y-2 text-sm text-[#6C757D]">
+            <ul className="space-y-2 text-sm text-text-secondary">
               <li className="flex items-start gap-2">
-                <span className="text-[#0056B3] mt-1">•</span>
+                <span className="text-brand mt-1">•</span>
                 <span>产品目录包含 62 个产品，分为三个类别</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#0056B3] mt-1">•</span>
+                <span className="text-brand mt-1">•</span>
                 <span>产品分类包括：Electric Silicone Dildo（电动硅胶阳具）、Manual Silicone Dildo（手动硅胶阳具）、Transgender Products（人妖产品）</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#0056B3] mt-1">•</span>
+                <span className="text-brand mt-1">•</span>
                 <span>产品价格和库存可能随时变动，请以实际询价为准</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#0056B3] mt-1">•</span>
+                <span className="text-brand mt-1">•</span>
                 <span>如需批量采购或定制服务，请联系我们的销售团队</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#0056B3] mt-1">•</span>
+                <span className="text-brand mt-1">•</span>
                 <span>最小起订量（MOQ）请参考具体产品要求</span>
               </li>
             </ul>
@@ -192,7 +192,7 @@ export default function ProductCatalogPage() {
           <div className="mt-8 text-center">
             <Link 
               href="/products"
-              className="inline-flex items-center gap-2 text-[#0056B3] hover:text-[#004494] font-medium transition-colors"
+              className="inline-flex items-center gap-2 text-brand hover:text-brand-hover font-medium transition-colors"
             >
               <svg 
                 className="w-5 h-5" 

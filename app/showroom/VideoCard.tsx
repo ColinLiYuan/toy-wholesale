@@ -33,7 +33,7 @@ export default function VideoCard({ video }: { video: ShowroomVideo }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="relative aspect-[3/4] bg-[#1A1A1A]">
+      <div className="relative aspect-[3/4] bg-text-primary">
         {!videoError ? (
           <video
             ref={videoRef}
@@ -58,7 +58,7 @@ export default function VideoCard({ video }: { video: ShowroomVideo }) {
 
         <div className={`absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity duration-300 ${hovered && !videoError ? 'opacity-0' : 'opacity-100'}`}>
           <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-            <svg className="w-8 h-8 text-[#0056B3] ml-1" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 text-brand ml-1" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
@@ -66,7 +66,7 @@ export default function VideoCard({ video }: { video: ShowroomVideo }) {
 
         {video.category && (
           <div className="absolute top-4 left-4">
-            <span className="px-3 py-1 bg-[#0056B3]/90 text-white text-xs font-semibold rounded-full backdrop-blur-sm">
+            <span className="px-3 py-1 bg-brand/90 text-white text-xs font-semibold rounded-full backdrop-blur-sm">
               {video.category}
             </span>
           </div>
@@ -74,10 +74,10 @@ export default function VideoCard({ video }: { video: ShowroomVideo }) {
       </div>
 
       <div className="p-6">
-        <h3 className="text-lg font-bold text-[#1A1A1A] mb-2 group-hover:text-[#0056B3] transition-colors">
+        <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-brand transition-colors">
           {video.title}
         </h3>
-        <div className="flex items-center space-x-2 text-sm text-[#6C757D]">
+        <div className="flex items-center space-x-2 text-sm text-text-secondary">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

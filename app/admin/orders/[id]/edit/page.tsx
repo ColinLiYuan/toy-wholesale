@@ -67,20 +67,15 @@ export default function EditOrderPage() {
       try {
         // 加载订单详情
         const orderData = await salesOrderService.getOrderById(orderId);
-        console.log('Order data:', orderData);
-        console.log('Order distributorId:', orderData.distributorId);
-        console.log('Order distributor:', orderData.distributor);
         setOrder(orderData as SalesOrder);
         
         // 兼容后端：优先使用 distributorId，如果没有则从 distributor.id 获取
         const distributorIdNum = orderData.distributorId 
           ? Number(orderData.distributorId) 
           : (orderData.distributor ? Number(orderData.distributor.id) : undefined);
-        console.log('Converted distributorId:', distributorIdNum);
         
         // 兼容后端：items 可能在 orderItems 或其他字段
         const orderItems = (orderData as any).items || (orderData as any).orderItems || (orderData as any).orderItemsList || [];
-        console.log('Order items from backend:', orderItems);
         
         // 转换后端items为前端格式（根据 SalesOrderDetailResponse.OrderItemInfo 结构）
         const formattedItems = orderItems.map((item: any) => ({
@@ -93,7 +88,6 @@ export default function EditOrderPage() {
           unitPrice: item.unitPrice,
           subtotal: item.subtotal,
         }));
-        console.log('Formatted items for display:', formattedItems);
         
         setFormData({
           status: orderData.status,
@@ -120,7 +114,6 @@ export default function EditOrderPage() {
 
         // 加载经销商列表
         const distributorsData = await distributorAdminService.getActiveDistributors();
-        console.log('Distributors:', distributorsData);
         setDistributors(distributorsData);
 
         // 加载产品列表
@@ -249,12 +242,6 @@ export default function EditOrderPage() {
         items: items,
       };
       
-      console.log('=== 提交订单数据 ===');
-      console.log('formData:', formData);
-      console.log('items:', items);
-      console.log('items length:', items.length);
-      console.log('submitData:', JSON.stringify(submitData, null, 2));
-      console.log('==================');
       
       if (items.length === 0) {
         alert('请至少添加一个商品');

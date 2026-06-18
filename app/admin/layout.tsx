@@ -178,7 +178,7 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0056B3] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto mb-4"></div>
           <p className="text-gray-600">正在验证身份...</p>
         </div>
       </div>
@@ -190,7 +190,7 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0056B3] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto mb-4"></div>
           <p className="text-gray-600">正在跳转...</p>
         </div>
       </div>
@@ -213,7 +213,7 @@ export default function AdminLayout({
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-            <Link href={navigation[0]?.href || '/admin/dashboard'} className="text-xl font-bold text-[#0056B3]">
+            <Link href={navigation[0]?.href || '/admin/dashboard'} className="text-xl font-bold text-brand">
               {siteConfig[currentSite]?.adminName || 'Admin'}
             </Link>
             <button
@@ -239,7 +239,7 @@ export default function AdminLayout({
                       href={item.href}
                       className={`flex-1 flex items-center px-4 py-3 rounded-lg transition-colors ${
                         isActive && !hasChildren
-                          ? 'bg-[#0056B3] text-white font-semibold'
+                          ? 'bg-brand text-white font-semibold'
                           : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                     >
@@ -338,7 +338,7 @@ export default function AdminLayout({
             >
               登出
             </button>
-            <div className="w-8 h-8 bg-[#0056B3] rounded-full flex items-center justify-center text-white font-bold">
+            <div className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white font-bold">
               A
             </div>
           </div>

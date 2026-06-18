@@ -29,7 +29,7 @@ export const inquiryCartUtils = {
   },
 
   // 添加商品到询盘车
-  async addItem(item: Omit<InquiryCartItem, 'id'>): Promise<any> {
+  async addItem(item: Omit<InquiryCartItem, 'id'>): Promise<void> {
     try {
       const headers = this.getHeaders();
       
@@ -68,7 +68,7 @@ export const inquiryCartUtils = {
 
       if (response.code === 200 && response.data) {
         // 转换后端数据格式为前端格式
-        return response.data.map((item: any) => ({
+        return response.data.map((item: InquiryCartItem) => ({
           id: item.id,
           productId: item.productId,
           productName: item.productName,
@@ -77,7 +77,7 @@ export const inquiryCartUtils = {
           skuCode: item.skuCode,
           color: item.color,
           quantity: item.quantity,
-          specifications: item.specifications ? JSON.parse(item.specifications) : undefined,
+          specifications: item.specifications ? JSON.parse(item.specifications as unknown as string) : undefined,
           notes: item.notes,
         }));
       }
@@ -174,7 +174,7 @@ export const inquiryCartUtils = {
   },
 
   // 将询盘车转换为询单项（提交时使用）
-  convertToInquiryItems(cartItems: InquiryCartItem[]): any[] {
+  convertToInquiryItems(cartItems: InquiryCartItem[]): InquiryCartItem[] {
     return cartItems.map((item) => ({
       productId: item.productId,
       skuId: item.skuId,

@@ -114,13 +114,13 @@ export default function CategorySelector({ selectedCategories, onChange }: Categ
               return (
                 <span
                   key={slug}
-                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#E8F0FE] text-[#0056B3]"
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-brand-light text-brand"
                 >
                   {categoryName}
                   <button
                     type="button"
                     onClick={() => toggleCategory(slug)}
-                    className="ml-1 text-[#0056B3] hover:text-[#003d82]"
+                    className="ml-1 text-brand hover:text-[#003d82]"
                   >
                     ×
                   </button>

@@ -28,7 +28,6 @@ export default function BlogPage() {
       const data = await blogAdminService.getAllBlogs(currentPage, pageSize);
       setBlogs(data.content || []);
       setTotalPages(data.totalPages || 1);
-      console.log('Loaded blogs:', data.content?.length, 'items');
     } catch (err: any) {
       const errorMsg = err.message || '加载博客列表失败';
       setError(errorMsg);
