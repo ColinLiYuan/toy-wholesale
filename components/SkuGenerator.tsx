@@ -148,6 +148,11 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
     onSupplierChange?.(selected);
   };
 
+  // SKU 预览
+  const selectedSupplier = suppliers.find(s => String(s.id) === String(selectedSupplierId));
+  const supplierCode = selectedSupplier?.internalCode || 'SUP';
+  const showPreview = !!(selectedSupplierId && category && material);
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -241,20 +246,17 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
       </div>
 
       {/* 生成的 SKU 预览 */}
-      {(selectedSupplierId && category && material) && (() => {
-        const selected = suppliers.find(s => String(s.id) === String(selectedSupplierId));
-        const code = selected?.internalCode || 'SUP';
-        return (
-          <div className="p-4 bg-brand-light border-2 border-brand rounded-lg">
-            <p className="text-sm text-brand font-semibold mb-1">SKU 编码参考值：</p>
-            <p className="text-2xl font-mono font-bold text-brand">
-              {code}-{category}-{material}-{randomCode}
-            </p>
-            <p className="text-xs text-text-secondary mt-2">
-              格式：供应商代码-品类-材质-随机码
-            </p>
-          </div>
-        );
+      {showPreview && (
+        <div className="p-4 bg-brand-light border-2 border-brand rounded-lg">
+          <p className="text-sm text-brand font-semibold mb-1">SKU 编码参考值：</p>
+          <p className="text-2xl font-mono font-bold text-brand">
+            {supplierCode}-{category}-{material}-{randomCode}
+          </p>
+          <p className="text-xs text-text-secondary mt-2">
+            格式：供应商代码-品类-材质-随机码
+          </p>
+        </div>
+      )}
     </div>
   );
 }
