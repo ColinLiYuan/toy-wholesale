@@ -2942,9 +2942,260 @@ export const seoKeywordService = {
   },
 };
 
+// ==================== 报价单管理服务 ====================
+
+export const quotationAdminService = {
+  // 获取所有报价单（分页，可选状态筛选）
+  async getAllQuotations(
+    page: number = 0,
+    size: number = 20,
+    sortBy: string = 'createdAt',
+    direction: string = 'DESC',
+    status?: string
+  ): Promise<import('@/types').QuotationListResponse> {
+    try {
+      const params: Record<string, any> = { page, size, sortBy, direction };
+      if (status) params.status = status;
+
+      const apiResult: ApiResult<import('@/types').QuotationListResponse> = await apiClient.get(
+        '/v1/quotations',
+        { params }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch quotations');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch quotations:', error);
+      throw error;
+    }
+  },
+
+  // 根据ID查询报价单详情
+  async getQuotationById(id: number): Promise<import('@/types').Quotation> {
+    try {
+      const apiResult: ApiResult<import('@/types').Quotation> = await apiClient.get(
+        `/v1/quotations/${id}`
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch quotation');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch quotation:', error);
+      throw error;
+    }
+  },
+
+  // 根据报价单编号查询
+  async getByQuotationNumber(number: string): Promise<import('@/types').Quotation> {
+    try {
+      const apiResult: ApiResult<import('@/types').Quotation> = await apiClient.get(
+        `/v1/quotations/number/${number}`
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch quotation');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch quotation:', error);
+      throw error;
+    }
+  },
+
+  // 根据经销商ID查询报价单
+  async getByDistributorId(
+    distributorId: number,
+    page: number = 0,
+    size: number = 20
+  ): Promise<import('@/types').QuotationListResponse> {
+    try {
+      const apiResult: ApiResult<import('@/types').QuotationListResponse> = await apiClient.get(
+        `/v1/quotations/distributor/${distributorId}`,
+        { params: { page, size } }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch quotations');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch quotations:', error);
+      throw error;
+    }
+  },
+
+  // 创建报价单
+  async createQuotation(data: {
+    distributorId: number;
+    title?: string;
+    validUntil?: string;
+    tradeTerms?: string;
+    sellerCompanyName?: string;
+    sellerAddress?: string;
+    sellerContactPerson?: string;
+    sellerPhone?: string;
+    sellerEmail?: string;
+    notes?: string;
+    internalNotes?: string;
+    items: {
+      productId: number;
+      productName?: string;
+      productSku?: string;
+      productImage?: string;
+      quantity: number;
+      unitPrice: number;
+      notes?: string;
+    }[];
+  }): Promise<import('@/types').Quotation> {
+    try {
+      const apiResult: ApiResult<import('@/types').Quotation> = await apiClient.post(
+        '/v1/quotations',
+        data
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create quotation');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create quotation:', error);
+      throw error;
+    }
+  },
+
+  // 更新报价单
+  async updateQuotation(
+    id: number,
+    data: {
+      distributorId?: number;
+      title?: string;
+      validUntil?: string;
+      tradeTerms?: string;
+      sellerCompanyName?: string;
+      sellerAddress?: string;
+      sellerContactPerson?: string;
+      sellerPhone?: string;
+      sellerEmail?: string;
+      notes?: string;
+      internalNotes?: string;
+      items?: {
+        productId: number;
+        productName?: string;
+        productSku?: string;
+        productImage?: string;
+        quantity: number;
+        unitPrice: number;
+        notes?: string;
+      }[];
+    }
+  ): Promise<import('@/types').Quotation> {
+    try {
+      const apiResult: ApiResult<import('@/types').Quotation> = await apiClient.put(
+        `/v1/quotations/${id}`,
+        data
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update quotation');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update quotation:', error);
+      throw error;
+    }
+  },
+
+  // 删除报价单
+  async deleteQuotation(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/quotations/${id}`
+      );
+
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete quotation');
+      }
+    } catch (error) {
+      console.error('Failed to delete quotation:', error);
+      throw error;
+    }
+  },
+
+  // 更新报价单状态
+  async updateQuotationStatus(
+    id: number,
+    status: string
+  ): Promise<import('@/types').Quotation> {
+    try {
+      const apiResult: ApiResult<import('@/types').Quotation> = await apiClient.patch(
+        `/v1/quotations/${id}/status`,
+        null,
+        { params: { status } }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update quotation status');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update quotation status:', error);
+      throw error;
+    }
+  },
+
+  // 发送报价单
+  async sendQuotation(id: number): Promise<import('@/types').Quotation> {
+    try {
+      const apiResult: ApiResult<import('@/types').Quotation> = await apiClient.patch(
+        `/v1/quotations/${id}/send`
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to send quotation');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to send quotation:', error);
+      throw error;
+    }
+  },
+
+  // 导出报价单为PDF
+  async exportPdf(id: number, quotationNumber: string): Promise<void> {
+    try {
+      const response = await apiClient.get(`/v1/quotations/${id}/export-pdf`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${quotationNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export PDF:', error);
+      throw error;
+    }
+  },
+};
+
 // 导出类型（方便其他模块使用）
-export type { 
-  Inquiry, 
+export type {
+  Inquiry,
   InquiryItem,
   FollowUpRecord,
   Lead,
@@ -2953,7 +3204,10 @@ export type {
   Distributor,
   Product,
   ProductSku,
-  SeoKeyword
+  SeoKeyword,
+  Quotation,
+  QuotationItem,
+  QuotationListResponse
 } from '@/types';
 
 // 导出站点服务

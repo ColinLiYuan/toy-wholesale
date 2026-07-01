@@ -6,32 +6,42 @@ import InquiryModal from '@/components/InquiryModal';
 import { R2_BASE_URL } from '@/lib/r2-config';
 import type { Product } from '@/types';
 
-export default function HomePageClient({ initialFeaturedProducts = [] }: { initialFeaturedProducts?: Product[] }) {
+export default function HomePageClient({
+  initialFeaturedProducts = [],
+  initialNewProducts = [],
+}: {
+  initialFeaturedProducts?: Product[];
+  initialNewProducts?: Product[];
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>(initialFeaturedProducts);
+  const [newProducts, setNewProducts] = useState<Product[]>(initialNewProducts);
   const [loading, setLoading] = useState(initialFeaturedProducts.length === 0);
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const fetchProducts = async () => {
       try {
         setLoading(true);
         const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
-        const response = await fetch(`${apiBaseUrl}/api/v1/products/featured?tag=首页推荐&limit=6`, {
-          headers: { 'X-Site-Id': 'toy' },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.code === 200 && data.data) {
-            setFeaturedProducts(data.data);
-          }
+        const [hotRes, newRes] = await Promise.all([
+          fetch(`${apiBaseUrl}/api/v1/products/featured?tag=首页推荐&limit=8`, { headers: { 'X-Site-Id': 'toy' } }),
+          fetch(`${apiBaseUrl}/api/v1/products/featured?tag=新品&limit=4`, { headers: { 'X-Site-Id': 'toy' } }),
+        ]);
+        if (hotRes.ok) {
+          const data = await hotRes.json();
+          if (data.code === 200 && data.data) setFeaturedProducts(data.data);
+        }
+        if (newRes.ok) {
+          const data = await newRes.json();
+          if (data.code === 200 && data.data) setNewProducts(data.data);
         }
       } catch (error) {
-        console.error('获取推荐产品失败:', error);
+        console.error('获取产品失败:', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchFeaturedProducts();
+    fetchProducts();
   }, []);
 
   const stats = [
@@ -64,6 +74,11 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
     { step: 4, title: 'Production & Shipping', desc: 'We manufacture, QC, pack, and ship. Real-time tracking from factory to your door.' },
   ];
 
+  function productImageUrl(product: Product) {
+    if (!product.image) return '/placeholder-product.svg';
+    return product.image.startsWith('http') ? product.image : `${R2_BASE_URL}/${product.image}`;
+  }
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -71,7 +86,6 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
           1. Hero
       ============================================ */}
       <section className="relative min-h-[90vh] flex items-center pt-16 bg-white overflow-hidden">
-        {/* Subtle background texture */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-brand/3 to-transparent rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-surface to-transparent rounded-full blur-3xl" />
@@ -79,13 +93,11 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 w-full relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Left */}
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand/20 bg-brand/5">
                 <span className="w-2 h-2 rounded-full bg-brand" />
                 <span className="text-sm text-brand font-semibold tracking-wide">Dongguan Factory Direct</span>
               </div>
-
               <div className="space-y-5">
                 <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.08] tracking-tight text-text-primary">
                   Premium Adult Toys<br />
@@ -96,36 +108,22 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
                   Medical-grade silicone products for global retailers and distributors. Low MOQ, OEM/ODM branding, dedicated account support — all from Dongguan&apos;s manufacturing hub.
                 </p>
               </div>
-
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                <Link
-                  href="/products"
-                  className="group inline-flex items-center justify-center px-8 py-4 rounded-xl bg-brand text-white font-semibold text-lg hover:bg-brand-hover transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                >
+                <Link href="/products" className="group inline-flex items-center justify-center px-8 py-4 rounded-xl bg-brand text-white font-semibold text-lg hover:bg-brand-hover transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5">
                   Browse Catalog
                   <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </Link>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-xl border-2 border-[#D1D5DB] text-text-primary font-semibold text-lg hover:border-brand hover:text-brand transition-all duration-200"
-                >
+                <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center justify-center px-8 py-4 rounded-xl border-2 border-[#D1D5DB] text-text-primary font-semibold text-lg hover:border-brand hover:text-brand transition-all duration-200">
                   Request Pricing
                 </button>
               </div>
             </div>
-
-            {/* Right — Product image */}
             <div className="relative hidden lg:block">
               <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-surface via-white to-gray-200 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-gray-100">
-                <img
-                  src={`${R2_BASE_URL}/toy/home_product.jpg`}
-                  alt="Medical-grade silicone product — wholesale supplier"
-                  className="w-full h-full object-contain p-6"
-                />
+                <img src={`${R2_BASE_URL}/toy/home_product.jpg`} alt="Medical-grade silicone product — wholesale supplier" className="w-full h-full object-contain p-6" />
               </div>
-              {/* Floating badge */}
               <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg border border-gray-100 px-5 py-3 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                   <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -143,7 +141,144 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       </section>
 
       {/* ============================================
-          2. Stats
+          2. Hot Products
+      ============================================ */}
+      <section className="py-20 lg:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
+              Hot Selling Products
+            </h2>
+            <p className="text-lg text-text-secondary max-w-xl mx-auto">
+              Proven sellers across global markets. Medical-grade silicone, competitive wholesale pricing.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse">
+                  <div className="h-56 bg-gray-200" />
+                  <div className="p-5 space-y-3">
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded" />
+                    <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product) => (
+                <Link key={product.id} href={`/products/${product.slug}`} className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <div className="relative h-56 bg-surface flex items-center justify-center overflow-hidden">
+                    <img
+                      src={productImageUrl(product)}
+                      alt={product.alt || product.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
+                    />
+                    {product.tags && (() => {
+                      try {
+                        const tagList = Array.isArray(product.tags) ? product.tags : JSON.parse(product.tags as string);
+                        const firstTag = tagList[0];
+                        return firstTag ? (
+                          <div className="absolute top-3 left-3 px-2.5 py-1 bg-brand text-white text-xs font-semibold rounded-md shadow">
+                            {firstTag}
+                          </div>
+                        ) : null;
+                      } catch { return null; }
+                    })()}
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-sm font-semibold text-text-primary mb-2 group-hover:text-brand transition-colors line-clamp-2 leading-snug">
+                      {product.title || product.name}
+                    </h3>
+                    <div className="flex items-center justify-between text-xs text-text-secondary mb-3">
+                      {product.material && <span>{product.material}</span>}
+                      {product.minOrder && product.minOrder > 0 && (
+                        <span className="text-brand font-semibold">MOQ: {product.minOrder} pcs</span>
+                      )}
+                    </div>
+                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <span className="text-xs text-text-muted">Wholesale</span>
+                      <span className="text-sm font-bold text-brand group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                        Get Quote
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-text-secondary text-lg">No featured products yet</p>
+            </div>
+          )}
+
+          <div className="text-center mt-10">
+            <Link href="/products" className="inline-flex items-center gap-2 text-brand font-semibold hover:text-brand-hover transition-colors">
+              View Full Catalog
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          3. New Arrivals
+      ============================================ */}
+      {newProducts.length > 0 && (
+        <section className="py-20 lg:py-28 bg-surface">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="text-center mb-14">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
+                New Arrivals
+              </h2>
+              <p className="text-lg text-text-secondary max-w-xl mx-auto">
+                Latest additions to our wholesale catalog. Be the first to offer these to your market.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newProducts.map((product) => (
+                <Link key={product.id} href={`/products/${product.slug}`} className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                  <div className="relative h-56 bg-white flex items-center justify-center overflow-hidden">
+                    <img
+                      src={productImageUrl(product)}
+                      alt={product.alt || product.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
+                    />
+                    <div className="absolute top-3 left-3 px-2.5 py-1 bg-accent-green text-white text-xs font-semibold rounded-md shadow">
+                      NEW
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-sm font-semibold text-text-primary mb-2 group-hover:text-brand transition-colors line-clamp-2 leading-snug">
+                      {product.title || product.name}
+                    </h3>
+                    <div className="flex items-center justify-between text-xs text-text-secondary">
+                      {product.material && <span>{product.material}</span>}
+                      {product.minOrder && product.minOrder > 0 && (
+                        <span className="text-accent-green font-semibold">MOQ: {product.minOrder} pcs</span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ============================================
+          4. Stats
       ============================================ */}
       <section className="py-14 bg-white border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -164,7 +299,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       </section>
 
       {/* ============================================
-          3. Product Categories
+          5. Product Categories
       ============================================ */}
       <section className="py-20 lg:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -179,12 +314,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/products?category=${cat.slug}`}
-                className="group relative bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-              >
-                {/* Top gradient accent */}
+              <Link key={cat.slug} href={`/products?category=${cat.slug}`} className="group relative bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <div className={`h-1.5 w-full bg-gradient-to-r ${cat.gradient}`} />
                 <div className="p-7">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-5 shadow-sm`}>
@@ -208,7 +338,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       </section>
 
       {/* ============================================
-          4. Why Partner With Us
+          6. Why Partner With Us
       ============================================ */}
       <section className="py-20 lg:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -220,11 +350,9 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
               Dongguan factory access. No middlemen. Personalized wholesale service to grow your business.
             </p>
           </div>
-
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {advantages.map((item, i) => (
               <div key={i} className="group relative bg-white border border-gray-100 rounded-2xl p-7 hover:border-brand/20 hover:shadow-lg transition-all duration-200">
-                {/* Subtle left accent on hover */}
                 <div className="absolute left-0 top-6 bottom-6 w-0.5 bg-brand opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
                 <div className="w-11 h-11 rounded-xl bg-brand/8 flex items-center justify-center mb-5 group-hover:bg-brand/12 transition-colors">
                   <svg className="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,7 +368,7 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       </section>
 
       {/* ============================================
-          5. How to Order
+          7. How to Order
       ============================================ */}
       <section className="py-20 lg:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -252,15 +380,11 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
               Simple process from browsing to delivery. We handle the complexity.
             </p>
           </div>
-
           <div className="relative">
-            {/* Connecting line — desktop only */}
             <div className="hidden lg:block absolute top-12 left-[12.5%] right-[12.5%] h-0.5 bg-gray-200" />
-
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {steps.map((s, i) => (
                 <div key={i} className="relative bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-md transition-all duration-200 text-center">
-                  {/* Step circle */}
                   <div className="w-12 h-12 rounded-full bg-brand text-white flex items-center justify-center mx-auto mb-5 text-lg font-extrabold shadow-md relative z-10">
                     {s.step}
                   </div>
@@ -274,123 +398,13 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
       </section>
 
       {/* ============================================
-          6. Hot Products
-      ============================================ */}
-      <section className="py-20 lg:py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
-              Hot Selling Products
-            </h2>
-            <p className="text-lg text-text-secondary max-w-xl mx-auto">
-              Proven sellers across global markets. Medical-grade silicone, competitive wholesale pricing.
-            </p>
-          </div>
-
-          {loading ? (
-            <div className="grid md:grid-cols-3 gap-8">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse">
-                  <div className="h-72 bg-gray-200" />
-                  <div className="p-6 space-y-4">
-                    <div className="h-6 bg-gray-200 rounded w-3/4" />
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-200 rounded" />
-                      <div className="h-4 bg-gray-200 rounded" />
-                      <div className="h-4 bg-gray-200 rounded w-1/2" />
-                    </div>
-                    <div className="h-12 bg-gray-200 rounded-xl" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : featuredProducts.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-8">
-              {featuredProducts.map((product) => (
-                <div key={product.id} className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <Link href={`/products/${product.slug}`} className="relative h-72 bg-surface flex items-center justify-center overflow-hidden block">
-                    <img
-                      src={product.image?.startsWith('http') ? product.image : `${R2_BASE_URL}/${product.image}`}
-                      alt={product.alt || product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
-                    />
-                    {product.tags && (() => {
-                      const tagList = Array.isArray(product.tags) ? product.tags : (typeof product.tags === 'string' ? JSON.parse(product.tags) : []);
-                      const firstTag = tagList[0];
-                      return firstTag ? (
-                        <div className="absolute top-4 left-4 px-3 py-1.5 bg-brand text-white text-xs font-semibold rounded-lg shadow-md">
-                          {firstTag}
-                        </div>
-                      ) : null;
-                    })()}
-                  </Link>
-                  <div className="p-6">
-                    <Link href={`/products/${product.slug}`}>
-                      <h3 className="text-lg font-bold text-text-primary mb-3 hover:text-brand transition-colors line-clamp-1">
-                        {product.title}
-                      </h3>
-                    </Link>
-                    <div className="space-y-2 mb-4">
-                      {product.material && (
-                        <div className="flex justify-between text-sm">
-                          <span className="text-text-secondary">Material</span>
-                          <span className="text-text-primary font-medium">{product.material}</span>
-                        </div>
-                      )}
-                      {product.shortDescription && (
-                        <div className="flex justify-between text-sm">
-                          <span className="text-text-secondary">Feature</span>
-                          <span className="text-text-primary font-medium line-clamp-1">{product.shortDescription}</span>
-                        </div>
-                      )}
-                      {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
-                        <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
-                          <span className="text-text-secondary">MOQ</span>
-                          <span className="text-brand font-semibold">{product.minOrder} pcs</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mb-4 p-3 bg-brand/5 rounded-xl border border-brand/10">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-brand flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                        <span className="text-xs font-semibold text-brand">OEM Branding Available</span>
-                      </div>
-                    </div>
-                    <Link
-                      href={`/contact?product=${product.slug}`}
-                      className="block w-full py-3 rounded-xl bg-brand text-white font-semibold text-center hover:bg-brand-hover transition-colors duration-200"
-                    >
-                      Get Bulk Quote
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <svg className="w-20 h-20 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-              <p className="text-text-secondary text-lg mb-1">No featured products yet</p>
-              <p className="text-gray-400 text-sm">New arrivals coming soon</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ============================================
-          7. CTA
+          8. CTA
       ============================================ */}
       <section className="relative py-20 lg:py-28 bg-brand overflow-hidden">
-        {/* Background pattern */}
         <div className="absolute inset-0 pointer-events-none opacity-10">
           <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white" />
           <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-white" />
         </div>
-
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 tracking-tight">
             Ready to Stock Your Shelves?
@@ -399,19 +413,13 @@ export default function HomePageClient({ initialFeaturedProducts = [] }: { initi
             Join retailers in 50+ countries sourcing premium adult toys from Dongguan. Competitive pricing, OEM branding, global delivery.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center px-10 py-4 rounded-xl bg-white text-brand font-bold text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-            >
+            <Link href="/contact" className="inline-flex items-center justify-center px-10 py-4 rounded-xl bg-white text-brand font-bold text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
               Contact Sales
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
-            <Link
-              href="/sample-kit"
-              className="inline-flex items-center justify-center px-10 py-4 rounded-xl border-2 border-white/30 text-white font-bold text-lg hover:bg-white/10 transition-all"
-            >
+            <Link href="/sample-kit" className="inline-flex items-center justify-center px-10 py-4 rounded-xl border-2 border-white/30 text-white font-bold text-lg hover:bg-white/10 transition-all">
               Request Sample Kit
             </Link>
           </div>

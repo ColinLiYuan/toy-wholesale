@@ -34,6 +34,7 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
       { name: '潜客管理', href: '/admin/leads', icon: '👥' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
+      { name: '报价单管理', href: '/admin/quotation', icon: '📄' },
       { name: '管理员管理', href: '/admin/admins', icon: '🔐' },
       { name: '博客管理', href: '/admin/blog', icon: '📝' },
     ],

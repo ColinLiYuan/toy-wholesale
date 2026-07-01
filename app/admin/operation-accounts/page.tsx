@@ -33,30 +33,18 @@ export default function SocialMediaAccountsPage() {
           pagination.currentPage,
           20
         );
-      } else if (selectedPlatform) {
-        // 如果有平台筛选，使用 filter 接口
-        const data = await operationAccountService.getAccountsByFilter(
-          selectedAccountType || 'GENERAL',
-          selectedPlatform
-        );
-        response = {
-          content: data,
-          currentPage: 0,
-          totalPages: 1,
-          totalElements: data.length,
-          hasNext: false,
-          hasPrevious: false,
-          first: true,
-          last: true,
-          pageSize: 20,
-        };
       } else if (selectedAccountType) {
+        // 按账号类型查询
         const data = await operationAccountService.getAccountsByType(selectedAccountType);
+        // 如有平台筛选，客户端过滤
+        const filtered = selectedPlatform
+          ? data.filter((a: OperationAccount) => a.platform === selectedPlatform)
+          : data;
         response = {
-          content: data,
+          content: filtered,
           currentPage: 0,
           totalPages: 1,
-          totalElements: data.length,
+          totalElements: filtered.length,
           hasNext: false,
           hasPrevious: false,
           first: true,

@@ -34,11 +34,15 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   let featuredProducts: Product[] = [];
+  let newProducts: Product[] = [];
   try {
-    featuredProducts = await productService.getFeaturedProducts('首页推荐', 6);
+    [featuredProducts, newProducts] = await Promise.all([
+      productService.getFeaturedProducts('首页推荐', 8),
+      productService.getFeaturedProducts('新品', 4),
+    ]);
   } catch (error) {
     console.error('Failed to fetch featured products for homepage:', error);
   }
 
-  return <HomePageClient initialFeaturedProducts={featuredProducts} />;
+  return <HomePageClient initialFeaturedProducts={featuredProducts} initialNewProducts={newProducts} />;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supplierService } from '@/services';
 import type { Supplier } from '@/types';
 
@@ -51,15 +51,30 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
   const [selectedSupplierId, setSelectedSupplierId] = useState<string>('');
   const [category, setCategory] = useState('');
   const [material, setMaterial] = useState('');
-  const [sequence, setSequence] = useState('001');
-  const [weight, setWeight] = useState('');
+  const [randomCode, setRandomCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
-  const hasParsedRef = useRef(false); // 使用 ref 确保只解析一次
-  const onSkuGeneratedRef = useRef(onSkuGenerated); // 保持回调引用稳定
-  const suppliersRef = useRef<Supplier[]>([]); // 保持 suppliers 引用稳定
+  const hasParsedRef = useRef(false);
+  const onSkuGeneratedRef = useRef(onSkuGenerated);
+  const suppliersRef = useRef<Supplier[]>([]);
   onSkuGeneratedRef.current = onSkuGenerated;
   suppliersRef.current = suppliers;
+
+  // 生成 3 位随机大写字母
+  const generateRandomCode = useCallback(() => {
+    let result = '';
+    for (let i = 0; i < 3; i++) {
+      result += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    }
+    return result;
+  }, []);
+
+  // 初始化随机码
+  useEffect(() => {
+    if (!randomCode) {
+      setRandomCode(generateRandomCode());
+    }
+  }, []);
   
   // 加载供应商列表
   useEffect(() => {
@@ -98,42 +113,34 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
     const currentSuppliers = suppliersRef.current;
     if (currentSuppliers.length === 0) return; // 供应商列表未加载
 
-    hasParsedRef.current = true; // 立即锁定
+    hasParsedRef.current = true;
     setIsInitialized(true);
-    
+
     const parts = currentSku.split('-');
     if (parts.length >= 4) {
-      // 尝试匹配供应商
       const supplierPart = parts[0];
       const matched = currentSuppliers.find(s => s.code === supplierPart || s.name === supplierPart);
       if (matched) setSelectedSupplierId(String(matched.id));
-      
+
       setCategory(parts[1]);
       setMaterial(parts[2]);
-      
-      const lastPart = parts[parts.length - 1];
-      if (lastPart.toLowerCase().endsWith('kg')) {
-        setWeight(lastPart);
-        setSequence(parts.slice(3, -1).join('-'));
-      } else {
-        setSequence(parts.slice(3).join('-'));
-      }
+      setRandomCode(parts[3] || generateRandomCode());
     }
-  }, [currentSku]); // 只依赖 currentSku，使用 ref 访问其他值
+  }, [currentSku]);
 
   // 自动生成 SKU
   useEffect(() => {
     const currentSuppliers = suppliersRef.current;
     const selected = currentSuppliers.find(s => String(s.id) === String(selectedSupplierId));
-    if (selected && category && material) {
+    if (selected && category && material && randomCode) {
       const code = selected?.internalCode || 'SUP';
-      const newSku = `${code}-${category}-${material}${sequence ? '-' + sequence : ''}${weight ? '-' + weight : ''}`;
-      
+      const newSku = `${code}-${category}-${material}-${randomCode}`;
+
       if (newSku !== currentSku) {
         onSkuGeneratedRef.current(newSku);
       }
     }
-  }, [selectedSupplierId, category, material, sequence, weight, currentSku]); // 移除 suppliers 依赖，使用 ref
+  }, [selectedSupplierId, category, material, randomCode, currentSku]);
 
   const handleSupplierSelect = (id: string) => {
     setSelectedSupplierId(id);
@@ -208,35 +215,28 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
           </select>
         </div>
 
-        {/* 序列号 */}
+        {/* 随机码 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            序列号
+            随机码
           </label>
-          <input
-            type="text"
-            value={sequence}
-            onChange={(e) => setSequence(e.target.value.padStart(3, '0'))}
-            placeholder="001"
-            maxLength={5}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-          />
-          <p className="text-xs text-gray-500 mt-1">自动补零，如：001, 002...</p>
-        </div>
-
-        {/* 重量（可选） */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            重量（可选）
-          </label>
-          <input
-            type="text"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            placeholder="例如：2kg"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-          />
-          <p className="text-xs text-gray-500 mt-1">用于物流成本计算</p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={randomCode}
+              readOnly
+              className="w-24 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 font-mono text-center text-lg tracking-widest"
+            />
+            <button
+              type="button"
+              onClick={() => setRandomCode(generateRandomCode())}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+              title="重新生成"
+            >
+              ↻
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">随机 3 位大写字母，可点击刷新</p>
         </div>
       </div>
 
@@ -248,14 +248,13 @@ export default function SkuGenerator({ onSkuGenerated, onSupplierChange, current
           <div className="p-4 bg-brand-light border-2 border-brand rounded-lg">
             <p className="text-sm text-brand font-semibold mb-1">SKU 编码参考值：</p>
             <p className="text-2xl font-mono font-bold text-brand">
-              {code}-{category}-{material}{sequence ? '-' + sequence : ''}{weight ? '-' + weight : ''}
+              {code}-{category}-{material}-{randomCode}
             </p>
             <p className="text-xs text-text-secondary mt-2">
-              格式：供应商代码-品类-材质-序列号-重量
+              格式：供应商代码-品类-材质-随机码
             </p>
           </div>
         );
-      })()}
     </div>
   );
 }

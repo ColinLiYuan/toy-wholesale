@@ -98,4 +98,15 @@ export const API_ENDPOINTS = {
   // 灵活订单管理（潜客转化和快速下单）
   FLEXIBLE_QUICK_CONVERT: '/v1/flexible-orders/leads',  // POST /v1/flexible-orders/leads/{id}/quick-convert
   FLEXIBLE_CREATE_ORDER: '/v1/flexible-orders/create-direct',  // POST /v1/flexible-orders/create-direct
+
+  // 报价单管理（后台管理接口）
+  ADMIN_QUOTATIONS: '/v1/quotations',                    // GET /v1/quotations?page=&size=&status=
+  ADMIN_QUOTATION_DETAIL: '/v1/quotations',              // GET /v1/quotations/{id}
+  ADMIN_QUOTATION_CREATE: '/v1/quotations',              // POST /v1/quotations
+  ADMIN_QUOTATION_UPDATE: '/v1/quotations',              // PUT /v1/quotations/{id}
+  ADMIN_QUOTATION_DELETE: '/v1/quotations',              // DELETE /v1/quotations/{id}
+  ADMIN_QUOTATION_STATUS: '/v1/quotations',              // PATCH /v1/quotations/{id}/status
+  ADMIN_QUOTATION_SEND: '/v1/quotations',                // PATCH /v1/quotations/{id}/send
+  ADMIN_QUOTATION_BY_NUMBER: '/v1/quotations/number',    // GET /v1/quotations/number/{number}
+  ADMIN_QUOTATION_BY_DISTRIBUTOR: '/v1/quotations/distributor',  // GET /v1/quotations/distributor/{id}
 } as const;

@@ -624,3 +624,58 @@ export interface SeoKeywordListResponse {
   first: boolean;
   last: boolean;
 }
+
+// ==================== 报价单相关类型 ====================
+
+// 报价单状态
+export type QuotationStatus = 'DRAFT' | 'SENT' | 'ACCEPTED' | 'DECLINED' | 'EXPIRED';
+
+// 报价单项
+export interface QuotationItem {
+  id?: number;
+  productId: number;
+  productName?: string;
+  productSku?: string;
+  productImage?: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal?: number;
+  notes?: string;
+}
+
+// 报价单
+export interface Quotation {
+  id?: number;
+  siteId?: string;
+  quotationNumber: string;
+  distributorId?: number;
+  distributor?: Distributor;
+  title?: string;
+  status: QuotationStatus;
+  totalAmount: number;
+  validUntil?: string;
+  tradeTerms?: string;
+  sellerCompanyName?: string;
+  sellerAddress?: string;
+  sellerContactPerson?: string;
+  sellerPhone?: string;
+  sellerEmail?: string;
+  notes?: string;
+  internalNotes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  items?: QuotationItem[];
+}
+
+// 报价单列表响应
+export interface QuotationListResponse {
+  content: Quotation[];
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  first: boolean;
+  last: boolean;
+}
