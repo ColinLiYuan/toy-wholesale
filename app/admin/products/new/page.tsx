@@ -930,7 +930,6 @@ export default function NewProductPage() {
                 onChange={(e) => setProduct({ ...product, status: e.target.value as any })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
               >
-                <option value="DRAFT">草稿</option>
                 <option value="ACTIVE">活跃</option>
                 <option value="INACTIVE">停用</option>
               </select>
