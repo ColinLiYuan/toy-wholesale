@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Request product samples to evaluate our premium adult wellness products before placing bulk orders. Quality guaranteed with competitive wholesale pricing.',
   keywords: ['product samples', 'adult toys samples', 'quality testing', 'wholesale samples', 'bulk order evaluation'],
   openGraph: {
-    title: 'Request Product Samples — Evaluate Quality First | Silvibe',
+    title: 'Request Product Samples — Evaluate Quality First | SinTone',
     description: 'Experience our premium adult wellness products with free samples',
     type: 'website',
     images: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
         url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvibe - Request Product Samples',
+        alt: 'SinTone - Request Product Samples',
       },
     ],
   },

@@ -5,8 +5,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: {
-    default: "Premium Adult Toys Wholesale | Silvibe — Medical-Grade Supplier",
-    template: "%s | Silvibe",
+    default: "Premium Adult Toys Wholesale | SinTone — Medical-Grade Supplier",
+    template: "%s | SinTone",
   },
   description: "Premium wholesale sex toys and adult toys supplier. Medical-grade silicone, low MOQ from 20 pcs, OEM/ODM, FDA/CE/RoHS certified. Direct from Dongguan factory with global shipping.",
   keywords: [
@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     "low MOQ adult products",
     "medical-grade silicone toys",
   ],
-  authors: [{ name: "Silvibe" }],
-  creator: "Silvibe",
-  publisher: "Silvibe",
+  authors: [{ name: "SinTone" }],
+  creator: "SinTone",
+  publisher: "SinTone",
   formatDetection: {
     email: false,
     address: false,
@@ -31,21 +31,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://www.adult-toy-wholesale.com",
-    siteName: "Silvibe",
-    title: "Silvibe — Medical-Grade Silicone Adult Toys Wholesale",
+    siteName: "SinTone",
+    title: "SinTone — Medical-Grade Silicone Adult Toys Wholesale",
     description: "Certified medical-grade silicone toys from Dongguan. Low MOQ, FDA/CE/RoHS compliant. OEM/ODM for global retailers.",
     images: [
       {
         url: "https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg",
         width: 1200,
         height: 630,
-        alt: "Silvibe - Medical-Grade Silicone Adult Toys Wholesale",
+        alt: "SinTone - Medical-Grade Silicone Adult Toys Wholesale",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Silvibe — Medical-Grade Adult Toys Wholesale",
+    title: "SinTone — Medical-Grade Adult Toys Wholesale",
     description: "Medical-grade silicone adult toys from Dongguan. Low MOQ for global retailers.",
     images: ["https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg"],
   },
@@ -89,7 +89,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "Silvibe",
+              name: "SinTone",
               url: "https://www.adult-toy-wholesale.com",
               logo: "https://www.adult-toy-wholesale.com/favicon.ico",
               description: "Medical-grade silicone adult toys wholesale supplier from Dongguan, China. Low MOQ, OEM/ODM, FDA/CE/RoHS certified.",
@@ -121,7 +121,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              name: "Silvibe",
+              name: "SinTone",
               url: "https://www.adult-toy-wholesale.com",
               potentialAction: {
                 "@type": "SearchAction",

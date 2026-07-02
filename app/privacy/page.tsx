@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - Silvibe',
-  description: 'Privacy policy for Silvibe wholesale adult toys. Learn how we collect, use, and protect your personal information.',
+  title: 'Privacy Policy - SinTone',
+  description: 'Privacy policy for SinTone wholesale adult toys. Learn how we collect, use, and protect your personal information.',
   alternates: {
     canonical: '/privacy',
   },
@@ -32,7 +32,7 @@ export default function PrivacyPolicyPage() {
         <div className="max-w-4xl mx-auto prose prose-lg">
           <h2 className="text-2xl font-bold text-text-primary mb-4">1. Introduction</h2>
           <p className="text-text-secondary mb-6">
-            Silvibe ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make wholesale purchases.
+            SinTone ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make wholesale purchases.
           </p>
 
           <h2 className="text-2xl font-bold text-text-primary mb-4">2. Information We Collect</h2>

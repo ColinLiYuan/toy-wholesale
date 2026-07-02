@@ -3,10 +3,10 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'About Us — Direct from Dongguan Factory',
-  description: 'Learn about Silvibe — your trusted wholesale adult toys partner based in Dongguan, China. Direct factory access, supply chain advantages, low MOQ from 20 pcs.',
-  keywords: ['about Silvibe', 'dongguan adult toys supplier', 'adult toys distributor', 'direct factory wholesale', 'china wholesale adult toys'],
+  description: 'Learn about SinTone — your trusted wholesale adult toys partner based in Dongguan, China. Direct factory access, supply chain advantages, low MOQ from 20 pcs.',
+  keywords: ['about SinTone', 'dongguan adult toys supplier', 'adult toys distributor', 'direct factory wholesale', 'china wholesale adult toys'],
   openGraph: {
-    title: 'About Us — Silvibe Wholesale',
+    title: 'About Us — SinTone Wholesale',
     description: 'Your trusted wholesale partner with direct Dongguan factory access. Low MOQ, quality guaranteed.',
     type: 'website',
     images: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
         url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvibe - About Us',
+        alt: 'SinTone - About Us',
       },
     ],
   },
@@ -28,7 +28,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-white">
       <section className="relative py-20 px-6 bg-surface border-b border-gray-200">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-text-primary">About Silvibe</h1>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-text-primary">About SinTone</h1>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto">
             Your personal wholesale partner based in Dongguan, China. Direct factory access with supply chain advantages.
           </p>
@@ -41,7 +41,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-4xl font-bold text-text-primary mb-6">Our Story</h2>
               <div className="space-y-4 text-text-secondary text-lg leading-relaxed">
-                <p>Based in Dongguan, the manufacturing heart of China, Silvibe was founded with a simple mission: to provide direct factory access to quality adult wellness products for retailers and e-commerce businesses worldwide.</p>
+                <p>Based in Dongguan, the manufacturing heart of China, SinTone was founded with a simple mission: to provide direct factory access to quality adult wellness products for retailers and e-commerce businesses worldwide.</p>
                 <p>As a specialized wholesale supplier, we offer personalized service that large distributors can't match. We work directly with trusted factories in Dongguan and Shenzhen, ensuring competitive pricing, quality control, and flexible order quantities.</p>
                 <p>Our location in Dongguan gives us unique supply chain advantages — quick factory visits, faster sample development, and better negotiation power. This means better prices and faster turnaround for your business.</p>
               </div>
@@ -99,7 +99,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Partner With Us?</h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">The Silvibe advantage: personalized service with factory-direct pricing</p>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">The SinTone advantage: personalized service with factory-direct pricing</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div><div className="text-5xl font-bold mb-2">100+</div><div className="text-white/80">Trusted Factories</div></div>

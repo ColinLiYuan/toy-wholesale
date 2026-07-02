@@ -27,7 +27,7 @@ export default function DashboardPage() {
       {/* 页面标题 */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">仪表板</h1>
-        <p className="text-gray-600 mt-1">欢迎来到 LuxeAdult 管理后台</p>
+        <p className="text-gray-600 mt-1">欢迎来到 SinTone 管理后台</p>
       </div>
 
       {/* 统计卡片 */}

@@ -158,7 +158,7 @@ Google 现在主要使用移动版页面进行索引和排名，因此移动端�
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "LuxeAdult Toy Wholesale",
+  "name": "SinTone Toy Wholesale",
   "url": "https://example.com",
   "logo": "https://example.com/logo.png",
   "contactPoint": {
@@ -218,7 +218,7 @@ Google 现在主要使用移动版页面进行索引和排名，因此移动端�
   },
   "publisher": {
     "@type": "Organization",
-    "name": "LuxeAdult",
+    "name": "SinTone",
     "logo": {
       "@type": "ImageObject",
       "url": "https://example.com/logo.png"

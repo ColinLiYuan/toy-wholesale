@@ -403,7 +403,7 @@ export default function BlogPost({ post }) {
 
 **示例**：
 \`\`\`
-✅ Wholesale Educational Toys - Safe & Certified | LuxeAdult
+✅ Wholesale Educational Toys - Safe & Certified | SinTone
 ✅ Bulk Silicone Baby Toys - MOQ 50 Units | ToyWholesale
 ❌ Home Page
 ❌ Products - Page 1

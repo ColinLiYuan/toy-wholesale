@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: 'Browse our full wholesale catalog. Medical-grade silicone adult toys, low MOQ from 20 pcs, OEM/ODM available. Direct from Dongguan factory.',
   keywords: ['wholesale adult toys', 'adult toys catalog', 'bulk sex toys', 'OEM adult products', 'wholesale silicone toys'],
   openGraph: {
-    title: 'Wholesale Adult Toys Catalog | Silvibe',
+    title: 'Wholesale Adult Toys Catalog | SinTone',
     description: 'Browse our full wholesale catalog with medical-grade silicone adult toys from Dongguan factory',
     type: 'website',
     images: [
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
         url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvibe - Wholesale Adult Toys Catalog',
+        alt: 'SinTone - Wholesale Adult Toys Catalog',
       },
     ],
   },

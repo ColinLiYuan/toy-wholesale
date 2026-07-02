@@ -432,7 +432,7 @@ Search Console 是 Google 提供的免费工具，帮助网站所有者监控和
 - ASTM certified toy supplier
 
 **品牌关键词**：
-- LuxeAdult toys
+- SinTone toys
 - [你的品牌名] wholesale
 
 #### 跟踪频率

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
         url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvibe - Contact Us',
+        alt: 'SinTone - Contact Us',
       },
     ],
   },

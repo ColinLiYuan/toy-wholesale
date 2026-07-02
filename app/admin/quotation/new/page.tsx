@@ -28,7 +28,7 @@ export default function NewQuotationPage() {
     title: '',
     validUntil: '',
     tradeTerms: '',
-    sellerCompanyName: 'LuxeAdult Co., Ltd.',
+    sellerCompanyName: 'SinTone Co., Ltd.',
     sellerAddress: '',
     sellerContactPerson: '',
     sellerPhone: '',

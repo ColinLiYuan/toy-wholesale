@@ -344,7 +344,7 @@ export default function HomePageClient({
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
-              Why Partner With Silvibe
+              Why Partner With SinTone
             </h2>
             <p className="text-lg text-text-secondary max-w-xl mx-auto">
               Dongguan factory access. No middlemen. Personalized wholesale service to grow your business.

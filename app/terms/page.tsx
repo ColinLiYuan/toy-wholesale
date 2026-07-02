@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - Silvibe',
-  description: 'Terms and conditions for purchasing wholesale adult toys from Silvibe. Read our terms of service before placing orders.',
+  title: 'Terms of Service - SinTone',
+  description: 'Terms and conditions for purchasing wholesale adult toys from SinTone. Read our terms of service before placing orders.',
   alternates: {
     canonical: '/terms',
   },
@@ -32,7 +32,7 @@ export default function TermsOfServicePage() {
         <div className="max-w-4xl mx-auto prose prose-lg">
           <h2 className="text-2xl font-bold text-text-primary mb-4">1. Acceptance of Terms</h2>
           <p className="text-text-secondary mb-6">
-            By accessing and using Silvibe's website and services, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our website or services.
+            By accessing and using SinTone's website and services, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our website or services.
           </p>
 
           <h2 className="text-2xl font-bold text-text-primary mb-4">2. Eligibility</h2>
@@ -139,17 +139,17 @@ export default function TermsOfServicePage() {
 
           <h2 className="text-2xl font-bold text-text-primary mb-4">9. Intellectual Property</h2>
           <p className="text-text-secondary mb-6">
-            All content on this website, including text, images, logos, and product designs, is the property of Silvibe and is protected by copyright, trademark, and other intellectual property laws. You may not use our intellectual property without prior written consent.
+            All content on this website, including text, images, logos, and product designs, is the property of SinTone and is protected by copyright, trademark, and other intellectual property laws. You may not use our intellectual property without prior written consent.
           </p>
 
           <h2 className="text-2xl font-bold text-text-primary mb-4">10. Limitation of Liability</h2>
           <p className="text-text-secondary mb-6">
-            To the maximum extent permitted by law, Silvibe shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our website, products, or services. Our total liability shall not exceed the amount you paid for the specific product or service giving rise to the claim.
+            To the maximum extent permitted by law, SinTone shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our website, products, or services. Our total liability shall not exceed the amount you paid for the specific product or service giving rise to the claim.
           </p>
 
           <h2 className="text-2xl font-bold text-text-primary mb-4">11. Indemnification</h2>
           <p className="text-text-secondary mb-6">
-            You agree to indemnify and hold harmless Silvibe from any claims, damages, or expenses arising from your breach of these terms, violation of laws, or infringement of third-party rights.
+            You agree to indemnify and hold harmless SinTone from any claims, damages, or expenses arising from your breach of these terms, violation of laws, or infringement of third-party rights.
           </p>
 
           <h2 className="text-2xl font-bold text-text-primary mb-4">12. Governing Law</h2>

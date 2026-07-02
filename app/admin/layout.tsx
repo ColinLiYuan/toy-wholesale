@@ -25,8 +25,8 @@ type MenuItem = {
 
 const siteConfig: Record<string, { label: string; adminName: string; menus: MenuItem[] }> = {
   toy: {
-    label: 'LuxeAdult (Toy)',
-    adminName: 'LuxeAdult Admin',
+    label: 'SinTone (Toy)',
+    adminName: 'SinTone Admin',
     menus: [
       { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
       { name: '产品管理', href: '/admin/products', icon: '📦' },

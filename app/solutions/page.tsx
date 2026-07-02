@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Tailored wholesale solutions for online stores, physical retailers, dropshippers, and distributors worldwide. Flexible MOQ from 20 pcs, fast global shipping from Dongguan.',
   keywords: ['wholesale solutions', 'adult toys distribution', 'retail partnership', 'dropshipping program', 'bulk orders', 'global shipping'],
   openGraph: {
-    title: 'Wholesale Solutions for Adult Toys | Silvibe',
+    title: 'Wholesale Solutions for Adult Toys | SinTone',
     description: 'Tailored wholesale solutions for retailers, distributors, and e-commerce businesses worldwide',
     type: 'website',
     images: [
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
         url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvibe - Wholesale Solutions',
+        alt: 'SinTone - Wholesale Solutions',
       },
     ],
   },

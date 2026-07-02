@@ -67,7 +67,7 @@ SEO（Search Engine Optimization，搜索引擎优化）是通过优化网站内
 ### 标题标签（Title Tag）
 - **长度**：50-60 字符
 - **格式**：主关键词 | 品牌名
-- **示例**："Wholesale Adult Toys - Premium Silicone Products | LuxeAdult"
+- **示例**："Wholesale Adult Toys - Premium Silicone Products | SinTone"
 
 ### 元描述（Meta Description）
 - **长度**：150-160 字符

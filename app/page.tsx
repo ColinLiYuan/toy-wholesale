@@ -8,22 +8,22 @@ export const metadata: Metadata = {
   description: 'Leading wholesale sex toys and adult toys supplier. Medical-grade silicone, low MOQ from 20 pcs, OEM/ODM, FDA/CE certified. Direct from Dongguan factory.',
   keywords: ['wholesale sex toys', 'adult toys wholesale', 'wholesale adult toys', 'medical-grade silicone toys', 'sex toys wholesale supplier'],
   openGraph: {
-    title: 'Silvibe — Medical-Grade Silicone Adult Toys Wholesale',
+    title: 'SinTone — Medical-Grade Silicone Adult Toys Wholesale',
     description: 'Premium medical-grade silicone adult toys for global wholesale distribution. Low MOQ, OEM/ODM available.',
     type: 'website',
-    siteName: 'Silvibe',
+    siteName: 'SinTone',
     images: [
       {
         url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvibe - Medical-Grade Silicone Adult Toys Wholesale',
+        alt: 'SinTone - Medical-Grade Silicone Adult Toys Wholesale',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Silvibe — Medical-Grade Adult Toys Wholesale',
+    title: 'SinTone — Medical-Grade Adult Toys Wholesale',
     description: 'Medical-grade silicone adult toys from Dongguan. Low MOQ for global retailers.',
     images: ['https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg'],
   },

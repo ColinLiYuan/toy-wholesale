@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs. Learn how to grow your business with our industry insights.',
   keywords: ['adult toys wholesale', 'business tips', 'retail advice', 'e-commerce strategies', 'wholesale distribution'],
   openGraph: {
-    title: 'Industry Insights & Business Tips | Silvibe',
+    title: 'Industry Insights & Business Tips | SinTone',
     description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs',
     type: 'website',
     images: [
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
         url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvibe - Industry Insights & Business Tips',
+        alt: 'SinTone - Industry Insights & Business Tips',
       },
     ],
   },

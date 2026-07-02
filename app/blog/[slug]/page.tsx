@@ -28,11 +28,11 @@ function ArticleJsonLd({ blog }: { blog: BlogPost }) {
     dateModified: blog.updatedAt || blog.publishedAt,
     author: {
       '@type': 'Person',
-      name: blog.authorName || 'Silvibe Editorial Team',
+      name: blog.authorName || 'SinTone Editorial Team',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Silvibe',
+      name: 'SinTone',
       logo: {
         '@type': 'ImageObject',
         url: `${baseUrl}/favicon.ico`,
@@ -97,7 +97,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps) {
     }
 
     return {
-      title: `${blog.seoTitle || blog.title} | LuxeAdult Wholesale`,
+      title: `${blog.seoTitle || blog.title} | SinTone Wholesale`,
       description: blog.seoDescription || blog.excerpt,
       keywords,
       openGraph: {
@@ -120,7 +120,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps) {
     };
   } catch {
     return {
-      title: 'Blog Not Found | LuxeAdult Wholesale',
+      title: 'Blog Not Found | SinTone Wholesale',
     };
   }
 }

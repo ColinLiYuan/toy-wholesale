@@ -10,8 +10,8 @@ export async function generateMetadata({ params }: VerifyPageProps): Promise<Met
   
   return {
     title: isEn 
-      ? 'Product Inquiry - Request Wholesale Pricing | LuxeAdult Wholesale'
-      : '产品咨询 - 获取批发报价 | LuxeAdult 批发',
+      ? 'Product Inquiry - Request Wholesale Pricing | SinTone Wholesale'
+      : '产品咨询 - 获取批发报价 | SinTone 批发',
     description: isEn
       ? 'Request wholesale pricing, product catalogs, and bulk quotes for premium adult wellness products. Low MOQ and fast global shipping.'
       : '申请成人健康产品批发价格、产品目录和批量报价。低起订量和快速全球发货。',

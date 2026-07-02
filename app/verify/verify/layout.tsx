@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Verify Product Authenticity | LuxeAdult Wholesale',
+  title: 'Verify Product Authenticity | SinTone Wholesale',
   description: 'Verify the authenticity of your products using our security code system. Ensure you have genuine products.',
 };
 

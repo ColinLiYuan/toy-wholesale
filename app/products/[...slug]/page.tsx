@@ -11,18 +11,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   try {
     const product = await productService.getProductDetail(productSlug);
     return {
-      title: product.seoTitle || `${product.title} | Silvibe`,
+      title: product.seoTitle || `${product.title} | SinTone`,
       description: product.seoDescription || product.description || `Buy ${product.title} at wholesale prices. Premium adult wellness products for global distribution.`,
       keywords: product.seoKeywords ? product.seoKeywords.split(',').map(k => k.trim()) : [product.title, 'adult toys wholesale', 'wellness products'],
       openGraph: {
-        title: product.seoTitle || `${product.title} | Silvibe`,
+        title: product.seoTitle || `${product.title} | SinTone`,
         description: product.seoDescription || product.description || `Buy ${product.title} at wholesale prices. Premium adult wellness products for global distribution.`,
         images: product.image ? [{ url: product.image.startsWith('http') ? product.image : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${product.image}`, alt: product.alt || product.title }] : [],
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
-        title: product.seoTitle || `${product.title} | Silvibe`,
+        title: product.seoTitle || `${product.title} | SinTone`,
         description: product.seoDescription || product.description || `Buy ${product.title} at wholesale prices. Premium adult wellness products for global distribution.`,
         images: product.image ? [product.image.startsWith('http') ? product.image : `https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/${product.image}`] : [],
       },
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   } catch (error) {
     return {
-      title: 'Product Not Found | Silvibe',
+      title: 'Product Not Found | SinTone',
       description: 'The requested product could not be found.',
     };
   }
@@ -53,7 +53,7 @@ function ProductJsonLd({ product }: { product: Product }) {
     sku: product.sku || product.productSkus?.[0]?.sku || undefined,
     brand: {
       '@type': 'Brand',
-      name: product.brand || 'Silvibe',
+      name: product.brand || 'SinTone',
     },
     ...(product.productSkus?.length ? {
       offers: product.productSkus.map((sku) => ({
