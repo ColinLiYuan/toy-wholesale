@@ -1548,14 +1548,33 @@ export const inquiryAdminService = {
         null,
         { params: { status } }
       );
-      
+
       if (apiResult.code !== 200 || !apiResult.data) {
         throw new Error(apiResult.message || 'Failed to update inquiry status');
       }
-      
+
       return apiResult.data;
     } catch (error) {
       console.error('Failed to update inquiry status:', error);
+      throw error;
+    }
+  },
+
+  // 更新询盘信息 - PUT /api/v1/inquiries/{id}
+  async updateInquiry(id: number, data: Partial<Inquiry>): Promise<Inquiry> {
+    try {
+      const apiResult: ApiResult<Inquiry> = await apiClient.put(
+        `/v1/inquiries/${id}`,
+        data
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update inquiry');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update inquiry:', error);
       throw error;
     }
   },

@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { inquiryAdminService } from '@/services';
+import { countryName } from '@/lib/countries';
 import type { Inquiry } from '@/types';
 
 const statusMap: Record<string, string> = {
@@ -280,6 +282,9 @@ export default function InquiriesPage() {
                       {inquiry.companyName && (
                         <div className="text-xs text-gray-400">{inquiry.companyName}</div>
                       )}
+                      {inquiry.country && (
+                        <div className="text-xs text-gray-400">{countryName(inquiry.country)}</div>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
@@ -312,6 +317,12 @@ export default function InquiriesPage() {
                       >
                         查看
                       </button>
+                      <Link
+                        href={`/admin/inquiries/${inquiry.id}/edit`}
+                        className="text-green-600 hover:text-green-900 mr-3"
+                      >
+                        编辑
+                      </Link>
                       {!inquiry.assignedTo && inquiry.status !== 'CONVERTED' && inquiry.status !== 'CLOSED' && (
                         <button
                           onClick={() => handleAssignSalesperson(inquiry.id!)}

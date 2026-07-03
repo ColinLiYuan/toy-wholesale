@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 import { inquiryAdminService } from '@/services';
 import type { Inquiry } from '@/types';
 import AttachmentManager from '@/components/AttachmentManager';
@@ -139,12 +140,20 @@ export default function InquiryDetailPage() {
   return (
     <div className="p-6">
       {/* 返回按钮 */}
-      <button
-        onClick={() => router.back()}
-        className="mb-4 text-sm text-blue-600 hover:text-blue-900"
-      >
-        ← 返回列表
-      </button>
+      <div className="flex items-center gap-4 mb-4">
+        <button
+          onClick={() => router.back()}
+          className="text-sm text-blue-600 hover:text-blue-900"
+        >
+          ← 返回列表
+        </button>
+        <Link
+          href={`/admin/inquiries/${inquiryId}/edit`}
+          className="text-sm text-green-600 hover:text-green-900"
+        >
+          ✏️ 编辑
+        </Link>
+      </div>
 
       {/* 标题和状态 */}
       <div className="mb-6 flex items-center justify-between">

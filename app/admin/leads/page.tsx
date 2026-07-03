@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { leadAdminService } from '@/services';
 import type { Lead } from '@/types';
 import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
+import { countryName } from '@/lib/countries';
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -325,6 +326,9 @@ export default function LeadsPage() {
                           <p className="text-sm text-gray-900">{lead.contactPerson || '-'}</p>
                           {lead.position && (
                             <p className="text-xs text-gray-500">{lead.position}</p>
+                          )}
+                          {lead.country && (
+                            <p className="text-xs text-gray-500">{countryName(lead.country)}</p>
                           )}
                         </div>
                       </td>
