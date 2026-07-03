@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { salesOrderService, SalesOrder, OrderStatus, PaymentRecord, ShipmentRecord, FollowUpRecord } from '@/services';
 import AttachmentManager from '@/components/AttachmentManager';
 import { formatImageUrl } from '@/lib/api-config';
+import { countryName } from '@/lib/countries';
 
 // 本地类型定义
 type PaymentStatus = 'PENDING' | 'PAID' | 'PARTIAL' | 'REFUNDED' | 'FAILED';
@@ -690,7 +691,7 @@ export default function OrderDetailPage() {
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700">收货地址</label>
               <p className="mt-1 text-gray-900">
-                {[order.shippingAddress, order.shippingCity, order.shippingRegion, order.shippingCountry, order.shippingZipCode]
+                {[order.shippingAddress, order.shippingCity, order.shippingRegion, countryName(order.shippingCountry || ''), order.shippingZipCode]
                   .filter(Boolean)
                   .join(' ') || '-'}
               </p>

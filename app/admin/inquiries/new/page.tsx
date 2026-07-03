@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { inquiryAdminService, Inquiry } from '@/services';
 import { getSiteId } from '@/lib/api-client';
+import CountrySelect from '@/components/CountrySelect';
 
 export default function NewInquiryPage() {
   const router = useRouter();
@@ -198,12 +199,9 @@ export default function NewInquiryPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">国家</label>
-              <input
-                type="text"
+              <CountrySelect
                 value={formData.country || ''}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="客户所在国家"
+                onChange={(code) => setFormData({ ...formData, country: code })}
               />
             </div>
           </div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { distributorAdminService } from '@/services';
 import { Distributor } from '@/types';
 import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
+import { countryName } from '@/lib/countries';
 
 export default function DistributorsPage() {
   const [loading, setLoading] = useState(true);
@@ -275,7 +276,7 @@ export default function DistributorsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="space-y-1">
-                          {distributor.country && <p className="text-sm text-gray-900">{distributor.country}</p>}
+                          {distributor.country && <p className="text-sm text-gray-900">{countryName(distributor.country)}</p>}
                           {distributor.city && <p className="text-sm text-gray-500">{distributor.city}</p>}
                         </div>
                       </td>

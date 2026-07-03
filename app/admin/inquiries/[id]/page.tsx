@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { inquiryAdminService } from '@/services';
 import type { Inquiry } from '@/types';
 import AttachmentManager from '@/components/AttachmentManager';
+import { countryName } from '@/lib/countries';
 
 const statusMap: Record<string, string> = {
   NEW: '新询盘',
@@ -219,7 +220,7 @@ export default function InquiryDetailPage() {
               {inquiry.country && (
                 <div>
                   <label className="text-sm text-gray-500">国家</label>
-                  <div className="text-sm font-medium text-gray-900">{inquiry.country}</div>
+                  <div className="text-sm font-medium text-gray-900">{countryName(inquiry.country)}</div>
                 </div>
               )}
             </div>

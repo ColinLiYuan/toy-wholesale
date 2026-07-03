@@ -7,6 +7,7 @@ import { leadAdminService } from '@/services';
 import type { Lead, FollowUpRecord } from '@/types';
 import AttachmentManager from '@/components/AttachmentManager';
 import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
+import { countryName } from '@/lib/countries';
 
 export default function LeadDetailPage() {
   const router = useRouter();
@@ -270,7 +271,7 @@ export default function LeadDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">国家</label>
-            <p className="text-gray-900">{lead.country || '-'}</p>
+            <p className="text-gray-900">{countryName(lead.country || '') || '-'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">省份/州</label>

@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { salesOrderService, distributorAdminService, productAdminService, SalesOrder, Distributor, Product, ProductSku, OrderStatus } from '@/services';
 import { formatImageUrl } from '@/lib/api-config';
+import CountrySelect from '@/components/CountrySelect';
 
 export default function EditOrderPage() {
   const router = useRouter();
@@ -674,12 +675,9 @@ export default function EditOrderPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">国家</label>
-              <input
-                type="text"
+              <CountrySelect
                 value={formData.shippingCountry || ''}
-                onChange={(e) => setFormData({ ...formData, shippingCountry: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="国家"
+                onChange={(code) => setFormData({ ...formData, shippingCountry: code })}
               />
             </div>
             <div>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { leadAdminService } from '@/services';
 import type { Lead } from '@/types';
 import { getSiteId } from '@/lib/api-client';
+import CountrySelect from '@/components/CountrySelect';
 
 export default function NewLeadPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function NewLeadPage() {
 
   // 根据站点筛选来源选项
   const sourceOptions = currentSite === 'seric'
-    ? allSourceOptions.filter(option => option.value === 'MADE_IN_CHINA')
+    ? allSourceOptions.filter(option => ['MADE_IN_CHINA', 'REFERRAL'].includes(option.value))
     : allSourceOptions;
 
   const [formData, setFormData] = useState<Partial<Lead>>({
@@ -206,12 +207,9 @@ export default function NewLeadPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">国家</label>
-                <input
-                  type="text"
+                <CountrySelect
                   value={formData.country || ''}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                  placeholder="请输入国家"
+                  onChange={(code) => setFormData({ ...formData, country: code })}
                 />
               </div>
               <div>

@@ -7,6 +7,8 @@ import { distributorAdminService } from '@/services';
 import { Distributor, FollowUpRecord } from '@/types';
 import AttachmentManager from '@/components/AttachmentManager';
 import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
+import CountrySelect from '@/components/CountrySelect';
+import { countryName } from '@/lib/countries';
 
 export default function DistributorDetailPage() {
   const router = useRouter();
@@ -300,15 +302,12 @@ export default function DistributorDetailPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">国家</label>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="country"
+                    <CountrySelect
                       value={formData.country || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                      onChange={(code) => setFormData({ ...formData, country: code })}
                     />
                   ) : (
-                    <p className="text-gray-900">{distributor.country || '-'}</p>
+                    <p className="text-gray-900">{countryName(distributor.country || '') || '-'}</p>
                   )}
                 </div>
                 <div>

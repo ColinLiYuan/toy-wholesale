@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { quotationAdminService, distributorAdminService, productAdminService } from '@/services';
 import type { Distributor, Product, Quotation } from '@/types';
+import { countryName } from '@/lib/countries';
 
 interface QuotationItemForm {
   productId: number;
@@ -308,7 +309,7 @@ export default function EditQuotationPage() {
                 <option value={0}>-- 请选择客户 --</option>
                 {distributors.map(d => (
                   <option key={d.id} value={d.id}>
-                    {d.name} ({d.code}) - {d.country || ''}
+                    {d.name} ({d.code}) - {countryName(d.country || '') || '-'}
                   </option>
                 ))}
               </select>

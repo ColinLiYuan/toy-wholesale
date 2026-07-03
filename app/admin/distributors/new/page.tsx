@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { distributorAdminService } from '@/services';
 import { Distributor } from '@/types';
+import CountrySelect from '@/components/CountrySelect';
 
 export default function NewDistributorPage() {
   const router = useRouter();
@@ -168,13 +169,9 @@ export default function NewDistributorPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">国家 <span className="text-red-500">*</span></label>
-              <input
-                type="text"
-                name="country"
+              <CountrySelect
                 value={formData.country || ''}
-                onChange={handleInputChange}
-                placeholder="请输入国家"
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent ${errors.country ? 'border-red-500' : 'border-gray-300'}`}
+                onChange={(code) => setFormData({ ...formData, country: code })}
               />
               {errors.country && <p className="mt-1 text-sm text-red-500">{errors.country}</p>}
             </div>
