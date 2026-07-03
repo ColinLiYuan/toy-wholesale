@@ -102,7 +102,7 @@ export default function RootLayout({
                 addressCountry: "CN",
               },
               sameAs: [
-                "https://linkedin.com/company/luxeadult-wholesale",
+                "https://linkedin.com/company/sintone-wholesale",
               ],
               contactPoint: {
                 "@type": "ContactPoint",

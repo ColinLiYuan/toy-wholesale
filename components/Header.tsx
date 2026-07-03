@@ -53,7 +53,7 @@ export default function Header() {
             <div className="w-8 h-8 bg-brand rounded flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="font-semibold text-gray-900 hidden sm:block">Silvibe</span>
+            <span className="font-semibold text-gray-900 hidden sm:block">SinTone</span>
           </Link>
 
           {/* Desktop Navigation */}

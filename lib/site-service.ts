@@ -18,9 +18,9 @@ export interface SiteConfig {
 const SITE_CONFIGS: Record<SiteId, SiteConfig> = {
   toy: {
     id: 'toy',
-    label: 'LuxeAdult (Toy)',
-    adminName: 'LuxeAdult Admin',
-    domain: 'www.luxeadult.com'
+    label: 'SinTone',
+    adminName: 'SinTone Admin',
+    domain: 'www.sintone.com'
   },
   myth: {
     id: 'myth',
