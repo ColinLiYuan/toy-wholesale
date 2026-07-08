@@ -674,7 +674,7 @@ export default function EditProductPage() {
                 {skus.map((sku, index) => (
                   <div key={index} className="flex items-center justify-between text-sm">
                     <span className="text-gray-700">颜色: <span className="font-semibold">{sku.color}</span></span>
-                    <span className="text-gray-400 text-xs">SKU 由后端自动生成</span>
+                    <span className="text-gray-500 text-xs font-mono">{sku.sku}</span>
                   </div>
                 ))}
               </div>
