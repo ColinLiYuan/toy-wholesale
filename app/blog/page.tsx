@@ -6,19 +6,19 @@ import { Metadata } from 'next';
 import BlogPagination from './BlogPagination';
 
 export const metadata: Metadata = {
-  title: 'Industry Insights & Business Tips',
-  description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs. Learn how to grow your business with our industry insights.',
-  keywords: ['adult toys wholesale', 'business tips', 'retail advice', 'e-commerce strategies', 'wholesale distribution'],
+  title: 'Adult Toys Wholesale Blog | Industry Insights & Product Guides',
+  description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs. Product guides, material comparisons, and wholesale business tips from SinTone.',
+  keywords: ['adult toys wholesale blog', 'sex toy reviews', 'business tips', 'product guides', 'retail advice', 'wholesale distribution'],
   openGraph: {
-    title: 'Industry Insights & Business Tips | SinTone',
-    description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs',
+    title: 'Adult Toys Wholesale Blog | SinTone Industry Insights',
+    description: 'Expert advice for adult toy retailers, distributors, and e-commerce entrepreneurs. Product guides and business tips.',
     type: 'website',
     images: [
       {
         url: 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev/toy/home_product.jpg',
         width: 1200,
         height: 630,
-        alt: 'SinTone - Industry Insights & Business Tips',
+        alt: 'SinTone - Adult Toys Wholesale Blog',
       },
     ],
   },

@@ -53,6 +53,55 @@ function ArticleJsonLd({ blog }: { blog: BlogPost }) {
   );
 }
 
+// Auto-detect FAQ sections in Markdown content and generate FAQPage Schema
+function FaqPageJsonLd({ content }: { content: string; slug: string }) {
+  if (!content) return null;
+
+  // Match FAQ blocks: **Q: question?** followed by A: answer
+  const faqRegex = /\*\*Q:\s+(.+?)\*\*\s*\n\s*A:\s*(.+?)(?=\n\n|\n\*\*Q:|\n---|\n##|$)/gs;
+  const qaPairs: { question: string; answer: string }[] = [];
+  let match;
+  while ((match = faqRegex.exec(content)) !== null) {
+    qaPairs.push({
+      question: match[1].trim(),
+      answer: match[2].trim().replace(/\n/g, ' '),
+    });
+  }
+
+  // Also try alternate format with multi-line answers
+  if (qaPairs.length === 0) {
+    const altRegex = /\*\*Q:\s+(.+?)\*\*\s*\n\s*(A:\s*)?([\s\S]+?)(?=\n\*\*Q:|\n##\s|\n---\s|$)/g;
+    while ((match = altRegex.exec(content)) !== null) {
+      const answer = (match[3] || '').trim().replace(/\n/g, ' ').substring(0, 300);
+      if (answer) {
+        qaPairs.push({ question: match[1].trim(), answer });
+      }
+    }
+  }
+
+  if (qaPairs.length === 0) return null;
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: qaPairs.map(qa => ({
+      '@type': 'Question',
+      name: qa.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: qa.answer,
+      },
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
 function BlogBreadcrumbJsonLd({ items }: { items: { name: string; url: string }[] }) {
   const schema = {
     '@context': 'https://schema.org',
@@ -73,19 +122,19 @@ function BlogBreadcrumbJsonLd({ items }: { items: { name: string; url: string }[
   );
 }
 
-// 生成静态参数（可选，用于 SSG）
+// Generate static params (optional, for SSG)
 export async function generateStaticParams() {
   return [];
 }
 
-// 生成元数据
+// Generate metadata
 export async function generateMetadata({ params }: BlogDetailPageProps) {
   const { slug } = await params;
 
   try {
     const blog = await blogService.getBlogBySlug(slug);
 
-    // 处理 tags：支持字符串和数组
+    // Handle tags: support both string and array
     let keywords: string[] = [];
     if (blog.tags) {
       const tags = blog.tags as any;
@@ -136,7 +185,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   } catch (err: any) {
     error = err.message || 'Failed to load blog post';
   }
-  
+
   if (error || !blog) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#141414] to-[#0a0a0a] text-[#E5E5E5] flex items-center justify-center">
@@ -157,6 +206,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   return (
     <>
       <ArticleJsonLd blog={blog} />
+      <FaqPageJsonLd content={blog.content} slug={slug} />
       <BlogBreadcrumbJsonLd
         items={[
           { name: 'Home', url: '/' },
@@ -175,7 +225,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           >
             ← Back to Blog
           </Link>
-          
+
           {/* Category & Date */}
           <div className="flex items-center gap-4 mb-6">
             <span className="px-3 py-1 bg-[#00D4FF]/10 text-[#00D4FF] text-sm font-medium rounded-full">
@@ -191,17 +241,17 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               </span>
             )}
           </div>
-          
+
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
             {blog.title}
           </h1>
-          
+
           {/* Excerpt */}
           <p className="text-xl text-[#9CA3AF] leading-relaxed">
             {blog.excerpt}
           </p>
-          
+
           {/* Author */}
           {blog.authorName && (
             <div className="mt-6 flex items-center gap-3">
@@ -216,7 +266,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           )}
         </div>
       </section>
-      
+
       {/* Cover Image */}
       {blog.coverImage && (
         <section className="px-6 pb-8">
@@ -229,7 +279,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           </div>
         </section>
       )}
-      
+
       {/* Content */}
       <section className="px-6 pb-20">
         <article className="max-w-4xl mx-auto bg-[#1a1a1a] rounded-xl p-8 md:p-12 border border-[#2a2a2a]">
@@ -238,7 +288,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeHighlight]}
               components={{
-                // 自定义样式
                 h1: ({ node, ...props }) => (
                   <h1 className="text-3xl font-bold mb-6 mt-8 text-[#E5E5E5]" {...props} />
                 ),
@@ -274,17 +323,16 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                   )
                 ),
                 img: ({ node, ...props }) => {
-                  // 处理图片路径：相对路径转换为完整 URL
                   let src = props.src || '';
                   if (src && typeof src === 'string' && !src.startsWith('http')) {
-                    // 相对路径，使用 formatImageUrl 处理
                     src = formatImageUrl(src);
                   }
                   return (
-                    <img 
-                      {...props} 
+                    <img
+                      {...props}
                       src={src}
-                      className="rounded-lg my-6 w-full" 
+                      className="rounded-lg my-6 w-full"
+                      loading="lazy"
                     />
                   );
                 },
@@ -306,22 +354,20 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           </div>
         </article>
       </section>
-      
+
       {/* Tags */}
       {blog.tags && (() => {
-        // 解析 tags：可能是 JSON 字符串或数组
         let tagsArray: string[] = [];
         if (typeof blog.tags === 'string') {
           try {
             tagsArray = JSON.parse(blog.tags);
           } catch {
-            // 解析失败，尝试按逗号分隔
             tagsArray = (blog.tags as string).split(',').filter((t: string) => t.trim());
           }
         } else if (Array.isArray(blog.tags)) {
           tagsArray = blog.tags;
         }
-        
+
         return tagsArray.length > 0 ? (
           <section className="px-6 pb-20">
             <div className="max-w-4xl mx-auto">
