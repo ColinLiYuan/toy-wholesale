@@ -412,16 +412,20 @@ export default function EditProductPage() {
     setDraggedGalleryIndex(null);
   };
 
-  // SKU管理
-  const addSku = () => {
-    setSkus([...skus, { sku: '', stock: 0 }]);
-  };
+  // 颜色选项（与新增页面一致）
+  const colorOptions = [
+    { value: 'BK', label: '黑色 (BK)' },
+    { value: 'WH', label: '白色 (WH)' },
+    { value: 'RD', label: '红色 (RD)' },
+    { value: 'PK', label: '粉色 (PK)' },
+    { value: 'PU', label: '紫色 (PU)' },
+    { value: 'BL', label: '蓝色 (BL)' },
+    { value: 'GN', label: '绿色 (GN)' },
+    { value: 'SK', label: '肤色 (SK)' },
+    { value: 'CL', label: '透明 (CL)' },
+  ];
 
-  const updateSku = (index: number, field: keyof ProductSku, value: any) => {
-    const updatedSkus = [...skus];
-    updatedSkus[index] = { ...updatedSkus[index], [field]: value };
-    setSkus(updatedSkus);
-  };
+  // SKU管理（后端自动生成，无需手动输入）
 
   const removeSku = (index: number) => {
     setSkus(skus.filter((_, i) => i !== index));
@@ -630,94 +634,50 @@ export default function EditProductPage() {
           />
         </div>
 
-        {/* SKU 管理 */}
+        {/* SKU 管理（后端自动生成） */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">SKU 管理</h2>
-            <button
-              type="button"
-              onClick={addSku}
-              className="px-4 py-2 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors"
-            >
-              + 添加 SKU
-            </button>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">SKU 管理</h2>
+          <p className="text-sm text-gray-500 mb-4">选择颜色后，后端将自动生成 SKU 编码</p>
+
+          {/* 颜色选择器 */}
+          <div className="flex flex-wrap gap-3 mb-4">
+            {colorOptions.map((color) => {
+              const isSelected = skus.some(s => s.color === color.value);
+              return (
+                <button
+                  key={color.value}
+                  type="button"
+                  onClick={() => {
+                    if (isSelected) {
+                      setSkus(skus.filter(s => s.color !== color.value));
+                    } else {
+                      setSkus([...skus, { sku: '', color: color.value, stock: 0 }]);
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isSelected
+                      ? 'bg-[#00F2FE] text-[#050505]'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {color.label}
+                </button>
+              );
+            })}
           </div>
-          
-          {skus.length > 0 ? (
-            <div className="space-y-4">
-              {skus.map((sku, index) => (
-                <div key={index} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                  {/* 移动按钮 */}
-                  <div className="flex flex-col space-y-1">
-                    <button
-                      type="button"
-                      onClick={() => moveSkuUp(index)}
-                      disabled={index === 0}
-                      className="w-8 h-6 bg-gray-200 rounded text-gray-600 hover:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => moveSkuDown(index)}
-                      disabled={index === skus.length - 1}
-                      className="w-8 h-6 bg-gray-200 rounded text-gray-600 hover:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                      ↓
-                    </button>
+
+          {/* 已选颜色的 SKU 列表（只读预览） */}
+          {skus.length > 0 && (
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-xs font-semibold text-gray-600 mb-2">将自动生成以下 SKU：</p>
+              <div className="space-y-2">
+                {skus.map((sku, index) => (
+                  <div key={index} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700">颜色: <span className="font-semibold">{sku.color}</span></span>
+                    <span className="text-gray-400 text-xs">SKU 由后端自动生成</span>
                   </div>
-                  
-                  {/* SKU 编码 */}
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">SKU 编码</label>
-                    <input
-                      type="text"
-                      value={sku.sku}
-                      onChange={(e) => updateSku(index, 'sku', e.target.value)}
-                      placeholder="例如：SKU-001"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  
-                  {/* 颜色 */}
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">颜色</label>
-                    <input
-                      type="text"
-                      value={sku.color || ''}
-                      onChange={(e) => updateSku(index, 'color', e.target.value)}
-                      placeholder="例如：Black"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                    />
-                  </div>
-                  
-                  {/* 库存 */}
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">库存</label>
-                    <input
-                      type="number"
-                      value={sku.stock}
-                      onChange={(e) => updateSku(index, 'stock', parseInt(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                    />
-                  </div>
-                  
-                  {/* 删除按钮 */}
-                  <button
-                    type="button"
-                    onClick={() => removeSku(index)}
-                    className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                  >
-                    删除
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-              <p className="text-gray-500">暂无 SKU</p>
-              <p className="text-xs text-gray-400 mt-1">点击上方按钮添加 SKU</p>
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -480,6 +480,7 @@ export default function NewProductPage() {
               </button>
             ))}
           </div>
+
           
           {selectedColors.length > 0 && (
             <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">

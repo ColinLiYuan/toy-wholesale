@@ -50,6 +50,7 @@ export const categories: CategoryItem[] = [
     priority: 0.8,
     children: [
       { name: 'Wand Vibrators', slug: 'wand-vibrators' },
+      { name: 'G-Spot Vibrators', slug: 'g-spot-vibrators' },
       { name: 'App-Controlled Toys', slug: 'app-controlled' }
     ]
   },
