@@ -58,7 +58,8 @@ function FaqPageJsonLd({ content }: { content: string; slug: string }) {
   if (!content) return null;
 
   // Match FAQ blocks: **Q: question?** followed by A: answer
-  const faqRegex = /\*\*Q:\s+(.+?)\*\*\s*\n\s*A:\s*(.+?)(?=\n\n|\n\*\*Q:|\n---|\n##|$)/gs;
+  // Use [\s\S] instead of . with /s flag for es2018 compatibility
+  const faqRegex = /\*\*Q:\s+(.+?)\*\*[\s]*\n[\s]*A:\s*([\s\S]+?)(?=\n\n|\n\*\*Q:|\n---|\n##|$)/g;
   const qaPairs: { question: string; answer: string }[] = [];
   let match;
   while ((match = faqRegex.exec(content)) !== null) {
@@ -66,17 +67,6 @@ function FaqPageJsonLd({ content }: { content: string; slug: string }) {
       question: match[1].trim(),
       answer: match[2].trim().replace(/\n/g, ' '),
     });
-  }
-
-  // Also try alternate format with multi-line answers
-  if (qaPairs.length === 0) {
-    const altRegex = /\*\*Q:\s+(.+?)\*\*\s*\n\s*(A:\s*)?([\s\S]+?)(?=\n\*\*Q:|\n##\s|\n---\s|$)/g;
-    while ((match = altRegex.exec(content)) !== null) {
-      const answer = (match[3] || '').trim().replace(/\n/g, ' ').substring(0, 300);
-      if (answer) {
-        qaPairs.push({ question: match[1].trim(), answer });
-      }
-    }
   }
 
   if (qaPairs.length === 0) return null;
