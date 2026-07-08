@@ -178,17 +178,9 @@ export default function HomePageClient({
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
                     />
-                    {product.tags && (() => {
-                      try {
-                        const tagList = Array.isArray(product.tags) ? product.tags : JSON.parse(product.tags as string);
-                        const firstTag = tagList[0];
-                        return firstTag ? (
-                          <div className="absolute top-3 left-3 px-2.5 py-1 bg-brand text-white text-xs font-semibold rounded-md shadow">
-                            {firstTag}
-                          </div>
-                        ) : null;
-                      } catch { return null; }
-                    })()}
+                    <div className="absolute top-3 left-3 px-2.5 py-1 bg-brand text-white text-xs font-semibold rounded-md shadow">
+                      HOT
+                    </div>
                   </div>
                   <div className="p-5">
                     <h3 className="text-sm font-semibold text-text-primary mb-2 group-hover:text-brand transition-colors line-clamp-2 leading-snug">

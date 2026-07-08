@@ -75,19 +75,23 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
     return product.shortDescription.split(';').filter(f => f.trim()).slice(0, 5);
   })();
 
-  // 解析Tags为数组
+  // 内部管理标签（首页推荐/新品等），详情页不展示
+  const internalTags = ['首页推荐', '新品', 'hot', 'new', 'featured'];
+
+  // 解析Tags为数组，过滤掉内部管理标签
   const tags = (() => {
     if (!product?.tags) return [];
-    if (Array.isArray(product.tags)) return product.tags;
-    if (typeof product.tags === 'string') {
+    let raw: string[] = [];
+    if (Array.isArray(product.tags)) raw = product.tags;
+    else if (typeof product.tags === 'string') {
       try {
         const parsed = JSON.parse(product.tags);
-        return Array.isArray(parsed) ? parsed : [];
+        raw = Array.isArray(parsed) ? parsed : [];
       } catch {
         return [];
       }
     }
-    return [];
+    return raw.filter(t => !internalTags.includes(t));
   })();
 
   // 解析Features对象
