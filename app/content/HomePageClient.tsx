@@ -175,7 +175,7 @@ export default function HomePageClient({
                     <img
                       src={productImageUrl(product)}
                       alt={product.alt || product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
                     />
                     <div className="absolute top-3 left-3 px-2.5 py-1 bg-brand text-white text-xs font-semibold rounded-md shadow">
@@ -244,7 +244,7 @@ export default function HomePageClient({
                     <img
                       src={productImageUrl(product)}
                       alt={product.alt || product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
                     />
                     <div className="absolute top-3 left-3 px-2.5 py-1 bg-accent-green text-white text-xs font-semibold rounded-md shadow">
