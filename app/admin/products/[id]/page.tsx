@@ -360,6 +360,32 @@ export default function EditProductPage() {
     }
   };
 
+  const moveGallery = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= galleries.length) return;
+
+    const current = galleries[index];
+    const target = galleries[targetIndex];
+    if (!current.id || !target.id) return;
+
+    const currentOrder = current.sortOrder;
+    const targetOrder = target.sortOrder;
+
+    try {
+      await Promise.all([
+        galleryAdminService.updateSortOrder(current.id, targetOrder),
+        galleryAdminService.updateSortOrder(target.id, currentOrder),
+      ]);
+      const newGalleries = [...galleries];
+      [newGalleries[index], newGalleries[targetIndex]] = [newGalleries[targetIndex], newGalleries[index]];
+      newGalleries[index].sortOrder = targetOrder;
+      newGalleries[targetIndex].sortOrder = currentOrder;
+      setGalleries(newGalleries);
+    } catch (error) {
+      console.error('Failed to reorder gallery:', error);
+    }
+  };
+
   const setAsPrimary = async (gallery: Gallery) => {
     if (!gallery.id) return;
     
@@ -1066,8 +1092,29 @@ export default function EditProductPage() {
                       主图
                     </div>
                   )}
+                  {/* 排序按钮（始终可见） */}
+                  {idx > 0 && (
+                    <button type="button" onClick={() => moveGallery(idx, 'up')}
+                      className="absolute top-1 left-1 px-2 py-0.5 bg-gray-800 text-white text-xs rounded opacity-60 hover:opacity-100">↑</button>
+                  )}
+                  {idx < galleries.length - 1 && (
+                    <button type="button" onClick={() => moveGallery(idx, 'down')}
+                      className="absolute bottom-1 left-1 px-2 py-0.5 bg-gray-800 text-white text-xs rounded opacity-60 hover:opacity-100">↓</button>
+                  )}
                   {/* 操作按钮 */}
                   <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2 rounded-lg">
+                    <button
+                      type="button"
+                      onClick={() => moveGallery(idx, 'up')}
+                      disabled={idx === 0}
+                      className="px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-500 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >↑</button>
+                    <button
+                      type="button"
+                      onClick={() => moveGallery(idx, 'down')}
+                      disabled={idx === galleries.length - 1}
+                      className="px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-500 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >↓</button>
                     {!gallery.isPrimary && (
                       <button
                         type="button"
