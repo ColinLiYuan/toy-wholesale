@@ -73,7 +73,7 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
     : [];
 
   return (
-    <div className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+    <div className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col">
       {product.badge && (
         <div className="absolute top-4 left-4 z-10">
           <span className="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand text-white shadow-md">
@@ -90,7 +90,7 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
         />
       </Link>
 
-      <div className="p-6 space-y-4">
+      <div className="p-6 space-y-4 flex flex-col flex-1">
         <Link href={`/products/${product.slug}`} className="block">
           <h3 className="text-lg font-bold text-text-primary group-hover:text-brand transition-colors leading-tight">
             {product.title}
@@ -138,7 +138,7 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
           </div>
         )}
 
-        <div className="pt-4 border-t border-gray-100">
+        <div className="mt-auto pt-4 border-t border-gray-100">
           {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 0 && (
             <div className="flex items-center gap-2 mb-3">
               <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
@@ -149,14 +149,14 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
               </p>
             </div>
           )}
-        </div>
 
-        <button
-          onClick={handleAddToInquiry}
-          className="block w-full py-3 text-white font-semibold text-center transition-colors duration-200 bg-brand hover:bg-brand-hover rounded-lg"
-        >
-          Add to Inquiry
-        </button>
+          <button
+            onClick={handleAddToInquiry}
+            className="block w-full py-3 text-white font-semibold text-center transition-colors duration-200 bg-brand hover:bg-brand-hover rounded-lg"
+          >
+            Add to Inquiry
+          </button>
+        </div>
       </div>
     </div>
   );
