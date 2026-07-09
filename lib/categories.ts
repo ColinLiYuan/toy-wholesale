@@ -41,7 +41,8 @@ export const categories: CategoryItem[] = [
     children: [
       { name: 'Manual Strokers', slug: 'manual-strokers' },
       { name: 'Automatic Cup Series', slug: 'automatic-cups' },
-      { name: 'Prostate Massagers', slug: 'prostate-massagers' }
+      { name: 'Prostate Massagers', slug: 'prostate-massagers' },
+      { name: 'Stamina Trainers', slug: 'stamina-trainers' }
     ]
   },
   {
@@ -52,14 +53,28 @@ export const categories: CategoryItem[] = [
       { name: 'Wand Vibrators', slug: 'wand-vibrators' },
       { name: 'G-Spot Vibrators', slug: 'g-spot-vibrators' },
       { name: 'Rabbit Vibrators', slug: 'rabbit-vibrators' },
+      { name: 'Clitoral Stimulators', slug: 'clitoral-stimulators' },
       { name: 'Bullet Vibrators', slug: 'bullet-vibrators' },
       { name: 'App-Controlled Toys', slug: 'app-controlled' }
     ]
   },
   {
+    name: 'Anal Toys',
+    slug: 'anal-toys',
+    priority: 0.75,
+    children: [
+      { name: 'Butt Plugs', slug: 'butt-plugs' },
+      { name: 'Anal Beads', slug: 'anal-beads' }
+    ]
+  },
+  {
     name: 'BDSM & Bondage', // 原有分类保留，优先级放后
     slug: 'bdsm-bondage',
-    priority: 0.7
+    priority: 0.7,
+    children: [
+      { name: 'Restraints', slug: 'restraints' },
+      { name: 'Impact Play', slug: 'impact-play' }
+    ]
   }
 ];
 
