@@ -16,6 +16,7 @@ export interface Supplier {
   contactPerson?: string;
   phone?: string;
   address?: string;
+  country?: string;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -670,6 +671,43 @@ export interface Quotation {
 // 报价单列表响应
 export interface QuotationListResponse {
   content: Quotation[];
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  first: boolean;
+  last: boolean;
+}
+
+// ==================== 访问记录相关类型 ====================
+
+// 访问记录类型
+export interface VisitRecord {
+  id?: number;
+  siteId?: string;
+  visitType: 'SUPPLIER_VISIT' | 'CUSTOMER_VISIT';
+  supplierId?: number;
+  supplier?: { id: number; name: string };
+  distributorId?: number;
+  distributor?: { id: number; name: string; country?: string };
+  visitedPerson?: string;
+  visitedPosition?: string;
+  visitedContact?: string;
+  visitDate?: string;
+  location?: string;
+  purpose?: string;
+  summary?: string;
+  nextAction?: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// 访问记录列表响应
+export interface VisitRecordListResponse {
+  content: VisitRecord[];
   currentPage: number;
   pageSize: number;
   totalElements: number;

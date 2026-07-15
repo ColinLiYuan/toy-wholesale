@@ -1,6 +1,6 @@
 import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api-config';
-import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, OperationAccount, OperationAccountListResponse, Inquiry, InquiryItem, Admin } from '@/types';
+import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, OperationAccount, OperationAccountListResponse, Inquiry, InquiryItem, Admin, VisitRecord, VisitRecordListResponse } from '@/types';
 
 // 防伪验证服务
 export const antiCounterfeitService = {
@@ -50,6 +50,106 @@ function getFallbackSuppliers(): Supplier[] {
     { id: 3, name: 'Direct Manufacturer C', code: 'DM', internalCode: 'DM', isActive: true },
   ];
 }
+
+// 供应商管理服务（后台管理接口）
+export const supplierAdminService = {
+  // 获取所有供应商（分页）- GET /v1/suppliers
+  async getAllSuppliers(page: number = 0, size: number = 20): Promise<{ content: Supplier[]; totalElements: number; totalPages: number; currentPage: number }> {
+    try {
+      const apiResult: ApiResult<any> = await apiClient.get(
+        '/v1/suppliers',
+        { params: { page, size } }
+      );
+
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to fetch suppliers');
+      }
+
+      const data = apiResult.data;
+      return {
+        content: data.content || [],
+        totalElements: data.totalElements || 0,
+        totalPages: data.totalPages || 0,
+        currentPage: data.number || data.currentPage || 0,
+      };
+    } catch (error) {
+      console.error('Failed to fetch suppliers:', error);
+      throw error;
+    }
+  },
+
+  // 根据ID获取供应商详情 - GET /v1/suppliers/{id}
+  async getSupplierById(id: number): Promise<Supplier> {
+    try {
+      const apiResult: ApiResult<Supplier> = await apiClient.get(
+        `/v1/suppliers/${id}`
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch supplier');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch supplier:', error);
+      throw error;
+    }
+  },
+
+  // 创建供应商 - POST /v1/suppliers
+  async createSupplier(data: Partial<Supplier>): Promise<Supplier> {
+    try {
+      const apiResult: ApiResult<Supplier> = await apiClient.post(
+        '/v1/suppliers',
+        data
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create supplier');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create supplier:', error);
+      throw error;
+    }
+  },
+
+  // 更新供应商 - PUT /v1/suppliers/{id}
+  async updateSupplier(id: number, data: Partial<Supplier>): Promise<Supplier> {
+    try {
+      const apiResult: ApiResult<Supplier> = await apiClient.put(
+        `/v1/suppliers/${id}`,
+        data
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update supplier');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update supplier:', error);
+      throw error;
+    }
+  },
+
+  // 删除供应商 - DELETE /v1/suppliers/{id}
+  async deleteSupplier(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/suppliers/${id}`
+      );
+
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete supplier');
+      }
+    } catch (error) {
+      console.error('Failed to delete supplier:', error);
+      throw error;
+    }
+  },
+};
 
 // 认证服务
 export const authService = {
@@ -3212,6 +3312,104 @@ export const quotationAdminService = {
   },
 };
 
+// ==================== 访问记录管理服务 ====================
+
+export const visitRecordAdminService = {
+  // 获取所有访问记录（分页）- GET /v1/visit-records
+  async getAllVisitRecords(page: number = 0, size: number = 20, visitType?: string): Promise<VisitRecordListResponse> {
+    try {
+      const params: Record<string, any> = { page, size };
+      if (visitType) params.visitType = visitType;
+
+      const apiResult: ApiResult<VisitRecordListResponse> = await apiClient.get(
+        '/v1/visit-records',
+        { params }
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch visit records');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch visit records:', error);
+      throw error;
+    }
+  },
+
+  // 根据ID获取访问记录详情 - GET /v1/visit-records/{id}
+  async getVisitRecordById(id: number): Promise<VisitRecord> {
+    try {
+      const apiResult: ApiResult<VisitRecord> = await apiClient.get(
+        `/v1/visit-records/${id}`
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to fetch visit record');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to fetch visit record:', error);
+      throw error;
+    }
+  },
+
+  // 创建访问记录 - POST /v1/visit-records
+  async createVisitRecord(data: Partial<VisitRecord>): Promise<VisitRecord> {
+    try {
+      const apiResult: ApiResult<VisitRecord> = await apiClient.post(
+        '/v1/visit-records',
+        data
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to create visit record');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to create visit record:', error);
+      throw error;
+    }
+  },
+
+  // 更新访问记录 - PUT /v1/visit-records/{id}
+  async updateVisitRecord(id: number, data: Partial<VisitRecord>): Promise<VisitRecord> {
+    try {
+      const apiResult: ApiResult<VisitRecord> = await apiClient.put(
+        `/v1/visit-records/${id}`,
+        data
+      );
+
+      if (apiResult.code !== 200 || !apiResult.data) {
+        throw new Error(apiResult.message || 'Failed to update visit record');
+      }
+
+      return apiResult.data;
+    } catch (error) {
+      console.error('Failed to update visit record:', error);
+      throw error;
+    }
+  },
+
+  // 删除访问记录 - DELETE /v1/visit-records/{id}
+  async deleteVisitRecord(id: number): Promise<void> {
+    try {
+      const apiResult: ApiResult<void> = await apiClient.delete(
+        `/v1/visit-records/${id}`
+      );
+
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to delete visit record');
+      }
+    } catch (error) {
+      console.error('Failed to delete visit record:', error);
+      throw error;
+    }
+  },
+};
+
 // 导出类型（方便其他模块使用）
 export type {
   Inquiry,
@@ -3226,7 +3424,9 @@ export type {
   SeoKeyword,
   Quotation,
   QuotationItem,
-  QuotationListResponse
+  QuotationListResponse,
+  VisitRecord,
+  VisitRecordListResponse
 } from '@/types';
 
 // 导出站点服务

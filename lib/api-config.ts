@@ -109,4 +109,18 @@ export const API_ENDPOINTS = {
   ADMIN_QUOTATION_SEND: '/v1/quotations',                // PATCH /v1/quotations/{id}/send
   ADMIN_QUOTATION_BY_NUMBER: '/v1/quotations/number',    // GET /v1/quotations/number/{number}
   ADMIN_QUOTATION_BY_DISTRIBUTOR: '/v1/quotations/distributor',  // GET /v1/quotations/distributor/{id}
+
+  // 供应商管理
+  ADMIN_SUPPLIERS: '/v1/suppliers',
+  ADMIN_SUPPLIER_DETAIL: '/v1/suppliers',
+  ADMIN_SUPPLIER_CREATE: '/v1/suppliers',
+  ADMIN_SUPPLIER_UPDATE: '/v1/suppliers',
+  ADMIN_SUPPLIER_DELETE: '/v1/suppliers',
+
+  // 访问记录管理
+  ADMIN_VISIT_RECORDS: '/v1/visit-records',
+  ADMIN_VISIT_RECORD_DETAIL: '/v1/visit-records',
+  ADMIN_VISIT_RECORD_CREATE: '/v1/visit-records',
+  ADMIN_VISIT_RECORD_UPDATE: '/v1/visit-records',
+  ADMIN_VISIT_RECORD_DELETE: '/v1/visit-records',
 } as const;

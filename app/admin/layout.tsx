@@ -32,6 +32,8 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
       { name: '产品管理', href: '/admin/products', icon: '📦' },
       { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
       { name: '潜客管理', href: '/admin/leads', icon: '👥' },
+      { name: '供应商管理', href: '/admin/suppliers', icon: '🏭' },
+      { name: '访问记录', href: '/admin/visit-records', icon: '📋' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
       { name: '报价单管理', href: '/admin/quotation', icon: '📄' },
@@ -97,6 +99,8 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
     menus: [
       { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
       { name: '潜客管理', href: '/admin/leads', icon: '👥' },
+      { name: '供应商管理', href: '/admin/suppliers', icon: '🏭' },
+      { name: '访问记录', href: '/admin/visit-records', icon: '📋' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
     ],
