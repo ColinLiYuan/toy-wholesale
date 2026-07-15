@@ -185,11 +185,6 @@ export default function NewOrderPage() {
       return;
     }
 
-    if (items.length === 0) {
-      alert('请至少添加一个产品');
-      return;
-    }
-
     if (!confirm('确定要创建订单吗？')) {
       return;
     }
