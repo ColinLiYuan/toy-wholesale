@@ -97,6 +97,7 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
     label: 'Seric',
     adminName: 'Seric Admin',
     menus: [
+      { name: '产品管理', href: '/admin/products', icon: '📦' },
       { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
       { name: '潜客管理', href: '/admin/leads', icon: '👥' },
       { name: '供应商管理', href: '/admin/suppliers', icon: '🏭' },

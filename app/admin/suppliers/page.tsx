@@ -141,11 +141,6 @@ export default function SuppliersPage() {
                           >
                             编辑
                           </Link>
-                          <button
-                            onClick={() => handleDelete(supplier.id)}
-                            className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
-                          >
-                            删除
                           </button>
                         </div>
                       </td>

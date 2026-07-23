@@ -2,12 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { productAdminService } from '@/services';
+import { productAdminService, skuPurchasePriceService } from '@/services';
+import { siteCan } from '@/lib/site-permissions';
 import type { Product } from '@/types';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  // 进价面板
+  const [pricePanel, setPricePanel] = useState<{ productId: number; productName: string; skus: any[]; prices: Record<number, any[]> } | null>(null);
+
+  const openPricePanel = async (productId: number, productName: string) => {
+    try {
+      const product = await productAdminService.getProductById(productId);
+      const skus = product.productSkus || [];
+      const priceMap: Record<number, any[]> = {};
+      await Promise.all(skus.filter((s: any) => s.id).map(async (s: any) => {
+        try { priceMap[s.id] = await skuPurchasePriceService.getBySkuId(s.id); } catch { priceMap[s.id] = []; }
+      }));
+      setPricePanel({ productId, productName, skus, prices: priceMap });
+    } catch { alert('加载进价失败'); }
+  };
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState(0);
@@ -68,12 +83,14 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-bold text-gray-900">产品管理</h1>
           <p className="text-gray-600 mt-1">管理所有产品信息</p>
         </div>
-        <Link
-          href="/admin/products/new"
-          className="px-6 py-3 bg-[#00F2FE] text-[#050505] rounded-lg font-semibold hover:bg-[#00C4CC] transition-colors"
-        >
-          ➕ 添加新产品
-        </Link>
+        {siteCan('products', 'create') && (
+          <Link
+            href="/admin/products/new"
+            className="px-6 py-3 bg-[#00F2FE] text-[#050505] rounded-lg font-semibold hover:bg-[#00C4CC] transition-colors"
+          >
+            ➕ 添加新产品
+          </Link>
+        )}
       </div>
 
       {/* 筛选和搜索 */}
@@ -165,24 +182,40 @@ export default function ProductsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
+                          {siteCan('products', 'toggle_status') && (
+                            <button
+                              onClick={() => handleToggleStatus(product.id, product.status)}
+                              className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-colors"
+                            >
+                              {product.status === 'ACTIVE' ? '下架' : '上架'}
+                            </button>
+                          )}
                           <button
-                            onClick={() => handleToggleStatus(product.id, product.status)}
-                            className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-colors"
+                            onClick={() => openPricePanel(product.id, product.name || product.title || '')}
+                            className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors"
                           >
-                            {product.status === 'ACTIVE' ? '下架' : '上架'}
+                            进价
                           </button>
+                          <Link
+                            href={`/admin/products/${product.id}`}
+                            className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+                          >
+                            查看
+                          </Link>
                           <Link
                             href={`/admin/products/${product.id}`}
                             className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
                           >
                             编辑
                           </Link>
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
-                          >
-                            删除
-                          </button>
+                          {siteCan('products', 'delete') && (
+                            <button
+                              onClick={() => handleDelete(product.id)}
+                              className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                            >
+                              删除
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -223,6 +256,55 @@ export default function ProductsPage() {
             )}
           </>
         )}
+
+      {/* 进价面板 */}
+      {pricePanel && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-black bg-opacity-40" onClick={() => setPricePanel(null)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold">{pricePanel.productName} — SKU进价</h2>
+              <button onClick={() => setPricePanel(null)} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
+            </div>
+            <div className="p-6">
+              {pricePanel.skus.length === 0 ? (
+                <p className="text-gray-500">暂无SKU</p>
+              ) : (
+                pricePanel.skus.map((sku: any) => (
+                  <div key={sku.id || sku.sku} className="mb-4 border rounded-lg">
+                    <div className="bg-gray-50 px-4 py-2 font-medium text-sm">
+                      {sku.sku || '未命名'} {sku.color ? `| ${sku.color}` : ''} | 库存: {sku.stock}
+                    </div>
+                    <div className="p-3">
+                      {(pricePanel.prices[sku.id] || []).length === 0 ? (
+                        <p className="text-gray-400 text-sm">暂无进价</p>
+                      ) : (
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-left text-xs text-gray-500">
+                              <th className="py-1">供应商</th><th className="py-1 text-right">进价</th><th className="py-1">币种</th><th className="py-1 text-right">MOQ</th><th className="py-1">备注</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {pricePanel.prices[sku.id].map((p: any) => (
+                              <tr key={p.id} className="border-t">
+                                <td className="py-1">{p.supplier?.name || '-'}</td>
+                                <td className="py-1 text-right font-medium">{p.purchasePrice?.toFixed(2)}</td>
+                                <td className="py-1">{p.currency || 'CNY'}</td>
+                                <td className="py-1 text-right">{p.moq || '-'}</td>
+                                <td className="py-1 text-gray-500">{p.notes || '-'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

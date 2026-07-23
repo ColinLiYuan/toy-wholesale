@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { productAdminService, galleryAdminService } from '@/services';
-import type { Product, Gallery, ProductSku, ProductSpecification } from '@/types';
+import { productAdminService, galleryAdminService, supplierService, skuPurchasePriceService } from '@/services';
+import type { Product, Gallery, ProductSku, ProductSpecification, Supplier } from '@/types';
 import CategorySelector from '@/components/CategorySelector';
 
 // 解析分类数据（支持 JSON 数组和斜杠分隔格式）
@@ -66,11 +66,71 @@ export default function EditProductPage() {
   // 分类选择状态（多选）
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+  // 供应商列表（用于进价管理）
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+
+  // SKU 进价管理
+  const [purchasePrices, setPurchasePrices] = useState<Record<number, any[]>>({});
+  const [expandedSkuId, setExpandedSkuId] = useState<number | null>(null);
+  const [showAddPriceForm, setShowAddPriceForm] = useState<number | null>(null);
+  const [editingPriceId, setEditingPriceId] = useState<number | null>(null);
+  const [selectedSkuIds, setSelectedSkuIds] = useState<Set<number>>(new Set());
+  const [batchForm, setBatchForm] = useState({
+    supplierId: 0,
+    purchasePrice: 0,
+    currency: 'CNY',
+    moq: 1,
+    notes: '',
+  });
+  const [newPriceForm, setNewPriceForm] = useState({
+    supplierId: 0,
+    purchasePrice: 0,
+    currency: 'CNY',
+    moq: 1,
+    notes: '',
+  });
+
   useEffect(() => {
     if (isEditing && productId !== 'new') {
       fetchProduct();
     }
   }, [productId, isEditing]);
+
+  // 加载供应商列表
+  useEffect(() => {
+    supplierService.getAllSuppliers().then(setSuppliers).catch(console.error);
+  }, []);
+
+  const loadSkuPurchasePrices = async (skuId: number) => {
+    try {
+      const prices = await skuPurchasePriceService.getBySkuId(skuId);
+      setPurchasePrices(prev => ({ ...prev, [skuId]: prices }));
+    } catch (error) {
+      console.error('Failed to load purchase prices for sku', skuId, error);
+    }
+  };
+
+  // 当 SKU 列表变化时，加载每个已保存 SKU 的进价
+  useEffect(() => {
+    if (skus.length > 0) {
+      skus.forEach((sku) => {
+        if (sku.id) {
+          loadSkuPurchasePrices(sku.id);
+        }
+      });
+    }
+  }, [skus]);
+
+  // 通过 ?tab=prices 参数自动展开所有SKU进价
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tab') === 'prices') {
+      setTimeout(() => {
+        skus.forEach((sku) => { if (sku.id) setExpandedSkuId(sku.id); });
+        document.getElementById('purchase-prices')?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
+  }, [skus]);
 
   const fetchProduct = async () => {
     try {
@@ -438,20 +498,11 @@ export default function EditProductPage() {
     setDraggedGalleryIndex(null);
   };
 
-  // 颜色选项（与新增页面一致）
-  const colorOptions = [
-    { value: 'BK', label: '黑色 (BK)' },
-    { value: 'WH', label: '白色 (WH)' },
-    { value: 'RD', label: '红色 (RD)' },
-    { value: 'PK', label: '粉色 (PK)' },
-    { value: 'PU', label: '紫色 (PU)' },
-    { value: 'BL', label: '蓝色 (BL)' },
-    { value: 'GN', label: '绿色 (GN)' },
-    { value: 'SK', label: '肤色 (SK)' },
-    { value: 'CL', label: '透明 (CL)' },
-  ];
+  // SKU管理（可编辑，支持进价管理）
 
-  // SKU管理（后端自动生成，无需手动输入）
+  const addSku = () => {
+    setSkus([...skus, { sku: '', color: '', stock: 0 }]);
+  };
 
   const removeSku = (index: number) => {
     setSkus(skus.filter((_, i) => i !== index));
@@ -469,6 +520,51 @@ export default function EditProductPage() {
     const updatedSkus = [...skus];
     [updatedSkus[index], updatedSkus[index + 1]] = [updatedSkus[index + 1], updatedSkus[index]];
     setSkus(updatedSkus);
+  };
+
+  // 进价管理辅助函数
+  const handleSavePrice = async (skuId: number) => {
+    if (!newPriceForm.supplierId || !newPriceForm.purchasePrice) {
+      alert('请填写供应商和采购价格');
+      return;
+    }
+    try {
+      if (editingPriceId) {
+        await skuPurchasePriceService.update(editingPriceId, {
+          purchasePrice: newPriceForm.purchasePrice,
+          currency: newPriceForm.currency,
+          moq: newPriceForm.moq,
+          notes: newPriceForm.notes || undefined,
+        });
+      } else {
+        await skuPurchasePriceService.create({
+          skuId,
+          supplierId: newPriceForm.supplierId,
+          purchasePrice: newPriceForm.purchasePrice,
+          currency: newPriceForm.currency,
+          moq: newPriceForm.moq,
+          notes: newPriceForm.notes || undefined,
+        });
+      }
+      setShowAddPriceForm(null);
+                                  setEditingPriceId(null);
+      setEditingPriceId(null);
+      setNewPriceForm({ supplierId: 0, purchasePrice: 0, currency: 'CNY', moq: 1, notes: '' });
+      await loadSkuPurchasePrices(skuId);
+    } catch (error) {
+      console.error('Failed to save purchase price:', error);
+      alert('保存进价失败');
+    }
+  };
+
+  const handleDeletePrice = async (priceId: number, skuId: number) => {
+    try {
+      await skuPurchasePriceService.delete(priceId);
+      await loadSkuPurchasePrices(skuId);
+    } catch (error) {
+      console.error('Failed to delete purchase price:', error);
+      alert('删除进价失败');
+    }
   };
 
   // 产品特性管理（JSON对象格式）
@@ -660,53 +756,387 @@ export default function EditProductPage() {
           />
         </div>
 
-        {/* SKU 管理（后端自动生成） */}
+        {/* SKU 管理（可编辑） */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">SKU 管理</h2>
-          <p className="text-sm text-gray-500 mb-4">选择颜色后，后端将自动生成 SKU 编码</p>
-
-          {/* 颜色选择器 */}
-          <div className="flex flex-wrap gap-3 mb-4">
-            {colorOptions.map((color) => {
-              const isSelected = skus.some(s => s.color === color.value);
-              return (
-                <button
-                  key={color.value}
-                  type="button"
-                  onClick={() => {
-                    if (isSelected) {
-                      setSkus(skus.filter(s => s.color !== color.value));
-                    } else {
-                      setSkus([...skus, { sku: '', color: color.value, stock: 0 }]);
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isSelected
-                      ? 'bg-[#00F2FE] text-[#050505]'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {color.label}
-                </button>
-              );
-            })}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">SKU 管理</h2>
+              <p className="text-sm text-gray-500 mt-1">编辑 SKU 编码、颜色和库存，或留空 SKU 编码让后端自动生成</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSkus([...skus, { sku: '', color: '', stock: 0 }])}
+              className="px-4 py-2 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors"
+            >
+              + 添加 SKU
+            </button>
           </div>
 
-          {/* 已选颜色的 SKU 列表（只读预览） */}
-          {skus.length > 0 && (
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xs font-semibold text-gray-600 mb-2">将自动生成以下 SKU：</p>
-              <div className="space-y-2">
-                {skus.map((sku, index) => (
-                  <div key={index} className="flex items-center justify-between text-sm">
-                    <span className="text-gray-700">颜色: <span className="font-semibold">{sku.color}</span></span>
-                    <span className="text-gray-500 text-xs font-mono">{sku.sku}</span>
+          {skus.length > 0 ? (
+            <div className="space-y-3">
+              {skus.map((sku, index) => (
+                <div key={index} className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  {/* SKU 编码 */}
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">SKU 编码</label>
+                    <input
+                      type="text"
+                      value={sku.sku}
+                      onChange={(e) => {
+                        const updated = [...skus];
+                        updated[index] = { ...updated[index], sku: e.target.value };
+                        setSkus(updated);
+                      }}
+                      placeholder="留空自动生成"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                    />
                   </div>
-                ))}
-              </div>
+                  {/* 颜色 */}
+                  <div className="w-28 flex-shrink-0">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">颜色</label>
+                    <input
+                      type="text"
+                      value={sku.color || ''}
+                      onChange={(e) => {
+                        const updated = [...skus];
+                        updated[index] = { ...updated[index], color: e.target.value };
+                        setSkus(updated);
+                      }}
+                      placeholder="可选"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                    />
+                  </div>
+                  {/* 库存 */}
+                  <div className="w-24 flex-shrink-0">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">库存</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={sku.stock}
+                      onChange={(e) => {
+                        const updated = [...skus];
+                        updated[index] = { ...updated[index], stock: parseInt(e.target.value) || 0 };
+                        setSkus(updated);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                    />
+                  </div>
+                  {/* 排序按钮 */}
+                  <div className="flex flex-col gap-1 mt-5">
+                    <button
+                      type="button"
+                      onClick={() => moveSkuUp(index)}
+                      disabled={index === 0}
+                      className="px-2 py-0.5 text-xs bg-gray-200 text-gray-600 rounded hover:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="上移"
+                    >↑</button>
+                    <button
+                      type="button"
+                      onClick={() => moveSkuDown(index)}
+                      disabled={index === skus.length - 1}
+                      className="px-2 py-0.5 text-xs bg-gray-200 text-gray-600 rounded hover:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="下移"
+                    >↓</button>
+                  </div>
+                  {/* 删除按钮 */}
+                  <button
+                    type="button"
+                    onClick={() => removeSku(index)}
+                    className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors mt-5 text-sm"
+                  >
+                    删除
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+              <p className="text-gray-500">暂无 SKU</p>
+              <p className="text-xs text-gray-400 mt-1">点击上方按钮添加 SKU</p>
             </div>
           )}
         </div>
+
+        {/* SKU 进价管理 */}
+        {skus.length > 0 && (
+          <div id="purchase-prices" className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">进价管理</h2>
+            <p className="text-sm text-gray-500 mb-4">为每个 SKU 设置不同供应商的采购价格</p>
+
+            {/* 批量修改 */}
+            {selectedSkuIds.size > 0 && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <span className="text-sm font-semibold text-yellow-800 mr-3">已选 {selectedSkuIds.size} 个 SKU</span>
+                <div className="inline-flex items-center gap-2 flex-wrap mt-2">
+                  <select value={batchForm.supplierId}
+                    onChange={(e) => setBatchForm({...batchForm, supplierId: parseInt(e.target.value) || 0})}
+                    className="px-2 py-1.5 border border-gray-300 rounded text-sm w-32">
+                    <option value={0}>供应商</option>
+                    {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                  <input type="number" step="0.01" value={batchForm.purchasePrice || ''}
+                    onChange={(e) => setBatchForm({...batchForm, purchasePrice: parseFloat(e.target.value) || 0})}
+                    placeholder="价格" className="px-2 py-1.5 border border-gray-300 rounded text-sm w-20" />
+                  <select value={batchForm.currency}
+                    onChange={(e) => setBatchForm({...batchForm, currency: e.target.value})}
+                    className="px-2 py-1.5 border border-gray-300 rounded text-sm">
+                    <option value="CNY">CNY</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
+                  <input type="number" value={batchForm.moq || ''}
+                    onChange={(e) => setBatchForm({...batchForm, moq: parseInt(e.target.value) || 1})}
+                    placeholder="MOQ" className="px-2 py-1.5 border border-gray-300 rounded text-sm w-16" />
+                  <button type="button"
+                    onClick={async () => {
+                      if (!batchForm.supplierId || !batchForm.purchasePrice) { alert('请选供应商和输入价格'); return; }
+                      try {
+                        await skuPurchasePriceService.batchUpdate({
+                          skuIds: Array.from(selectedSkuIds),
+                          supplierId: batchForm.supplierId,
+                          purchasePrice: batchForm.purchasePrice,
+                          currency: batchForm.currency,
+                          moq: batchForm.moq,
+                          notes: batchForm.notes,
+                        });
+                        alert(`已更新 ${selectedSkuIds.size} 个 SKU`);
+                        setSelectedSkuIds(new Set());
+                        Array.from(selectedSkuIds).forEach(sid => loadSkuPurchasePrices(sid));
+                      } catch(e: any) { alert('批量更新失败: ' + e.message); }
+                    }}
+                    className="px-3 py-1.5 bg-yellow-600 text-white rounded text-sm font-semibold hover:bg-yellow-700">应用</button>
+                  <button type="button"
+                    onClick={() => setSelectedSkuIds(new Set())}
+                    className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-600">取消</button>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {skus.map((sku, index) => {
+                const skuId = sku.id;
+                const isExpanded = expandedSkuId === skuId;
+                const prices = skuId ? (purchasePrices[skuId] || []) : [];
+
+                return (
+                  <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                    {/* SKU 标题栏 */}
+                    <div
+                      className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => {
+                        if (skuId) {
+                          setExpandedSkuId(isExpanded ? null : skuId);
+                          setShowAddPriceForm(null);
+                                  setEditingPriceId(null);
+                        }
+                      }}
+                    >
+                      <input type="checkbox"
+                        checked={skuId ? selectedSkuIds.has(skuId) : false}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => {
+                          if (!skuId) return;
+                          const next = new Set(selectedSkuIds);
+                          if (e.target.checked) next.add(skuId); else next.delete(skuId);
+                          setSelectedSkuIds(next);
+                        }}
+                        className="w-4 h-4 mr-2" />
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold text-gray-900">
+                          {sku.sku || `SKU #${index + 1}`}
+                        </span>
+                        {sku.color && (
+                          <span className="text-xs text-gray-500">颜色: {sku.color}</span>
+                        )}
+                        <span className="text-xs text-gray-400">库存: {sku.stock}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {skuId && prices.length > 0 && (
+                          <span className="text-xs text-gray-500">{prices.length} 条进价记录</span>
+                        )}
+                        <span className="text-gray-400 text-sm">{isExpanded ? '▲' : '▼'}</span>
+                      </div>
+                    </div>
+
+                    {/* 展开内容 */}
+                    {isExpanded && skuId && (
+                      <div className="p-4">
+                        {/* 现有进价记录 */}
+                        {prices.length > 0 ? (
+                          <div className="overflow-x-auto mb-4">
+                            <table className="w-full text-sm border border-gray-200 rounded-lg">
+                              <thead className="bg-gray-50">
+                                <tr>
+                                  <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">供应商</th>
+                                  <th className="text-right px-3 py-2 text-xs font-semibold text-gray-600">采购价</th>
+                                  <th className="text-center px-3 py-2 text-xs font-semibold text-gray-600">币种</th>
+                                  <th className="text-right px-3 py-2 text-xs font-semibold text-gray-600">MOQ</th>
+                                  <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">备注</th>
+                                  <th className="text-center px-3 py-2 text-xs font-semibold text-gray-600">状态</th>
+                                  <th className="text-center px-3 py-2 text-xs font-semibold text-gray-600">操作</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {prices.map((price: any) => (
+                                  <tr key={price.id} className="border-t border-gray-200 hover:bg-gray-50">
+                                    <td className="px-3 py-2 text-gray-700">
+                                      {price.supplier?.name || (suppliers.find(s => s.id === (price.supplier?.id || price.supplierId))?.name) || '-'}
+                                    </td>
+                                    <td className="px-3 py-2 text-right text-gray-900 font-medium">
+                                      {price.purchasePrice?.toFixed(2)}
+                                    </td>
+                                    <td className="px-3 py-2 text-center text-gray-600">
+                                      {price.currency || 'CNY'}
+                                    </td>
+                                    <td className="px-3 py-2 text-right text-gray-600">
+                                      {price.moq || '-'}
+                                    </td>
+                                    <td className="px-3 py-2 text-gray-500 text-xs max-w-[150px] truncate">
+                                      {price.notes || '-'}
+                                    </td>
+                                    <td className="px-3 py-2 text-center">
+                                      {price.isActive !== false ? (
+                                        <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">启用</span>
+                                      ) : (
+                                        <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full">停用</span>
+                                      )}
+                                    </td>
+                                    <td className="px-3 py-2 text-center space-x-1">
+                                      <button type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setNewPriceForm({
+                                            supplierId: price.supplier?.id || price.supplierId || 0,
+                                            purchasePrice: price.purchasePrice || 0,
+                                            currency: price.currency || 'CNY',
+                                            moq: price.moq || 1,
+                                            notes: price.notes || '',
+                                          });
+                                          setEditingPriceId(price.id);
+                                          setShowAddPriceForm(skuId);
+                                        }}
+                                        className="text-blue-500 hover:text-blue-700 text-xs font-medium">编辑</button>
+                                      <button type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (confirm('确定要删除这条进价记录吗？')) handleDeletePrice(price.id, skuId);
+                                        }}
+                                        className="text-red-500 hover:text-red-700 text-xs font-medium">删除</button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-400 mb-4">暂无进价记录</p>
+                        )}
+
+                        {/* 添加进价表单 */}
+                        {showAddPriceForm === skuId ? (
+                          <div className="p-4 border border-[#00F2FE] rounded-lg bg-gray-50">
+                            <h4 className="text-sm font-semibold text-gray-900 mb-3">添加进价记录</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                              <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">供应商 *</label>
+                                <select
+                                  value={newPriceForm.supplierId}
+                                  onChange={(e) => setNewPriceForm({ ...newPriceForm, supplierId: parseInt(e.target.value) || 0 })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                                >
+                                  <option value={0}>请选择供应商</option>
+                                  {suppliers.map((s) => (
+                                    <option key={s.id} value={s.id}>{s.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">采购价 *</label>
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  value={newPriceForm.purchasePrice || ''}
+                                  onChange={(e) => setNewPriceForm({ ...newPriceForm, purchasePrice: parseFloat(e.target.value) || 0 })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                                  placeholder="0.00"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">币种</label>
+                                <select
+                                  value={newPriceForm.currency}
+                                  onChange={(e) => setNewPriceForm({ ...newPriceForm, currency: e.target.value })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                                >
+                                  <option value="USD">USD</option>
+                                  <option value="CNY">CNY</option>
+                                  <option value="EUR">EUR</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">MOQ</label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={newPriceForm.moq || ''}
+                                  onChange={(e) => setNewPriceForm({ ...newPriceForm, moq: parseInt(e.target.value) || 1 })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                                />
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="block text-xs font-medium text-gray-600 mb-1">备注</label>
+                                <input
+                                  type="text"
+                                  value={newPriceForm.notes}
+                                  onChange={(e) => setNewPriceForm({ ...newPriceForm, notes: e.target.value })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                                  placeholder="可选备注"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleSavePrice(skuId)}
+                                disabled={!newPriceForm.supplierId || !newPriceForm.purchasePrice}
+                                className="px-4 py-1.5 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                保存
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setShowAddPriceForm(null);
+                                  setEditingPriceId(null);
+                                  setNewPriceForm({ supplierId: 0, purchasePrice: 0, currency: 'CNY', moq: 1, notes: '' }); setEditingPriceId(null);
+                                }}
+                                className="px-4 py-1.5 border border-gray-300 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors"
+                              >
+                                取消
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowAddPriceForm(skuId);
+                              setNewPriceForm({ supplierId: 0, purchasePrice: 0, currency: 'CNY', moq: 1, notes: '' }); setEditingPriceId(null);
+                            }}
+                            className="px-4 py-1.5 bg-[#00F2FE] text-[#050505] rounded-lg text-sm font-semibold hover:bg-[#00C4CC] transition-colors"
+                          >
+                            + 添加进价
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* 价格信息 */}
         <div className="bg-white rounded-xl shadow-sm p-6">

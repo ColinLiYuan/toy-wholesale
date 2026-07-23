@@ -24,17 +24,20 @@ export const supplierService = {
   // 获取所有活跃供应商 - GET /v1/suppliers
   async getAllSuppliers(): Promise<Supplier[]> {
     try {
-      const apiResult: ApiResult<Supplier[]> = await apiClient.get(
+      const apiResult: ApiResult<any> = await apiClient.get(
         '/v1/suppliers',
         { params: { isActive: true } }
       );
-      
+
       if (apiResult.code !== 200 || !apiResult.data) {
         console.warn('Supplier API returned error, using fallback data');
         return getFallbackSuppliers();
       }
-      
-      return apiResult.data || [];
+
+      // 兼容分页和普通列表两种返回格式
+      const data = apiResult.data;
+      if (data.content) return data.content;
+      return Array.isArray(data) ? data : [];
     } catch (error) {
       // API 尚未部署或网络错误，静默使用模拟数据
       return getFallbackSuppliers();
@@ -3409,6 +3412,35 @@ export const visitRecordAdminService = {
     }
   },
 };
+
+// ==================== SKU 采购价格管理服务 ====================
+
+export const skuPurchasePriceService = {
+  async getBySkuId(skuId: number): Promise<any[]> {
+    const res: ApiResult<any[]> = await apiClient.get(`/v1/sku-purchase-prices/sku/${skuId}`)
+    if (res.code !== 200) throw new Error(res.message || 'Failed')
+    return res.data
+  },
+  async batchUpdate(data: {skuIds: number[], supplierId: number, purchasePrice: number, currency?: string, moq?: number, notes?: string}): Promise<any> {
+    const res: ApiResult<any> = await apiClient.post('/v1/sku-purchase-prices/batch', data)
+    if (res.code !== 200) throw new Error(res.message || 'Failed')
+    return res.data
+  },
+  async create(data: {skuId: number, supplierId: number, purchasePrice: number, currency?: string, moq?: number, validFrom?: string, validUntil?: string, notes?: string}): Promise<any> {
+    const res: ApiResult<any> = await apiClient.post('/v1/sku-purchase-prices', data)
+    if (res.code !== 200) throw new Error(res.message || 'Failed')
+    return res.data
+  },
+  async update(id: number, data: any): Promise<any> {
+    const res: ApiResult<any> = await apiClient.put(`/v1/sku-purchase-prices/${id}`, data)
+    if (res.code !== 200) throw new Error(res.message || 'Failed')
+    return res.data
+  },
+  async delete(id: number): Promise<void> {
+    const res: ApiResult<void> = await apiClient.delete(`/v1/sku-purchase-prices/${id}`)
+    if (res.code !== 200) throw new Error(res.message || 'Failed')
+  },
+}
 
 // 导出类型（方便其他模块使用）
 export type {

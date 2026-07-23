@@ -297,11 +297,6 @@ export default function DistributorsPage() {
                           >
                             查看
                           </Link>
-                          <button
-                            onClick={() => handleDelete(distributor.id!, distributor.name)}
-                            className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                          >
-                            删除
                           </button>
                         </div>
                       </td>

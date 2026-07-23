@@ -8,13 +8,14 @@ import type { Inquiry } from '@/types';
 import CountrySelect from '@/components/CountrySelect';
 
 const sourceOptions = [
-  { value: 'WEBSITE', label: '网站询盘' },
-  { value: 'EMAIL', label: '邮件开发' },
-  { value: 'EXHIBITION', label: '展会' },
-  { value: 'REFERRAL', label: '推荐' },
-  { value: 'COLD_CALL', label: '电话开发' },
-  { value: 'MYTH_TOY', label: 'MythToy' },
+  { value: 'WEBSITE_FORM', label: '网站表单' },
+  { value: 'EMAIL', label: '邮件' },
+  { value: 'ALIBABA', label: '阿里巴巴' },
+  { value: 'WHATSAPP', label: 'WhatsApp' },
+  { value: 'TRADE_SHOW', label: '展会' },
+  { value: 'MYTH_TOY', label: 'MythToy转移' },
   { value: 'MADE_IN_CHINA', label: '中国制造网' },
+  { value: 'OTHER', label: '其他' },
 ];
 
 export default function EditInquiryPage() {

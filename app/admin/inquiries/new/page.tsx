@@ -23,6 +23,7 @@ export default function NewInquiryPage() {
     { value: 'TRADE_SHOW', label: '展会' },
     { value: 'MYTH_TOY', label: 'MythToy转移' },
     { value: 'MADE_IN_CHINA', label: '中国制造网' },
+    { value: 'OTHER', label: '其他' },
   ];
 
   // 根据站点筛选来源选项
