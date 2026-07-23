@@ -297,7 +297,6 @@ export default function DistributorsPage() {
                           >
                             查看
                           </Link>
-                          </button>
                         </div>
                       </td>
                     </tr>

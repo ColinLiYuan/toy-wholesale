@@ -141,7 +141,6 @@ export default function SuppliersPage() {
                           >
                             编辑
                           </Link>
-                          </button>
                         </div>
                       </td>
                     </tr>
