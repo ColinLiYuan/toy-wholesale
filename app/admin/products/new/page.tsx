@@ -104,12 +104,16 @@ export default function NewProductPage() {
     { value: 'CL', label: '透明' },
   ];
 
+  const addSku = () => {
+    setSkus([...skus, { sku: '', color: '', image: '', stock: 0, weightWithBox: '' } as any]);
+  };
+
   const handleColorToggle = (colorCode: string) => {
     const existing = skus.findIndex(s => (s as any).colorCode === colorCode);
     if (existing >= 0) {
       setSkus(skus.filter((_, i) => i !== existing));
     } else {
-      setSkus([...skus, { sku: '', color: colorCode, image: '', stock: 0, colorCode } as any]);
+      setSkus([...skus, { sku: '', color: colorCode, image: '', stock: 0, weightWithBox: '', colorCode } as any]);
     }
   };
   const removeSku = (index: number) => {
@@ -324,6 +328,7 @@ export default function NewProductPage() {
           color: s.color || s.colorCode || '',
           image: s.image || '',
           stock: s.stock || 0,
+          weightWithBox: s.weightWithBox || null,
         }));
       }
       
@@ -455,7 +460,11 @@ export default function NewProductPage() {
 
         {/* SKU 管理 */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <p className="text-sm text-gray-500 mb-4">选择颜色后自动生成 SKU 行，可手动修改编码</p>
+          <div className="flex items-center gap-4 mb-4">
+            <p className="text-sm text-gray-500">选择颜色自动生成，或手动添加</p>
+            <button type="button" onClick={addSku}
+              className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">+ 添加SKU</button>
+          </div>
           <div className="flex flex-wrap gap-2 mb-4">
             {colorOptions.map((c) => {
               const selected = skus.some((s: any) => (s.colorCode || s.color) === c.value);
@@ -483,7 +492,11 @@ export default function NewProductPage() {
                   <input type="number" value={sku.stock || 0}
                     onChange={(e) => updateSku(index, 'stock', parseInt(e.target.value) || 0)}
                     placeholder="库存"
-                    className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                    className="w-16 px-2 py-2 border border-gray-300 rounded-lg text-sm" />
+                  <input type="text" value={(sku as any).weightWithBox || ''}
+                    onChange={(e) => updateSku(index, 'weightWithBox', e.target.value)}
+                    placeholder="重量(kg)"
+                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm" />
                   <button type="button" onClick={() => removeSku(index)}
                     className="px-2 py-2 text-red-600 hover:text-red-900">删除</button>
                 </div>
