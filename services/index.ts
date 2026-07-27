@@ -2124,6 +2124,7 @@ export interface Attachment {
   fileExtension: string;
   description?: string;
   uploadBy?: string;
+  bizType?: string;
   createdAt: string;
 }
 
@@ -2131,10 +2132,10 @@ export interface Attachment {
 export type OrderStatus = 'CREATED' | 'CONFIRMED' | 'PRODUCING' | 'READY_TO_SHIP' | 'SHIPPED' | 'DELIVERED' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
 
 // 支付状态
-export type PaymentStatus = 'PENDING' | 'PAID' | 'PARTIAL' | 'REFUNDED' | 'FAILED';
+export type PaymentStatus = 'PENDING' | 'PAID' | 'PARTIALLY_PAID' | 'REFUNDED' | 'FAILED';
 
 // 物流状态
-export type ShippingStatus = 'NOT_SHIPPED' | 'SHIPPING' | 'SHIPPED' | 'DELIVERED' | 'RETURNED';
+export type ShippingStatus = 'NOT_SHIPPED' | 'IN_TRANSIT' | 'SHIPPED' | 'DELIVERED' | 'RETURNED';
 
 // 订单项
 export interface OrderItem {
@@ -2251,7 +2252,8 @@ export const attachmentService = {
     entityType: 'INQUIRY' | 'LEAD' | 'SUPPLIER' | 'ORDER',
     entityId: number,
     description?: string,
-    uploadBy?: string
+    uploadBy?: string,
+    bizType?: string
   ): Promise<Attachment> {
     try {
       const formData = new FormData();
@@ -2260,6 +2262,7 @@ export const attachmentService = {
       formData.append('entityId', String(entityId));
       if (description) formData.append('description', description);
       if (uploadBy) formData.append('uploadBy', uploadBy);
+      if (bizType) formData.append('bizType', bizType);
 
       const apiResult: ApiResult<Attachment> = await apiClient.post(
         '/v1/attachments/upload',
@@ -2528,16 +2531,51 @@ export const salesOrderService = {
         null,
         { params: { status } }
       );
-      
       if (apiResult.code !== 200 || !apiResult.data) {
         throw new Error(apiResult.message || 'Failed to update order status');
       }
-      
       return apiResult.data;
     } catch (error) {
       console.error('Failed to update order status:', error);
       throw error;
     }
+  },
+
+  async updatePaymentStatus(id: number, status: string): Promise<SalesOrder> {
+    try {
+      const apiResult: ApiResult<SalesOrder> = await apiClient.patch(
+        `/v1/sales-orders/${id}/payment-status`,
+        null,
+        { params: { status } }
+      );
+      if (apiResult.code !== 200 || !apiResult.data) throw new Error(apiResult.message || 'Failed');
+      return apiResult.data;
+    } catch (error) { console.error(error); throw error; }
+  },
+
+  async updateShippingStatus(id: number, status: string): Promise<SalesOrder> {
+    try {
+      const apiResult: ApiResult<SalesOrder> = await apiClient.patch(
+        `/v1/sales-orders/${id}/shipping-status`, null, { params: { status } }
+      );
+      if (apiResult.code !== 200 || !apiResult.data) throw new Error(apiResult.message || 'Failed');
+      return apiResult.data;
+    } catch (error) { console.error(error); throw error; }
+  },
+
+  async updateProductionInfo(id: number, productionCompleteDate?: string, alertBeforeDays?: number): Promise<SalesOrder> {
+    try {
+      const params: any = {};
+      if (productionCompleteDate) params.productionCompleteDate = productionCompleteDate;
+      if (alertBeforeDays !== undefined) params.alertBeforeDays = alertBeforeDays;
+      const apiResult: ApiResult<SalesOrder> = await apiClient.patch(
+        `/v1/sales-orders/${id}/production-info`,
+        null,
+        { params }
+      );
+      if (apiResult.code !== 200 || !apiResult.data) throw new Error(apiResult.message || 'Failed');
+      return apiResult.data;
+    } catch (error) { console.error(error); throw error; }
   },
 
   // 添加支付记录 - POST /api/v1/sales-orders/{id}/payments

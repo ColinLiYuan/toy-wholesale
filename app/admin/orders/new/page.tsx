@@ -26,6 +26,9 @@ export default function NewOrderPage() {
     shippingCity: '',
     shippingRegion: '',
     shippingCountry: '',
+    purchaseDate: '',
+    productionCompleteDate: '',
+    alertBeforeDays: 3,
     shippingZipCode: '',
     notes: '',
     internalNotes: '',
@@ -319,6 +322,32 @@ export default function NewOrderPage() {
                 onChange={(e) => setFormData({ ...formData, shippingZipCode: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="邮编"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">采购日期</label>
+              <input type="date"
+                value={formData.purchaseDate || ''}
+                onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">预计生产完成</label>
+              <input
+                type="date"
+                value={formData.productionCompleteDate || ''}
+                onChange={(e) => setFormData({ ...formData, productionCompleteDate: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">告警提前天数</label>
+              <input
+                type="number"
+                value={formData.alertBeforeDays || ''}
+                onChange={(e) => setFormData({ ...formData, alertBeforeDays: parseInt(e.target.value) || 3 })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="默认3天"
               />
             </div>
           </div>

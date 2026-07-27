@@ -14,6 +14,14 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
   const [uploading, setUploading] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [attachmentDescription, setAttachmentDescription] = useState('');
+  const [bizType, setBizType] = useState('');
+
+  const bizTypeOptions = entityType === 'ORDER' ? [
+    { value: '', label: '-- 业务类型 --' },
+    { value: 'PI', label: 'PI (形式发票)' },
+    { value: '采购单', label: '采购单' },
+    { value: '付款水单', label: '付款水单' },
+  ] : [];
 
   useEffect(() => {
     fetchAttachments();
@@ -40,7 +48,9 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
           file,
           entityType,
           entityId,
-          attachmentDescription || undefined
+          attachmentDescription || undefined,
+          undefined, // uploadBy
+          entityType === 'ORDER' ? bizType || undefined : undefined
         );
       }
       setShowUploadForm(false);
@@ -101,6 +111,15 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
               placeholder="请输入附件描述..."
             />
           </div>
+          {entityType === 'ORDER' && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">业务类型</label>
+              <select value={bizType} onChange={(e) => setBizType(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent">
+                {bizTypeOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </select>
+            </div>
+          )}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">选择文件</label>
             <input
@@ -142,6 +161,7 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
               <div className="flex items-center space-x-4 text-xs text-gray-500">
                 <span>{formatFileSize(attachment.fileSize)}</span>
                 <span>{attachment.fileExtension.toUpperCase()}</span>
+                {attachment.bizType && <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">{attachment.bizType}</span>}
                 <span>{new Date(attachment.createdAt).toLocaleString('zh-CN')}</span>
                 {attachment.uploadBy && <span>上传者：{attachment.uploadBy}</span>}
               </div>

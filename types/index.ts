@@ -466,14 +466,14 @@ export type OrderStatus =
 export type PaymentStatus = 
   | 'PENDING'    // 待支付
   | 'PAID'       // 已支付
-  | 'PARTIAL'    // 部分支付
+  | 'PARTIALLY_PAID'    // 部分支付
   | 'REFUNDED'   // 已退款
   | 'FAILED';    // 支付失败
 
 // 物流状态枚举
 export type ShippingStatus = 
   | 'NOT_SHIPPED'  // 未发货
-  | 'SHIPPING'     // 运输中
+  | 'IN_TRANSIT'     // 运输中
   | 'SHIPPED'      // 已发货
   | 'DELIVERED'    // 已送达
   | 'RETURNED';    // 已退回
@@ -550,6 +550,10 @@ export interface SalesOrder {
   completedAt?: string;
   cancelledAt?: string;
   cancelReason?: string;
+  purchaseDate?: string;
+  productionCompleteDate?: string;
+  alertBeforeDays?: number;
+  alertSent?: boolean;
   notes?: string;
   internalNotes?: string;
   inquiryOrderId?: number;

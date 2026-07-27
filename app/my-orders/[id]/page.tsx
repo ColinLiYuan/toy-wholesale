@@ -90,14 +90,14 @@ const STATUS_LABELS: Record<string, string> = {
 const PAYMENT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   PENDING: { label: 'Pending', color: 'bg-orange-100 text-orange-700' },
   PAID: { label: 'Paid', color: 'bg-green-100 text-green-700' },
-  PARTIAL: { label: 'Partial', color: 'bg-blue-100 text-blue-700' },
+  PARTIALLY_PAID: { label: 'Partial', color: 'bg-blue-100 text-blue-700' },
   REFUNDED: { label: 'Refunded', color: 'bg-gray-100 text-gray-700' },
   FAILED: { label: 'Failed', color: 'bg-red-100 text-red-700' },
 };
 
-const SHIPPING_STATUS_LABELS: Record<string, { label: string; color: string }> = {
+const IN_TRANSIT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   NOT_SHIPPED: { label: 'Not Shipped', color: 'bg-gray-100 text-gray-600' },
-  SHIPPING: { label: 'In Transit', color: 'bg-blue-100 text-blue-700' },
+  IN_TRANSIT: { label: 'In Transit', color: 'bg-blue-100 text-blue-700' },
   SHIPPED: { label: 'Shipped', color: 'bg-green-100 text-green-700' },
   DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700' },
   RETURNED: { label: 'Returned', color: 'bg-red-100 text-red-700' },
@@ -331,8 +331,8 @@ export default function OrderDetailPage() {
               <h2 className="text-sm font-semibold text-text-primary mb-4 uppercase tracking-wide">Shipping</h2>
               {order.shippingStatus && (
                 <div className="mb-3">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${SHIPPING_STATUS_LABELS[order.shippingStatus]?.color || 'bg-gray-100 text-gray-600'}`}>
-                    {SHIPPING_STATUS_LABELS[order.shippingStatus]?.label || order.shippingStatus}
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${IN_TRANSIT_STATUS_LABELS[order.shippingStatus]?.color || 'bg-gray-100 text-gray-600'}`}>
+                    {IN_TRANSIT_STATUS_LABELS[order.shippingStatus]?.label || order.shippingStatus}
                   </span>
                 </div>
               )}
@@ -373,7 +373,7 @@ export default function OrderDetailPage() {
                       <div key={sr.id} className="text-xs text-text-secondary">
                         <div className="flex justify-between">
                           <span>{sr.carrier} — {sr.trackingNumber}</span>
-                          <span className="font-medium">{SHIPPING_STATUS_LABELS[sr.status || '']?.label || sr.status}</span>
+                          <span className="font-medium">{IN_TRANSIT_STATUS_LABELS[sr.status || '']?.label || sr.status}</span>
                         </div>
                         {sr.shippedAt && <p>Shipped: {formatDate(sr.shippedAt)}</p>}
                       </div>

@@ -22,7 +22,7 @@ const statusMap: Record<OrderStatus, { label: string; color: string }> = {
 const paymentStatusMap = {
   PENDING: { label: '待支付', color: 'bg-gray-100 text-gray-800' },
   PAID: { label: '已支付', color: 'bg-green-100 text-green-800' },
-  PARTIAL: { label: '部分支付', color: 'bg-yellow-100 text-yellow-800' },
+  PARTIALLY_PAID: { label: '部分支付', color: 'bg-yellow-100 text-yellow-800' },
   REFUNDED: { label: '已退款', color: 'bg-orange-100 text-orange-800' },
   FAILED: { label: '支付失败', color: 'bg-red-100 text-red-800' },
 };

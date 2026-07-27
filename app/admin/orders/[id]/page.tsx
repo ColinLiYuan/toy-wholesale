@@ -9,8 +9,8 @@ import { formatImageUrl } from '@/lib/api-config';
 import { countryName } from '@/lib/countries';
 
 // 本地类型定义
-type PaymentStatus = 'PENDING' | 'PAID' | 'PARTIAL' | 'REFUNDED' | 'FAILED';
-type ShippingStatus = 'NOT_SHIPPED' | 'SHIPPING' | 'SHIPPED' | 'DELIVERED' | 'RETURNED';
+type PaymentStatus = 'PENDING' | 'PAID' | 'PARTIALLY_PAID' | 'REFUNDED' | 'FAILED';
+type ShippingStatus = 'NOT_SHIPPED' | 'IN_TRANSIT' | 'SHIPPED' | 'DELIVERED' | 'RETURNED';
 
 // 订单状态映射
 const statusMap: Record<OrderStatus, { label: string; color: string }> = {
@@ -29,7 +29,7 @@ const statusMap: Record<OrderStatus, { label: string; color: string }> = {
 const paymentStatusMap = {
   PENDING: { label: '待支付', color: 'bg-gray-100 text-gray-800' },
   PAID: { label: '已支付', color: 'bg-green-100 text-green-800' },
-  PARTIAL: { label: '部分支付', color: 'bg-yellow-100 text-yellow-800' },
+  PARTIALLY_PAID: { label: '部分支付', color: 'bg-yellow-100 text-yellow-800' },
   REFUNDED: { label: '已退款', color: 'bg-orange-100 text-orange-800' },
   FAILED: { label: '支付失败', color: 'bg-red-100 text-red-800' },
 };
@@ -37,7 +37,7 @@ const paymentStatusMap = {
 // 物流状态映射
 const shippingStatusMap = {
   NOT_SHIPPED: { label: '未发货', color: 'bg-gray-100 text-gray-800' },
-  SHIPPING: { label: '运输中', color: 'bg-blue-100 text-blue-800' },
+  IN_TRANSIT: { label: '运输中', color: 'bg-blue-100 text-blue-800' },
   SHIPPED: { label: '已发货', color: 'bg-indigo-100 text-indigo-800' },
   DELIVERED: { label: '已送达', color: 'bg-green-100 text-green-800' },
   RETURNED: { label: '已退回', color: 'bg-red-100 text-red-800' },
@@ -255,10 +255,7 @@ export default function OrderDetailPage() {
 
     setUpdating(true);
     try {
-      // TODO: 需要后端提供更新支付状态的API
-      // await salesOrderService.updatePaymentStatus(orderId, newStatus);
-      alert('支付状态更新功能待后端API支持');
-      // 重新加载订单
+      await salesOrderService.updatePaymentStatus(orderId, newStatus);
       const data = await salesOrderService.getOrderById(orderId);
       setOrder(data as SalesOrder);
     } catch (error: any) {
@@ -277,10 +274,7 @@ export default function OrderDetailPage() {
 
     setUpdating(true);
     try {
-      // TODO: 需要后端提供更新物流状态的API
-      // await salesOrderService.updateShippingStatus(orderId, newStatus);
-      alert('物流状态更新功能待后端API支持');
-      // 重新加载订单
+      await salesOrderService.updateShippingStatus(orderId, newStatus);
       const data = await salesOrderService.getOrderById(orderId);
       setOrder(data as SalesOrder);
     } catch (error: any) {
@@ -518,7 +512,7 @@ export default function OrderDetailPage() {
                   className="text-xs px-2 py-1 border border-gray-300 rounded disabled:opacity-50"
                 >
                   <option value="PENDING">待支付</option>
-                  <option value="PARTIAL">部分支付</option>
+                  <option value="PARTIALLY_PAID">部分支付</option>
                   <option value="PAID">已支付</option>
                   <option value="REFUNDED">已退款</option>
                   <option value="FAILED">支付失败</option>
@@ -540,7 +534,7 @@ export default function OrderDetailPage() {
                   className="text-xs px-2 py-1 border border-gray-300 rounded disabled:opacity-50"
                 >
                   <option value="NOT_SHIPPED">未发货</option>
-                  <option value="SHIPPING">运输中</option>
+                  <option value="IN_TRANSIT">运输中</option>
                   <option value="SHIPPED">已发货</option>
                   <option value="DELIVERED">已送达</option>
                   <option value="RETURNED">已退回</option>
@@ -1047,6 +1041,18 @@ export default function OrderDetailPage() {
             <label className="block text-sm font-medium text-gray-700">创建时间</label>
             <p className="mt-1 text-gray-900">{formatDate(order.createdAt)}</p>
           </div>
+          {(order as any).purchaseDate && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">采购日期</label>
+              <p className="mt-1 text-gray-900">{(order as any).purchaseDate}</p>
+            </div>
+          )}
+          {(order as any).productionCompleteDate && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">预计生产完成</label>
+              <p className="mt-1 text-red-600 font-semibold">{(order as any).productionCompleteDate}</p>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700">更新时间</label>
             <p className="mt-1 text-gray-900">{formatDate(order.updatedAt)}</p>

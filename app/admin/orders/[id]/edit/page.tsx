@@ -31,6 +31,9 @@ export default function EditOrderPage() {
     shippingRegion: '',
     shippingCountry: '',
     shippingZipCode: '',
+    purchaseDate: '',
+    productionCompleteDate: '',
+    alertBeforeDays: 3,
     notes: '',
     internalNotes: '',
   });
@@ -104,6 +107,9 @@ export default function EditOrderPage() {
           shippingRegion: orderData.shippingRegion || '',
           shippingCountry: orderData.shippingCountry || '',
           shippingZipCode: orderData.shippingZipCode || '',
+          purchaseDate: orderData.purchaseDate || '',
+          productionCompleteDate: orderData.productionCompleteDate || '',
+          alertBeforeDays: orderData.alertBeforeDays ?? 3,
           notes: orderData.notes || '',
           internalNotes: orderData.internalNotes || '',
         });
@@ -149,6 +155,15 @@ export default function EditOrderPage() {
       }
     }
   }, [formData.distributorId, distributors]);
+
+
+  // 有产品时自动计算总金额
+  useEffect(() => {
+    if (items.length > 0) {
+      const total = items.reduce((sum, item) => sum + (item.subtotal || item.quantity * item.unitPrice || 0), 0);
+      setFormData(prev => ({ ...prev, totalAmount: total }));
+    }
+  }, [items]);
 
   // 点击外部关闭下拉框
   useEffect(() => {
@@ -244,12 +259,6 @@ export default function EditOrderPage() {
       };
       
       
-      if (items.length === 0) {
-        alert('请至少添加一个商品');
-        setSaving(false);
-        return;
-      }
-      
       await salesOrderService.updateOrder(orderId, submitData);
       alert('订单更新成功！');
       router.push(`/admin/orders`);
@@ -331,7 +340,7 @@ export default function EditOrderPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="PENDING">待支付</option>
-                <option value="PARTIAL">部分支付</option>
+                <option value="PARTIALLY_PAID">部分支付</option>
                 <option value="PAID">已支付</option>
                 <option value="REFUNDED">已退款</option>
                 <option value="FAILED">支付失败</option>
@@ -348,7 +357,7 @@ export default function EditOrderPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="NOT_SHIPPED">未发货</option>
-                <option value="SHIPPING">运输中</option>
+                <option value="IN_TRANSIT">运输中</option>
                 <option value="SHIPPED">已发货</option>
                 <option value="DELIVERED">已送达</option>
                 <option value="RETURNED">已退回</option>
@@ -689,6 +698,28 @@ export default function EditOrderPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="邮编"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">采购日期</label>
+              <input type="date"
+                value={formData.purchaseDate || ''}
+                onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">预计生产完成</label>
+              <input type="date"
+                value={formData.productionCompleteDate || ''}
+                onChange={(e) => setFormData({ ...formData, productionCompleteDate: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">告警提前天数</label>
+              <input type="number"
+                value={formData.alertBeforeDays || ''}
+                onChange={(e) => setFormData({ ...formData, alertBeforeDays: parseInt(e.target.value) || 3 })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="默认3天" />
             </div>
           </div>
         </div>

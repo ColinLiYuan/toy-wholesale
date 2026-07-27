@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { inquiryAdminService } from '@/services';
 import { countryName } from '@/lib/countries';
+import CountrySelect from '@/components/CountrySelect';
 import type { Inquiry } from '@/types';
 
 const statusMap: Record<string, string> = {
@@ -33,6 +34,8 @@ export default function InquiriesPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [countryFilter, setCountryFilter] = useState('');
   const [stats, setStats] = useState({
     newCount: 0,
     contactedCount: 0,
@@ -56,9 +59,22 @@ export default function InquiriesPage() {
       } else {
         response = await inquiryAdminService.getAllInquiries(currentPage, 20);
       }
-      setInquiries(response.content || []);
+      let list = response.content || [];
+      // 客户端过滤
+      if (searchKeyword) {
+        const kw = searchKeyword.toLowerCase();
+        list = list.filter(i =>
+          (i.customerName || '').toLowerCase().includes(kw) ||
+          (i.customerPhone || '').toLowerCase().includes(kw) ||
+          (i.customerEmail || '').toLowerCase().includes(kw)
+        );
+      }
+      if (countryFilter) {
+        list = list.filter(i => i.country === countryFilter);
+      }
+      setInquiries(list);
       setTotalPages(response.totalPages || 0);
-      setTotalElements(response.totalElements || 0);
+      setTotalElements(list.length);
     } catch (error) {
       console.error('获取询盘列表失败:', error);
       alert('获取询盘列表失败');
@@ -213,17 +229,14 @@ export default function InquiriesPage() {
 
       {/* 筛选器 */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700">状态筛选:</label>
+        <div className="flex items-center gap-4 flex-wrap">
+          <label className="text-sm font-medium text-gray-700">状态:</label>
           <select
             value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-              setCurrentPage(0);
-            }}
+            onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(0); }}
             className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">全部状态</option>
+            <option value="">全部</option>
             <option value="NEW">新询盘</option>
             <option value="CONTACTED">已联系</option>
             <option value="QUOTING">报价中</option>
@@ -231,6 +244,22 @@ export default function InquiriesPage() {
             <option value="CONVERTED">已转化</option>
             <option value="CLOSED">已关闭</option>
           </select>
+          <input
+            type="text"
+            placeholder="搜索姓名/电话/邮箱..."
+            value={searchKeyword}
+            onChange={(e) => { setSearchKeyword(e.target.value); setCurrentPage(0); }}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm w-48"
+          />
+          <CountrySelect
+            value={countryFilter}
+            onChange={(code) => { setCountryFilter(code); setCurrentPage(0); }}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm w-40"
+          />
+          {(searchKeyword || countryFilter) && (
+            <button onClick={() => { setSearchKeyword(''); setCountryFilter(''); }}
+              className="text-sm text-blue-600 hover:underline">清除筛选</button>
+          )}
         </div>
       </div>
 
