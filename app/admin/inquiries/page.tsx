@@ -63,14 +63,14 @@ export default function InquiriesPage() {
       // 客户端过滤
       if (searchKeyword) {
         const kw = searchKeyword.toLowerCase();
-        list = list.filter(i =>
+        list = list.filter((i: Inquiry) =>
           (i.customerName || '').toLowerCase().includes(kw) ||
           (i.customerPhone || '').toLowerCase().includes(kw) ||
           (i.customerEmail || '').toLowerCase().includes(kw)
         );
       }
       if (countryFilter) {
-        list = list.filter(i => i.country === countryFilter);
+        list = list.filter((i: Inquiry) => i.country === countryFilter);
       }
       setInquiries(list);
       setTotalPages(response.totalPages || 0);

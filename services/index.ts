@@ -2196,6 +2196,10 @@ export interface SalesOrder {
   completedAt?: string;
   cancelledAt?: string;
   cancelReason?: string;
+  purchaseDate?: string;
+  productionCompleteDate?: string;
+  alertBeforeDays?: number;
+  alertSent?: boolean;
   notes?: string;
   internalNotes?: string;
   inquiryOrderId?: number;
