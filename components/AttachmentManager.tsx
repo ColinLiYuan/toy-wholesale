@@ -15,12 +15,19 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [attachmentDescription, setAttachmentDescription] = useState('');
   const [bizType, setBizType] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const isImage = (attachment: Attachment) => {
+    const ext = (attachment.fileExtension || '').toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext);
+  };
 
   const bizTypeOptions = entityType === 'ORDER' ? [
     { value: '', label: '-- 业务类型 --' },
     { value: 'PI', label: 'PI (形式发票)' },
     { value: '采购单', label: '采购单' },
     { value: '付款水单', label: '付款水单' },
+    { value: '唛头', label: '唛头' },
   ] : [];
 
   useEffect(() => {
@@ -167,6 +174,11 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
               </div>
             </div>
             <div className="flex items-center space-x-2 ml-4">
+              {isImage(attachment) && (
+                <img src={attachment.fileUrl} alt={attachment.fileName}
+                  className="w-10 h-10 object-cover rounded cursor-pointer border hover:opacity-80"
+                  onClick={() => setPreviewUrl(attachment.fileUrl)} />
+              )}
               <button
                 onClick={() => attachmentService.downloadAttachment(attachment.id)}
                 className="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors flex items-center"
@@ -196,6 +208,14 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
             <p className="text-gray-500">暂无附件</p>
           </div>
         )}
+
+      {/* 图片预览弹窗 */}
+      {previewUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" onClick={() => setPreviewUrl(null)}>
+          <img src={previewUrl} alt="preview" className="max-w-[90vw] max-h-[90vh] object-contain" onClick={e => e.stopPropagation()} />
+          <button onClick={() => setPreviewUrl(null)} className="absolute top-4 right-4 text-white text-3xl hover:text-gray-300">×</button>
+        </div>
+      )}
       </div>
     </div>
   );

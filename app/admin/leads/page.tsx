@@ -6,12 +6,15 @@ import { leadAdminService } from '@/services';
 import type { Lead } from '@/types';
 import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
 import { countryName } from '@/lib/countries';
+import CountrySelect from '@/components/CountrySelect';
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [countryFilter, setCountryFilter] = useState('');
+  const [triggerSearch, setTriggerSearch] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [statistics, setStatistics] = useState<Record<string, any>>({});
@@ -186,14 +189,18 @@ export default function LeadsPage() {
   };
 
   const filteredLeads = leads.filter(lead => {
-    if (!searchTerm) return true;
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      (lead.companyName && lead.companyName.toLowerCase().includes(searchLower)) ||
-      (lead.contactPerson && lead.contactPerson.toLowerCase().includes(searchLower)) ||
-      (lead.email && lead.email.toLowerCase().includes(searchLower)) ||
-      (lead.phone && lead.phone.includes(searchTerm))
-    );
+    let match = true;
+    if (searchTerm) {
+      const s = searchTerm.toLowerCase();
+      match = !!(lead.companyName && lead.companyName.toLowerCase().includes(s)) ||
+              !!(lead.contactPerson && lead.contactPerson.toLowerCase().includes(s)) ||
+              !!(lead.email && lead.email.toLowerCase().includes(s)) ||
+              !!(lead.phone && lead.phone.includes(searchTerm));
+    }
+    if (match && countryFilter) {
+      match = lead.country === countryFilter;
+    }
+    return match;
   });
 
   return (
@@ -254,8 +261,18 @@ export default function LeadsPage() {
               placeholder="搜索公司名称、联系人、邮箱或电话..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && setTriggerSearch(t => t + 1)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">国家</label>
+            <CountrySelect value={countryFilter} onChange={setCountryFilter} />
+          </div>
+          <div className="flex items-end">
+            <button onClick={() => setTriggerSearch(t => t + 1)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
+              搜索
+            </button>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">状态筛选</label>
