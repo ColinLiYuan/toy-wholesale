@@ -10,6 +10,7 @@ export interface Income {
   incomeBy?: string;
   source?: string;
   sourceId?: number;
+  sourceNumber?: string;
   createdAt?: string;
   updatedAt?: string;
 }
