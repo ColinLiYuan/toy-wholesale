@@ -2567,11 +2567,12 @@ export const salesOrderService = {
     } catch (error) { console.error(error); throw error; }
   },
 
-  async updateProductionInfo(id: number, productionCompleteDate?: string, alertBeforeDays?: number): Promise<SalesOrder> {
+  async updateProductionInfo(id: number, productionCompleteDate?: string, alertBeforeDays?: number, alertSent?: boolean): Promise<SalesOrder> {
     try {
       const params: any = {};
       if (productionCompleteDate) params.productionCompleteDate = productionCompleteDate;
       if (alertBeforeDays !== undefined) params.alertBeforeDays = alertBeforeDays;
+      if (alertSent !== undefined) params.alertSent = alertSent;
       const apiResult: ApiResult<SalesOrder> = await apiClient.patch(
         `/v1/sales-orders/${id}/production-info`,
         null,

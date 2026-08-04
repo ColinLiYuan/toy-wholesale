@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { distributorAdminService } from '@/services';
 import { Distributor, FollowUpRecord } from '@/types';
 import AttachmentManager from '@/components/AttachmentManager';

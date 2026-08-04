@@ -297,6 +297,12 @@ export default function DistributorsPage() {
                           >
                             查看
                           </Link>
+                          <Link
+                            href={`/admin/distributors/${distributor.id}?edit=1`}
+                            className="px-3 py-1.5 text-sm text-yellow-600 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors"
+                          >
+                            编辑
+                          </Link>
                         </div>
                       </td>
                     </tr>

@@ -45,7 +45,14 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
           { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
         ],
       },
-      { name: '收入管理', href: '/admin/incomes', icon: '💵' },
+      {
+        name: '收入管理',
+        href: '/admin/incomes',
+        icon: '💵',
+        children: [
+          { name: '订单收款', href: '/admin/incomes?type=ORDER' },
+        ],
+      },
       { name: '博客管理', href: '/admin/blog', icon: '📝' },
     ],
   },
@@ -131,7 +138,14 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
           { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
         ],
       },
-      { name: '收入管理', href: '/admin/incomes', icon: '💵' },
+      {
+        name: '收入管理',
+        href: '/admin/incomes',
+        icon: '💵',
+        children: [
+          { name: '订单收款', href: '/admin/incomes?type=ORDER' },
+        ],
+      },
     ],
   },
 };

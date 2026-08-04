@@ -335,6 +335,7 @@ export default function OrderDetailPage() {
 
     setUpdating(true);
     try {
+      console.log('更新订单状态:', { orderId, newStatus });
       await salesOrderService.updateOrderStatus(orderId, newStatus);
       alert('状态更新成功');
       // 重新加载订单

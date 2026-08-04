@@ -25,9 +25,11 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
   const bizTypeOptions = entityType === 'ORDER' ? [
     { value: '', label: '-- 业务类型 --' },
     { value: 'PI', label: 'PI (形式发票)' },
+    { value: '订货合同', label: '订货合同' },
     { value: '采购单', label: '采购单' },
     { value: '付款水单', label: '付款水单' },
     { value: '唛头', label: '唛头' },
+    { value: '提单', label: '提单' },
   ] : entityType === 'LEAD' ? [
     { value: '', label: '-- 业务类型 --' },
     { value: '报价单', label: '报价单' },
