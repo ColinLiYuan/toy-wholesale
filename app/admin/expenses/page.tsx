@@ -9,7 +9,7 @@ import { EXPENSE_TYPE_LABELS, EXPENSE_TYPE_CATEGORIES } from '@/types/expense';
 
 export default function ExpensesPage() {
   const searchParams = useSearchParams();
-  const expenseType = searchParams.get('type') || 'ADMIN';
+  const expenseType = searchParams.get('type') || '';
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,9 @@ export default function ExpensesPage() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch(`/api/v1/expenses/stats?type=${expenseType}`);
+      const url = expenseType ? `/api/v1/expenses/stats?type=${expenseType}` : '/api/v1/expenses/stats';
+      const siteId = localStorage.getItem('admin_site_id') || 'toy';
+      const res = await fetch(url, { headers: { 'X-Site-Id': siteId } });
       const json = await res.json();
       if (json.code === 200) setStats(json.data);
     } catch (e) { console.error(e); }
@@ -105,15 +107,17 @@ export default function ExpensesPage() {
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">分类</th>
               <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">金额</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">备注</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">来源</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">标签</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">支出人</th>
               <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {loading ? (
-              <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">加载中...</td></tr>
+              <tr><td colSpan={8} className="px-6 py-8 text-center text-gray-500">加载中...</td></tr>
             ) : expenses.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">暂无支出记录</td></tr>
+              <tr><td colSpan={8} className="px-6 py-8 text-center text-gray-500">暂无支出记录</td></tr>
             ) : expenses.map((exp) => (
               <tr key={exp.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm text-gray-900">{exp.expenseDate}</td>
@@ -126,6 +130,15 @@ export default function ExpensesPage() {
                   ¥{exp.amount?.toLocaleString()}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{exp.description || '-'}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">
+                {exp.sourceNumber || exp.source || '手动'}
+              </td>
+                <td className="px-6 py-4 text-sm cursor-pointer hover:bg-yellow-50" onClick={async () => {
+                  const t = prompt('修改标签', exp.tags || '');
+                  if (t !== null) { await expenseAdminService.updateExpense(exp.id, { tags: t }); fetchExpenses(page); }
+                }}>
+                  {exp.tags || <span className="text-gray-300">点击设置</span>}
+                </td>
                 <td className="px-6 py-4 text-sm text-gray-600">{exp.expenseBy || '-'}</td>
                 <td className="px-6 py-4 text-sm text-right space-x-2">
                   <Link href={`/admin/expenses/${exp.id}`} className="text-blue-600 hover:underline">编辑</Link>

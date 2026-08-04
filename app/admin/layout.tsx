@@ -28,23 +28,43 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
     label: 'SinTone',
     adminName: 'SinTone Admin',
     menus: [
-      { name: '仪表板', href: '/admin/dashboard', icon: '📊' },
       { name: '产品管理', href: '/admin/products', icon: '📦' },
       { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
       { name: '潜客管理', href: '/admin/leads', icon: '👥' },
       { name: '供应商管理', href: '/admin/suppliers', icon: '🏭' },
-      { name: '访问记录', href: '/admin/visit-records', icon: '📋' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
       { name: '报价单管理', href: '/admin/quotation', icon: '📄' },
-      { name: '管理员管理', href: '/admin/admins', icon: '🔐' },
+      {
+        name: '支出管理',
+        href: '/admin/expenses',
+        icon: '💰',
+        children: [
+          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
+          { name: '销售费用', href: '/admin/expenses?type=SALES' },
+          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
+        ],
+      },
+      { name: '收入管理', href: '/admin/incomes', icon: '💵' },
       { name: '博客管理', href: '/admin/blog', icon: '📝' },
     ],
   },
   myth: {
     label: 'Myth',
     adminName: 'Myth Admin',
-    menus: [],
+    menus: [
+      {
+        name: '支出管理',
+        href: '/admin/expenses',
+        icon: '💰',
+        children: [
+          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
+          { name: '销售费用', href: '/admin/expenses?type=SALES' },
+          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
+        ],
+      },
+      { name: '收入管理', href: '/admin/incomes', icon: '💵' },
+    ],
   },
   general: {
     label: '通用',
@@ -55,10 +75,7 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
         href: '/admin/expenses',
         icon: '💰',
         children: [
-          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
           { name: '管理费用', href: '/admin/expenses?type=ADMIN' },
-          { name: '销售费用', href: '/admin/expenses?type=SALES' },
-          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
           { name: '其他杂费', href: '/admin/expenses?type=OTHER' },
         ],
       },
@@ -104,6 +121,8 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
       { name: '访问记录', href: '/admin/visit-records', icon: '📋' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
+      { name: '支出管理', href: '/admin/expenses', icon: '💸' },
+      { name: '收入管理', href: '/admin/incomes', icon: '💵' },
     ],
   },
 };

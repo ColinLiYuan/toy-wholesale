@@ -28,6 +28,9 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
     { value: '采购单', label: '采购单' },
     { value: '付款水单', label: '付款水单' },
     { value: '唛头', label: '唛头' },
+  ] : entityType === 'LEAD' ? [
+    { value: '', label: '-- 业务类型 --' },
+    { value: '报价单', label: '报价单' },
   ] : [];
 
   useEffect(() => {
@@ -57,7 +60,7 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
           entityId,
           attachmentDescription || undefined,
           undefined, // uploadBy
-          entityType === 'ORDER' ? bizType || undefined : undefined
+          (entityType === 'ORDER' || entityType === 'LEAD') ? bizType || undefined : undefined
         );
       }
       setShowUploadForm(false);

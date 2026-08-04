@@ -10,8 +10,11 @@ export interface Expense {
   expenseDate: string;
   description?: string;
   expenseBy?: string;
-  source?: string;    // 来源类型：MANUAL / PURCHASE / ORDER
-  sourceId?: number;  // 来源记录ID
+  source?: string;        // 来源类型：MANUAL / PURCHASE / ORDER
+  sourceId?: number;      // 来源记录ID
+  sourceNumber?: string;  // 来源单号（如 SO-xxx）
+  tags?: string;
+  syncStatus?: string;
   createdAt?: string;
   updatedAt?: string;
 }

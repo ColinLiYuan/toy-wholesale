@@ -23,11 +23,12 @@ export default function NewLeadPage() {
     { value: 'COLD_CALL', label: '电话开发' },
     { value: 'MYTH_TOY', label: 'MythToy' },
     { value: 'MADE_IN_CHINA', label: '中国制造网' },
+    { value: 'INDEPENDENT_WEBSITE', label: '独立站' },
   ];
 
   // 根据站点筛选来源选项
   const sourceOptions = currentSite === 'seric'
-    ? allSourceOptions.filter(option => ['MADE_IN_CHINA', 'REFERRAL'].includes(option.value))
+    ? allSourceOptions.filter(option => ['MADE_IN_CHINA', 'REFERRAL', 'INDEPENDENT_WEBSITE'].includes(option.value))
     : allSourceOptions;
 
   const [formData, setFormData] = useState<Partial<Lead>>({

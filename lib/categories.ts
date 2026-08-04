@@ -83,7 +83,14 @@ const sericCategories: CategoryItem[] = [
   {
     name: '压力控制阀', nameEn: 'Pressure Control Valves', slug: 'pressure-control-valves', priority: 0.95,
     children: [
-      { name: '溢流阀', nameEn: 'Relief Valves', slug: 'relief-valves' },
+      { name: '溢流阀', nameEn: 'Relief Valves', slug: 'relief-valves',
+        children: [
+          { name: 'BT/G系列', nameEn: 'BT/G Series', slug: 'bt-g-series' },
+          { name: 'S-BT/G系列', nameEn: 'S-BT/G Series', slug: 's-bt-g-series' },
+          { name: 'BST/G系列', nameEn: 'BST/G Series', slug: 'bst-g-series' },
+          { name: 'S-BST/G系列', nameEn: 'S-BST/G Series', slug: 's-bst-g-series' },
+        ]
+      },
       { name: '减压阀', nameEn: 'Reducing Valves', slug: 'reducing-valves' },
       { name: '顺序阀', nameEn: 'Sequence Valves', slug: 'sequence-valves' },
       { name: '压力开关', nameEn: 'Pressure Switches', slug: 'pressure-switches' },

@@ -24,12 +24,12 @@ export default function NewInquiryPage() {
     { value: 'MYTH_TOY', label: 'MythToy转移' },
     { value: 'MADE_IN_CHINA', label: '中国制造网' },
     { value: 'OTHER', label: '其他' },
+    { value: 'INDEPENDENT_WEBSITE', label: '独立站' },
   ];
 
   // 根据站点筛选来源选项
-  // toy 展示全部来源，seric 只展示中国制造网
   const sourceOptions = currentSite === 'seric'
-    ? allSourceOptions.filter(option => option.value === 'MADE_IN_CHINA')
+    ? allSourceOptions.filter(option => ['MADE_IN_CHINA', 'REFERRAL', 'INDEPENDENT_WEBSITE'].includes(option.value))
     : allSourceOptions;
 
   // 表单数据 - 根据站点设置默认来源

@@ -4,12 +4,11 @@ import type { Expense } from '@/types/expense';
 
 export const expenseAdminService = {
   // 获取支出列表 - GET /api/v1/expenses?type=管理/销售
-  async getAllExpenses(type: string, page: number = 0, size: number = 20) {
+  async getAllExpenses(type?: string, page: number = 0, size: number = 20) {
     try {
-      const apiResult: ApiResult<any> = await apiClient.get(
-        '/v1/expenses',
-        { params: { type, page, size } }
-      );
+      const params: any = { page, size };
+      if (type) params.type = type;
+      const apiResult: ApiResult<any> = await apiClient.get('/v1/expenses', { params });
 
       if (apiResult.code !== 200 || !apiResult.data) {
         throw new Error(apiResult.message || 'Failed to fetch expenses');

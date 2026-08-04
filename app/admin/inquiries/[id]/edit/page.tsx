@@ -15,6 +15,7 @@ const sourceOptions = [
   { value: 'TRADE_SHOW', label: '展会' },
   { value: 'MYTH_TOY', label: 'MythToy转移' },
   { value: 'MADE_IN_CHINA', label: '中国制造网' },
+  { value: 'INDEPENDENT_WEBSITE', label: '独立站' },
   { value: 'OTHER', label: '其他' },
 ];
 
