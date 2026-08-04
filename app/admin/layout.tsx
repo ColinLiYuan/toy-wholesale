@@ -121,7 +121,16 @@ const siteConfig: Record<string, { label: string; adminName: string; menus: Menu
       { name: '访问记录', href: '/admin/visit-records', icon: '📋' },
       { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
       { name: '订单管理', href: '/admin/orders', icon: '🛒' },
-      { name: '支出管理', href: '/admin/expenses', icon: '💸' },
+      {
+        name: '支出管理',
+        href: '/admin/expenses',
+        icon: '💰',
+        children: [
+          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
+          { name: '销售费用', href: '/admin/expenses?type=SALES' },
+          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
+        ],
+      },
       { name: '收入管理', href: '/admin/incomes', icon: '💵' },
     ],
   },
