@@ -2673,6 +2673,24 @@ export const salesOrderService = {
     }
   },
 
+  // 获取跟进记录 - GET /api/v1/sales-orders/{id}/follow-ups
+  async getFollowUpRecords(id: number): Promise<FollowUpRecord[]> {
+    try {
+      const apiResult: ApiResult<FollowUpRecord[]> = await apiClient.get(
+        `/v1/sales-orders/${id}/follow-ups`
+      );
+
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to fetch follow-up records');
+      }
+
+      return apiResult.data || [];
+    } catch (error: any) {
+      console.error('Failed to fetch follow-up records:', error);
+      return [];
+    }
+  },
+
   // 删除跟进记录 - DELETE /api/v1/sales-orders/{orderId}/follow-ups/{followUpId}
   async deleteFollowUp(orderId: number, followUpId: number): Promise<void> {
     try {

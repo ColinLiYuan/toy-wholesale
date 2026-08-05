@@ -305,6 +305,7 @@ export interface Lead {
 export interface FollowUpRecord {
   id: number;
   leadId?: number;
+  orderId?: number;
   followUpType?: string;  // EMAIL-邮件, PHONE-电话, MEETING-会议, IM-即时通讯, OTHER-其他
   content?: string;
   result?: string;  // NO_RESPONSE-无回复, INTERESTED-有兴趣, REQUEST_QUOTE-要求报价, NEGOTIATING-谈判中, REJECTED-拒绝

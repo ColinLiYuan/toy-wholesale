@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { salesOrderService, SalesOrder, OrderStatus } from '@/services';
+import { salesOrderService, SalesOrder, OrderStatus, FollowUpRecord } from '@/services';
 import { countryName } from '@/lib/countries';
 
 // 订单状态映射
@@ -35,15 +35,34 @@ export default function OrdersPage() {
   const [totalElements, setTotalElements] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [lastFollowUps, setLastFollowUps] = useState<Record<number, FollowUpRecord | null>>({});
+
+  // 加载每条订单的最新跟进记录
+  const loadLastFollowUps = async (ordersList: SalesOrder[]) => {
+    const results: Record<number, FollowUpRecord | null> = {};
+    await Promise.all(
+      ordersList.map(async (order) => {
+        try {
+          const records = await salesOrderService.getFollowUpRecords(order.id!);
+          results[order.id!] = records.length > 0 ? records[0] : null;
+        } catch {
+          results[order.id!] = null;
+        }
+      })
+    );
+    setLastFollowUps(results);
+  };
 
   // 加载订单列表
   const loadOrders = async () => {
     setLoading(true);
     try {
       const response = await salesOrderService.getAllOrders(currentPage, 20);
-      setOrders((response.content || []) as SalesOrder[]);
+      const list = (response.content || []) as SalesOrder[];
+      setOrders(list);
       setTotalPages(response.totalPages || 0);
       setTotalElements(response.totalElements || 0);
+      loadLastFollowUps(list);
     } catch (error) {
       console.error('Failed to load orders:', error);
       setOrders([]);
@@ -164,6 +183,7 @@ export default function OrdersPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">支付状态</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">金额</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">最后跟进</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                 </tr>
               </thead>
@@ -201,6 +221,21 @@ export default function OrdersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(order.createdAt)}
+                    </td>
+                    <td className="px-6 py-4">
+                      {lastFollowUps[order.id!] ? (
+                        <div className="max-w-[200px]">
+                          <p className="text-sm text-gray-700 truncate">
+                            {lastFollowUps[order.id!]!.content || '-'}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {lastFollowUps[order.id!]!.followUpBy || ''}
+                            {lastFollowUps[order.id!]!.createdAt && ` · ${new Date(lastFollowUps[order.id!]!.createdAt!).toLocaleDateString('zh-CN')}`}
+                          </p>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">暂无</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link

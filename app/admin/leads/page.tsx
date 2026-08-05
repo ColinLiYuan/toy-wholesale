@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { leadAdminService } from '@/services';
-import type { Lead } from '@/types';
+import type { Lead, FollowUpRecord } from '@/types';
 import { formatPhoneWithCountryCode } from '@/lib/phone-formatter';
 import { countryName } from '@/lib/countries';
 import CountrySelect from '@/components/CountrySelect';
@@ -18,11 +18,35 @@ export default function LeadsPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [statistics, setStatistics] = useState<Record<string, any>>({});
+  const [lastFollowUps, setLastFollowUps] = useState<Record<number, FollowUpRecord | null>>({});
 
   useEffect(() => {
     fetchLeads();
     fetchStatistics();
   }, [currentPage, statusFilter]);
+
+  // 加载每条潜客的最新跟进记录
+  useEffect(() => {
+    if (leads.length > 0) {
+      loadLastFollowUps(leads);
+    }
+  }, [leads]);
+
+  const loadLastFollowUps = async (leadsList: Lead[]) => {
+    const results: Record<number, FollowUpRecord | null> = {};
+    await Promise.all(
+      leadsList.map(async (lead) => {
+        try {
+          const response = await leadAdminService.getFollowUpRecords(lead.id, 0, 1);
+          const records = response.content || [];
+          results[lead.id] = records.length > 0 ? records[0] : null;
+        } catch {
+          results[lead.id] = null;
+        }
+      })
+    );
+    setLastFollowUps(results);
+  };
 
   const fetchLeads = async () => {
     try {
@@ -68,24 +92,24 @@ export default function LeadsPage() {
       `请选择客户类型（输入数字）：\n1. 普通经销商 (REGULAR)\n2. 小型企业 (SMALL_BUSINESS)\n3. 个人 (INDIVIDUAL)\n\n默认：小型企业`,
       '2'
     );
-    
+
     if (customerType === null) return;
-    
+
     const typeMap: Record<string, string> = {
       '1': 'REGULAR',
       '2': 'SMALL_BUSINESS',
       '3': 'INDIVIDUAL',
     };
-    
+
     const selectedType = typeMap[customerType] || 'SMALL_BUSINESS';
-    
-    if (!confirm(`确认将“${companyName}”转化为${selectedType}经销商？\n系统将自动生成账号和密码。`)) {
+
+    if (!confirm(`确认将"${companyName}"转化为${selectedType}经销商？\n系统将自动生成账号和密码。`)) {
       return;
     }
-    
+
     try {
       const result = await leadAdminService.quickConvertToDistributor(leadId, selectedType);
-      
+
       alert(
         `转化成功！\n\n` +
         `经销商 ID: ${result.distributorId}\n` +
@@ -94,7 +118,7 @@ export default function LeadsPage() {
         `客户类型: ${result.customerTypeDescription}\n\n` +
         `请保存账号信息并发送给客户。`
       );
-      
+
       fetchLeads();
       fetchStatistics();
     } catch (error: any) {
@@ -317,6 +341,7 @@ export default function LeadsPage() {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">状态</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">优先级</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">来源</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">最后跟进</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">操作</th>
                   </tr>
                 </thead>
@@ -327,9 +352,9 @@ export default function LeadsPage() {
                         <div>
                           <h3 className="font-semibold text-gray-900">{lead.companyName || '-'}</h3>
                           {lead.website && (
-                            <a 
-                              href={lead.website} 
-                              target="_blank" 
+                            <a
+                              href={lead.website}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-blue-600 hover:underline"
                             >
@@ -384,6 +409,21 @@ export default function LeadsPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
                         {getSourceText(lead.source || '')}
+                      </td>
+                      <td className="px-6 py-4">
+                        {lastFollowUps[lead.id] ? (
+                          <div className="max-w-[200px]">
+                            <p className="text-sm text-gray-700 truncate">
+                              {lastFollowUps[lead.id]!.content || '-'}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {lastFollowUps[lead.id]!.followUpBy || ''}
+                              {lastFollowUps[lead.id]!.createdAt && ` · ${new Date(lastFollowUps[lead.id]!.createdAt!).toLocaleDateString('zh-CN')}`}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">暂无</span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
