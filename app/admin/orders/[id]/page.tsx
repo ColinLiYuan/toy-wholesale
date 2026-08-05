@@ -58,6 +58,7 @@ export default function OrderDetailPage() {
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentTransactionId, setPaymentTransactionId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('BANK_TRANSFER');
+  const [paymentCurrency, setPaymentCurrency] = useState('USD');
   const [paymentStatus, setPaymentStatus] = useState('PAID');
   const [paymentNotes, setPaymentNotes] = useState('');
   const payments: PaymentRecord[] = order?.paymentRecords || [];
@@ -195,6 +196,7 @@ export default function OrderDetailPage() {
       setUpdating(true);
       await salesOrderService.addPayment(orderId, {
         amount: parseFloat(paymentAmount),
+        currency: paymentCurrency,
         transactionId: paymentTransactionId || undefined,
         paymentMethod,
         status: paymentStatus,
@@ -203,6 +205,7 @@ export default function OrderDetailPage() {
       alert('支付记录添加成功');
       setShowPaymentForm(false);
       setPaymentAmount('');
+      setPaymentCurrency('USD');
       setPaymentTransactionId('');
       setPaymentStatus('PAID');
       setPaymentNotes('');
@@ -797,16 +800,26 @@ export default function OrderDetailPage() {
           <div className="mb-6 p-4 bg-gray-50 rounded-lg space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">支付金额 (USD)</label>
-                <input
-                  type="number"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
-                  placeholder="支付金额"
-                  step="0.01"
-                  min="0"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">支付金额</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                    placeholder="支付金额"
+                    step="0.01"
+                    min="0"
+                  />
+                  <select
+                    value={paymentCurrency}
+                    onChange={(e) => setPaymentCurrency(e.target.value)}
+                    className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00F2FE] focus:border-transparent"
+                  >
+                    <option value="USD">USD</option>
+                    <option value="CNY">CNY</option>
+                  </select>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">交易ID</label>
@@ -875,7 +888,7 @@ export default function OrderDetailPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <p className="text-lg font-bold text-green-600">{formatAmount(payment.amount)}</p>
+                      <p className="text-lg font-bold text-green-600">{payment.currency === 'CNY' ? '¥' : '$'}{payment.amount?.toFixed(2)}</p>
                       {payment.transactionId && (
                         <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                           交易ID: {payment.transactionId}

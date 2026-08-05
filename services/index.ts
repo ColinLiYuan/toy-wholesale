@@ -2216,6 +2216,7 @@ export interface PaymentRecord {
   id: number;
   transactionId?: string;
   amount: number;
+  currency?: string;  // CNY / USD
   paymentMethod?: string;  // BANK_TRANSFER, PAYPAL, CREDIT_CARD, ALIPAY, WECHAT
   status?: PaymentStatus;
   paidAt?: string;

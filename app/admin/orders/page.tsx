@@ -225,7 +225,7 @@ export default function OrdersPage() {
                     <td className="px-6 py-4">
                       {lastFollowUps[order.id!] ? (
                         <div className="max-w-[200px]">
-                          <p className="text-sm text-gray-700 truncate">
+                          <p className="text-sm text-gray-700 truncate" title={lastFollowUps[order.id!]!.content || ''}>
                             {lastFollowUps[order.id!]!.content || '-'}
                           </p>
                           <p className="text-xs text-gray-400 mt-1">

@@ -413,7 +413,7 @@ export default function LeadsPage() {
                       <td className="px-6 py-4">
                         {lastFollowUps[lead.id] ? (
                           <div className="max-w-[200px]">
-                            <p className="text-sm text-gray-700 truncate">
+                            <p className="text-sm text-gray-700 truncate" title={lastFollowUps[lead.id]!.content || ''}>
                               {lastFollowUps[lead.id]!.content || '-'}
                             </p>
                             <p className="text-xs text-gray-400 mt-1">
