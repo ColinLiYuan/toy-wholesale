@@ -26,9 +26,10 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
     { value: '', label: '-- 业务类型 --' },
     { value: 'PI', label: 'PI (形式发票)' },
     { value: '订货合同', label: '订货合同' },
-    { value: '采购单', label: '采购单' },
     { value: '付款水单', label: '付款水单' },
+    { value: '采购单', label: '采购单' },
     { value: '唛头', label: '唛头' },
+    { value: '装箱单', label: '装箱单' },
     { value: '提单', label: '提单' },
   ] : entityType === 'LEAD' ? [
     { value: '', label: '-- 业务类型 --' },
@@ -39,10 +40,24 @@ export default function AttachmentManager({ entityType, entityId }: AttachmentMa
     fetchAttachments();
   }, [entityType, entityId]);
 
+  // 外贸业务流程排序：PI → 订货合同 → 付款水单 → 采购单 → 唛头 → 装箱单 → 提单 → 其他
+  const bizTypeOrder = ['PI', '订货合同', '付款水单', '采购单', '唛头', '装箱单', '提单'];
+
+  const sortAttachments = (list: Attachment[]) => {
+    return [...list].sort((a, b) => {
+      const aIdx = bizTypeOrder.indexOf(a.bizType || '');
+      const bIdx = bizTypeOrder.indexOf(b.bizType || '');
+      if (aIdx === -1 && bIdx === -1) return 0;
+      if (aIdx === -1) return 1;
+      if (bIdx === -1) return -1;
+      return aIdx - bIdx;
+    });
+  };
+
   const fetchAttachments = async () => {
     try {
       const data = await attachmentService.getAttachments(entityType, entityId, 0, 100);
-      setAttachments(data.content || []);
+      setAttachments(sortAttachments(data.content || []));
     } catch (error) {
       console.error('Failed to fetch attachments:', error);
     }
