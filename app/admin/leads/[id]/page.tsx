@@ -19,7 +19,7 @@ export default function LeadDetailPage() {
   const [followUpRecords, setFollowUpRecords] = useState<FollowUpRecord[]>([]);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [newFollowUp, setNewFollowUp] = useState<Partial<FollowUpRecord>>({
-    followUpType: 'EMAIL',
+    followUpType: 'IM',
     result: 'NO_RESPONSE',
   });
   const [statusHistory, setStatusHistory] = useState<any[]>([]);
@@ -70,7 +70,7 @@ export default function LeadDetailPage() {
     try {
       await leadAdminService.addFollowUp(leadId, newFollowUp);
       setShowFollowUpForm(false);
-      setNewFollowUp({ followUpType: 'EMAIL', result: 'NO_RESPONSE' });
+      setNewFollowUp({ followUpType: 'IM', result: 'NO_RESPONSE' });
       fetchFollowUpRecords();
       fetchLead();
       alert('跟进记录添加成功');

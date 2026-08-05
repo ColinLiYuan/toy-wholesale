@@ -20,7 +20,7 @@ export default function DistributorDetailPage() {
   const [followUpRecords, setFollowUpRecords] = useState<FollowUpRecord[]>([]);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [newFollowUp, setNewFollowUp] = useState<Partial<FollowUpRecord>>({
-    followUpType: 'EMAIL',
+    followUpType: 'IM',
     result: 'NO_RESPONSE',
   });
 
@@ -57,7 +57,7 @@ export default function DistributorDetailPage() {
     try {
       await distributorAdminService.addFollowUp(parseInt(params.id!), newFollowUp);
       setShowFollowUpForm(false);
-      setNewFollowUp({ followUpType: 'EMAIL', result: 'NO_RESPONSE' });
+      setNewFollowUp({ followUpType: 'IM', result: 'NO_RESPONSE' });
       fetchFollowUpRecords();
       alert('跟进记录添加成功');
     } catch (error) {

@@ -92,24 +92,24 @@ export default function LeadsPage() {
       `请选择客户类型（输入数字）：\n1. 普通经销商 (REGULAR)\n2. 小型企业 (SMALL_BUSINESS)\n3. 个人 (INDIVIDUAL)\n\n默认：小型企业`,
       '2'
     );
-
+    
     if (customerType === null) return;
-
+    
     const typeMap: Record<string, string> = {
       '1': 'REGULAR',
       '2': 'SMALL_BUSINESS',
       '3': 'INDIVIDUAL',
     };
-
+    
     const selectedType = typeMap[customerType] || 'SMALL_BUSINESS';
-
-    if (!confirm(`确认将"${companyName}"转化为${selectedType}经销商？\n系统将自动生成账号和密码。`)) {
+    
+    if (!confirm(`确认将“${companyName}”转化为${selectedType}经销商？\n系统将自动生成账号和密码。`)) {
       return;
     }
-
+    
     try {
       const result = await leadAdminService.quickConvertToDistributor(leadId, selectedType);
-
+      
       alert(
         `转化成功！\n\n` +
         `经销商 ID: ${result.distributorId}\n` +
@@ -118,7 +118,7 @@ export default function LeadsPage() {
         `客户类型: ${result.customerTypeDescription}\n\n` +
         `请保存账号信息并发送给客户。`
       );
-
+      
       fetchLeads();
       fetchStatistics();
     } catch (error: any) {
@@ -352,9 +352,9 @@ export default function LeadsPage() {
                         <div>
                           <h3 className="font-semibold text-gray-900">{lead.companyName || '-'}</h3>
                           {lead.website && (
-                            <a
-                              href={lead.website}
-                              target="_blank"
+                            <a 
+                              href={lead.website} 
+                              target="_blank" 
                               rel="noopener noreferrer"
                               className="text-xs text-blue-600 hover:underline"
                             >

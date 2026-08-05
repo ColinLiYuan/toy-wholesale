@@ -72,7 +72,7 @@ export default function OrderDetailPage() {
   // 跟进记录
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [followUpContent, setFollowUpContent] = useState('');
-  const [followUpType, setFollowUpType] = useState('EMAIL');
+  const [followUpType, setFollowUpType] = useState('IM');
   const [followUpResult, setFollowUpResult] = useState('');
   const followUps: FollowUpRecord[] = order?.followUpRecords || [];
 
