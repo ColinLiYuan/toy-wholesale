@@ -36,6 +36,7 @@ export default function InquiriesPage() {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
+  const [searchTrigger, setSearchTrigger] = useState(0);
   const [stats, setStats] = useState({
     newCount: 0,
     contactedCount: 0,
@@ -48,7 +49,7 @@ export default function InquiriesPage() {
   useEffect(() => {
     fetchInquiries();
     fetchStats();
-  }, [currentPage, statusFilter]);
+  }, [currentPage, statusFilter, searchTrigger]);
 
   const fetchInquiries = async () => {
     try {
@@ -256,7 +257,7 @@ export default function InquiriesPage() {
             onChange={(code) => { setCountryFilter(code); setCurrentPage(0); }}
             className="border border-gray-300 rounded-md px-3 py-2 text-sm w-40"
           />
-          <button onClick={() => setCurrentPage(0)}
+          <button onClick={() => { setCurrentPage(0); setSearchTrigger(prev => prev + 1); }}
             className="px-4 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">搜索</button>
           {(searchKeyword || countryFilter) && (
             <button onClick={() => { setSearchKeyword(''); setCountryFilter(''); }}

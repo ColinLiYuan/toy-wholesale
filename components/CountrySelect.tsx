@@ -10,7 +10,7 @@ interface CountrySelectProps {
 }
 
 export default function CountrySelect({ value, onChange, className }: CountrySelectProps) {
-  const [search, setSearch] = useState(countryName(value) || '');
+  const [search, setSearch] = useState(value ? countryName(value) : '');
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 

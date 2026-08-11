@@ -268,7 +268,6 @@ export default function EditLeadPage() {
               {sourceOptions.map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
-              <option value="MYTH_TOY">MythToy</option>
             </select>
           </div>
         </div>
