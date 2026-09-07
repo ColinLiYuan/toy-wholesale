@@ -19,7 +19,7 @@ export default function DynamicBreadcrumbs({ categories, parentSlug, childSlug }
     const parentCategory = findCategoryBySlug(parentSlug, categories);
     if (parentCategory) {
       breadcrumbs.push({
-        label: parentCategory.name,
+        label: parentCategory.nameEn,
         href: `/products/${parentSlug}`,
       });
     }
@@ -29,7 +29,7 @@ export default function DynamicBreadcrumbs({ categories, parentSlug, childSlug }
     const childCategory = findCategoryBySlug(childSlug, categories);
     if (childCategory) {
       breadcrumbs.push({
-        label: childCategory.name,
+        label: childCategory.nameEn,
         href: `/products/${parentSlug}/${childSlug}`,
       });
     }

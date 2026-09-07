@@ -41,7 +41,7 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
   const [colorMap, setColorMap] = useState<Record<string, string>>(FALLBACK_COLOR_MAP);
 
   useEffect(() => {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
+    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const siteId = process.env.NEXT_PUBLIC_SITE_ID || '';
     const headers: Record<string, string> = siteId ? { 'X-Site-Id': siteId } : {};
     fetch(`${apiBaseUrl}/api/v1/dicts?type=COLOR`, { headers })

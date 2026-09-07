@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // 后端 API 地址（从环境变量读取，用于 Next.js 代理配置）
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const nextConfig: NextConfig = {
   output: 'standalone',

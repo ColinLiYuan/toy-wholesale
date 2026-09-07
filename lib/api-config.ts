@@ -6,7 +6,7 @@ export const API_BASE_URL = '/api';
 // 后端服务基础 URL（用于 SSR/服务端组件环境下的 API 请求）
 // 注意：在服务端组件中，axios 默认会使用相对路径，
 // 但如果需要直接调用后端，可以使用此变量
-export const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
+export const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 // Cloudflare R2 CDN 地址（从环境变量读取，用于图片等静态资源）
 export const R2_CDN_URL = process.env.NEXT_PUBLIC_R2_CDN_URL || 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev';

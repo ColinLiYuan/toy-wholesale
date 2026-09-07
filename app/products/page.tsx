@@ -90,7 +90,7 @@ export default async function ProductsPage({
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'ItemList',
-            name: currentCategory ? `${currentCategory.name} - Wholesale Products` : 'Wholesale Product Catalog',
+            name: currentCategory ? `${currentCategory.nameEn} - Wholesale Products` : 'Wholesale Product Catalog',
             description: 'Browse our full wholesale catalog of medical-grade silicone adult toys.',
             url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com'}/products${categoryParam !== 'all' ? `?category=${categoryParam}` : ''}`,
             numberOfItems: products.length,
@@ -116,7 +116,7 @@ export default async function ProductsPage({
           <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
-                {currentCategory ? currentCategory.name : 'Wholesale Product Catalog'}
+                {currentCategory ? currentCategory.nameEn : 'Wholesale Product Catalog'}
               </h1>
               {currentCategory?.description && (
                 <p className="text-sm text-text-secondary mt-1">{currentCategory.description}</p>

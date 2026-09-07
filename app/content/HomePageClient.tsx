@@ -22,7 +22,7 @@ export default function HomePageClient({
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
+        const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
         // 站点由部署配置决定（NEXT_PUBLIC_SITE_ID），不再硬编码
         const siteId = process.env.NEXT_PUBLIC_SITE_ID || '';
         const headers: Record<string, string> = siteId ? { 'X-Site-Id': siteId } : {};

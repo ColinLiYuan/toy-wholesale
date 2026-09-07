@@ -3,7 +3,7 @@ import type { BlogPost } from '@/types'
 
 export async function GET() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com'
-    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356'
+    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL
     const imageBaseUrl = 'https://pub-e5d14c6d386c4d90979458082617517a.r2.dev'
 
     let blogs: BlogPost[] = []

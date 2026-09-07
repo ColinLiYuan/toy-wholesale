@@ -3,7 +3,7 @@ import type { Product } from '@/types'
 
 export async function GET() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com'
-    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356'
+    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
     let products: Product[] = []
     try {

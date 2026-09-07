@@ -45,7 +45,7 @@ export default function WholesaleBreadcrumbs({ categories, currentCategory }: Wh
             href={`/products?parent=${parent.slug}`}
             className="text-gray-500 hover:text-brand transition-colors"
           >
-            {parent.name}
+            {parent.nameEn}
           </Link>
           
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +56,7 @@ export default function WholesaleBreadcrumbs({ categories, currentCategory }: Wh
 
       {/* 当前分类 */}
       <span className="text-text-primary font-semibold">
-        {category.name}
+        {category.nameEn}
       </span>
     </nav>
   );

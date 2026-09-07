@@ -154,7 +154,7 @@ export default function WholesaleFilter({ categories, selectedCategory, onFilter
                       : 'text-text-secondary hover:bg-surface hover:text-text-primary'
                   }`}
                 >
-                  {category.name}
+                  {category.nameEn}
                 </Link>
 
                 {category.children && category.children.length > 0 && (
@@ -169,7 +169,7 @@ export default function WholesaleFilter({ categories, selectedCategory, onFilter
                             : 'text-text-muted hover:text-text-primary hover:bg-gray-50'
                         }`}
                       >
-                        {child.name}
+                        {child.nameEn}
                       </Link>
                     ))}
                   </div>
