@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { productAdminService, galleryAdminService, supplierService, skuPurchasePriceService } from '@/services';
 import type { Product, Gallery, ProductSku, ProductSpecification, Supplier } from '@/types';
+import { getSiteId } from '@/lib/api-client';
 import CategorySelector from '@/components/CategorySelector';
 
 // 解析分类数据（支持 JSON 数组和斜杠分隔格式）
@@ -301,9 +302,7 @@ export default function EditProductPage() {
 
       const response = await fetch('/api/v1/upload/product', {
         method: 'POST',
-        headers: {
-          'X-Site-Id': 'toy',
-        },
+        headers: getSiteId() ? { 'X-Site-Id': getSiteId() } : {},
         body: formData,
       });
 
@@ -355,9 +354,7 @@ export default function EditProductPage() {
         // 先上传图片
         const response = await fetch('/api/v1/upload/product', {
           method: 'POST',
-          headers: {
-            'X-Site-Id': 'toy',
-          },
+          headers: getSiteId() ? { 'X-Site-Id': getSiteId() } : {},
           body: formData,
         });
 

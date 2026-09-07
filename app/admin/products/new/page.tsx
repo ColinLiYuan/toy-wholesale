@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { productAdminService } from '@/services';
 import type { Product, ProductSku, ProductSpecification } from '@/types';
+import { getSiteId } from '@/lib/api-client';
 import CategorySelector from '@/components/CategorySelector';
 
 export default function NewProductPage() {
@@ -155,9 +156,7 @@ export default function NewProductPage() {
 
         const response = await fetch('/api/v1/upload/product', {
           method: 'POST',
-          headers: {
-            'X-Site-Id': 'toy',
-          },
+          headers: getSiteId() ? { 'X-Site-Id': getSiteId() } : {},
           body: formData,
         });
 
@@ -242,9 +241,7 @@ export default function NewProductPage() {
 
       const response = await fetch('/api/v1/upload/product', {
         method: 'POST',
-        headers: {
-          'X-Site-Id': 'toy',
-        },
+        headers: getSiteId() ? { 'X-Site-Id': getSiteId() } : {},
         body: formData,
       });
 
@@ -354,7 +351,7 @@ export default function NewProductPage() {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'X-Site-Id': 'toy',
+                ...(getSiteId() ? { 'X-Site-Id': getSiteId() } : {}),
               },
               body: JSON.stringify(gallery),
             });

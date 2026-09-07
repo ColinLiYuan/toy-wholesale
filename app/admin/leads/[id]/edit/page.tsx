@@ -5,16 +5,12 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { leadAdminService } from '@/services';
 import type { Lead } from '@/types';
-import { getSiteId } from '@/lib/api-client';
 import CountrySelect from '@/components/CountrySelect';
 
 export default function EditLeadPage() {
   const router = useRouter();
 
-  // 获取当前站点
-  const currentSite = typeof window !== 'undefined' ? getSiteId() : 'toy';
-
-  // 所有潜客来源选项
+  // 所有潜客来源选项（不再按站点硬编码过滤）
   const allSourceOptions = [
     { value: 'WEBSITE', label: '网站询盘' },
     { value: 'EMAIL', label: '邮件开发' },
@@ -26,9 +22,7 @@ export default function EditLeadPage() {
     { value: 'INDEPENDENT_WEBSITE', label: '独立站' },
   ];
 
-  const sourceOptions = currentSite === 'seric'
-    ? allSourceOptions.filter(option => ['MADE_IN_CHINA', 'REFERRAL', 'INDEPENDENT_WEBSITE'].includes(option.value))
-    : allSourceOptions;
+  const sourceOptions = allSourceOptions;
   const params = useParams();
   const leadId = Number(params.id);
 

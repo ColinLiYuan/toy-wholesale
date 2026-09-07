@@ -7,7 +7,7 @@ import PaginationClient from '@/components/PaginationClient';
 import SortSelect from '@/components/SortSelect';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import { categories, findCategoryBySlug } from '@/lib/categories';
+import { fetchSiteCategories, findCategoryBySlug, CategoryItem } from '@/lib/categories';
 
 export const metadata: Metadata = {
   title: 'Wholesale Adult Toys Catalog — Bulk Orders from Factory',
@@ -72,7 +72,15 @@ export default async function ProductsPage({
     console.error('Failed to fetch products:', error);
   }
 
-  const currentCategory = categoryParam !== 'all' ? findCategoryBySlug(categoryParam) : undefined;
+  // 分类树来自后端（商户在管理端配置）；无配置时为空，不兜底
+  let categoryTree: CategoryItem[] = [];
+  try {
+    categoryTree = await fetchSiteCategories();
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+  }
+
+  const currentCategory = categoryParam !== 'all' ? findCategoryBySlug(categoryParam, categoryTree) : undefined;
 
   return (
     <div className="min-h-screen bg-surface">
@@ -103,7 +111,7 @@ export default async function ProductsPage({
       {/* Top Title Bar — compact, not a huge hero */}
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-          <WholesaleBreadcrumbs currentCategory={categoryParam === 'all' ? undefined : categoryParam} />
+          <WholesaleBreadcrumbs categories={categoryTree} currentCategory={categoryParam === 'all' ? undefined : categoryParam} />
 
           <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
@@ -139,7 +147,7 @@ export default async function ProductsPage({
             <div className="hidden lg:block w-72 flex-shrink-0">
               <div className="sticky top-24">
                 <Suspense fallback={<div className="w-72 h-96 bg-gray-100 animate-pulse rounded-xl" />}>
-                  <WholesaleFilter selectedCategory={categoryParam === 'all' ? undefined : categoryParam} />
+                  <WholesaleFilter categories={categoryTree} selectedCategory={categoryParam === 'all' ? undefined : categoryParam} />
                 </Suspense>
               </div>
             </div>

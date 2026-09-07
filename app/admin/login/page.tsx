@@ -35,8 +35,17 @@ export default function LoginPage() {
       
       // 2. 设置 localStorage
       localStorage.setItem('admin_token', response.token);
+      if (response.refreshToken) {
+        localStorage.setItem('admin_refresh_token', response.refreshToken);
+      }
       if (response.admin) {
-        localStorage.setItem('admin_info', JSON.stringify(response.admin));
+        // 存储完整登录信息（含 RBAC 能力），管理端侧边栏按 permissions 过滤菜单
+        localStorage.setItem('admin_info', JSON.stringify({
+          ...response.admin,
+          permissions: response.permissions,
+          boundSiteIds: response.boundSiteIds,
+          hasGlobalBinding: response.hasGlobalBinding,
+        }));
       }
       
       // 3. 设置 cookie
@@ -136,6 +145,7 @@ export default function LoginPage() {
             <button
               onClick={() => {
                 localStorage.removeItem('admin_token');
+                localStorage.removeItem('admin_refresh_token');
                 localStorage.removeItem('admin_info');
                 setDebugInfo('LocalStorage 已清除');
               }}

@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
         hostname: 'pub-e5d14c6d386c4d90979458082617517a.r2.dev',
         pathname: '/**',
       },
+      {
+        // 站点专属 R2 公共域（Cloudflare 生成的 pub-*.r2.dev 单层子域）
+        protocol: 'https',
+        hostname: '*.r2.dev',
+        pathname: '/**',
+      },
     ],
   },
   async headers() {

@@ -1,6 +1,10 @@
-// 产品分类配置 - 支持多站点 + 中英文
+// 商品分类（后端驱动）：分类由商户在管理端「分类管理」中自行配置，
+// 本文件不再内置任何分类数据（平台原则：无兜底业务数据）。
+// 后端未配置分类时返回空树，前台分类区为空。
+import { BACKEND_BASE_URL } from '@/lib/api-config';
+
 export interface CategoryItem {
-  name: string;       // 中文名（admin 展示）
+  name: string;       // 中文名（管理端展示）
   nameEn: string;     // 英文名（前台展示）
   slug: string;
   priority?: number;
@@ -9,154 +13,58 @@ export interface CategoryItem {
   children?: CategoryItem[];
 }
 
-// ====================== toy (成人用品) ======================
-const toyCategories: CategoryItem[] = [
-  {
-    name: '仿真倒模', nameEn: 'Realistic Life-size Series', slug: 'realistic-life-size', priority: 1.0,
-    children: [
-      { name: '全身倒模(TPE)', nameEn: 'Full Torsos (TPE)', slug: 'tpe-torsos' },
-      { name: '硅胶高端款', nameEn: 'Silicone Premium', slug: 'silicone-torsos' },
-      { name: '臀模', nameEn: 'Butt & Hip Models', slug: 'butt-masturbators' },
-    ]
-  },
-  {
-    name: '仿真阳具', nameEn: 'Realistic Dildos', slug: 'realistic-dildos', priority: 0.95,
-    children: [
-      { name: '双层密度', nameEn: 'Dual-Density', slug: 'dual-density' },
-      { name: '吸盘底座', nameEn: 'Suction Cup', slug: 'suction-cup-dildos' },
-      { name: '经典非振动', nameEn: 'Non-Vibrating', slug: 'classic-dildos' },
-    ]
-  },
-  {
-    name: '男用器具', nameEn: 'Male Masturbators', slug: 'male-masturbators', priority: 0.85,
-    children: [
-      { name: '手动飞机杯', nameEn: 'Manual Strokers', slug: 'manual-strokers' },
-      { name: '电动杯系列', nameEn: 'Automatic Cups', slug: 'automatic-cups' },
-      { name: '前列腺按摩', nameEn: 'Prostate Massagers', slug: 'prostate-massagers' },
-      { name: '持久训练器', nameEn: 'Stamina Trainers', slug: 'stamina-trainers' },
-    ]
-  },
-  {
-    name: '振动器', nameEn: 'Vibrators & Tech', slug: 'vibrators', priority: 0.8,
-    children: [
-      { name: 'AV按摩棒', nameEn: 'Wand Vibrators', slug: 'wand-vibrators' },
-      { name: 'G点振动器', nameEn: 'G-Spot Vibrators', slug: 'g-spot-vibrators' },
-      { name: '兔子振动器', nameEn: 'Rabbit Vibrators', slug: 'rabbit-vibrators' },
-      { name: '阴蒂刺激器', nameEn: 'Clitoral Stimulators', slug: 'clitoral-stimulators' },
-      { name: '跳蛋', nameEn: 'Bullet Vibrators', slug: 'bullet-vibrators' },
-      { name: 'APP控制玩具', nameEn: 'App-Controlled Toys', slug: 'app-controlled' },
-    ]
-  },
-  {
-    name: '肛交玩具', nameEn: 'Anal Toys', slug: 'anal-toys', priority: 0.75,
-    children: [
-      { name: '肛塞', nameEn: 'Butt Plugs', slug: 'butt-plugs' },
-      { name: '拉珠', nameEn: 'Anal Beads', slug: 'anal-beads' },
-    ]
-  },
-  {
-    name: 'BDSM束缚', nameEn: 'BDSM & Bondage', slug: 'bdsm-bondage', priority: 0.7,
-    children: [
-      { name: '束缚带', nameEn: 'Restraints', slug: 'restraints' },
-      { name: '鞭打玩具', nameEn: 'Impact Play', slug: 'impact-play' },
-    ]
-  },
-];
+// 简易模块级缓存（仅客户端生效）：避免同一页面多个组件重复请求
+const treeCache: Record<string, { tree: CategoryItem[]; at: number }> = {};
+const CACHE_TTL = 30 * 1000;
 
-// ====================== seric (液压件) ======================
-const sericCategories: CategoryItem[] = [
-  {
-    name: '方向控制阀', nameEn: 'Directional Control Valves', slug: 'directional-control-valves', priority: 1.0,
-    children: [
-      { name: '电磁换向阀', nameEn: 'Solenoid Directional Valves', slug: 'solenoid-directional-valves',
-        children: [
-          { name: 'DSG系列', nameEn: 'DSG Series', slug: 'dsg-series' },
-          { name: '4WE系列', nameEn: '4WE Series', slug: '4we-series' },
-        ]
-      },
-      { name: '手动换向阀', nameEn: 'Manual Directional Valves', slug: 'manual-directional-valves' },
-      { name: '液控换向阀', nameEn: 'Pilot Operated Directional Valves', slug: 'pilot-operated-directional-valves' },
-      { name: '单向阀', nameEn: 'Check Valves', slug: 'check-valves' },
-      { name: '叠加式方向阀', nameEn: 'Sandwich Valves (Directional)', slug: 'sandwich-valves-directional' },
-    ]
-  },
-  {
-    name: '压力控制阀', nameEn: 'Pressure Control Valves', slug: 'pressure-control-valves', priority: 0.95,
-    children: [
-      { name: '溢流阀', nameEn: 'Relief Valves', slug: 'relief-valves',
-        children: [
-          { name: 'BT/G系列', nameEn: 'BT/G Series', slug: 'bt-g-series' },
-          { name: 'S-BT/G系列', nameEn: 'S-BT/G Series', slug: 's-bt-g-series' },
-          { name: 'BST/G系列', nameEn: 'BST/G Series', slug: 'bst-g-series' },
-          { name: 'S-BST/G系列', nameEn: 'S-BST/G Series', slug: 's-bst-g-series' },
-        ]
-      },
-      { name: '减压阀', nameEn: 'Reducing Valves', slug: 'reducing-valves' },
-      { name: '顺序阀', nameEn: 'Sequence Valves', slug: 'sequence-valves' },
-      { name: '压力开关', nameEn: 'Pressure Switches', slug: 'pressure-switches' },
-    ]
-  },
-  {
-    name: '流量控制阀', nameEn: 'Flow Control Valves', slug: 'flow-control-valves', priority: 0.9,
-    children: [
-      { name: '节流阀', nameEn: 'Throttle Valves', slug: 'throttle-valves' },
-      { name: '调速阀(压力补偿)', nameEn: 'Flow Control Valves (PC)', slug: 'flow-control-valves-pc' },
-      { name: '分流/集流阀', nameEn: 'Flow Divider/Combiner', slug: 'flow-divider-combiner' },
-    ]
-  },
-  {
-    name: '液压泵', nameEn: 'Hydraulic Pumps', slug: 'hydraulic-pumps', priority: 0.85,
-    children: [
-      { name: '齿轮泵', nameEn: 'Gear Pumps', slug: 'gear-pumps' },
-      { name: '叶片泵', nameEn: 'Vane Pumps', slug: 'vane-pumps' },
-      { name: '柱塞泵', nameEn: 'Piston Pumps', slug: 'piston-pumps' },
-    ]
-  },
-  {
-    name: '液压马达', nameEn: 'Hydraulic Motors', slug: 'hydraulic-motors', priority: 0.8,
-    children: [
-      { name: '摆线马达', nameEn: 'Orbital Motors', slug: 'orbital-motors',
-        children: [
-          { name: '丹佛斯同款', nameEn: 'Danfoss Equivalent', slug: 'danfoss-equivalent' },
-        ]
-      },
-      { name: '齿轮马达', nameEn: 'Gear Motors', slug: 'gear-motors' },
-      { name: '柱塞马达', nameEn: 'Piston Motors', slug: 'piston-motors' },
-    ]
-  },
-  {
-    name: '液压附件', nameEn: 'Hydraulic Accessories', slug: 'hydraulic-accessories', priority: 0.7,
-    children: [
-      { name: '过滤器', nameEn: 'Filters', slug: 'filters' },
-      { name: '蓄能器', nameEn: 'Accumulators', slug: 'accumulators' },
-      { name: '压力表', nameEn: 'Pressure Gauges', slug: 'pressure-gauges' },
-      { name: '接头管件', nameEn: 'Fittings & Couplings', slug: 'fittings-couplings' },
-      { name: '密封件', nameEn: 'Seals', slug: 'seals' },
-    ]
-  },
-  {
-    name: '叠加阀/插装阀', nameEn: 'Sandwich / Cartridge Valves', slug: 'sandwich-cartridge-valves', priority: 0.65,
-    children: [
-      { name: '叠加阀', nameEn: 'Sandwich Valves', slug: 'sandwich-valves' },
-      { name: '插装阀', nameEn: 'Cartridge Valves', slug: 'cartridge-valves' },
-    ]
-  },
-];
-
-// ====================== 按站点获取分类 ======================
-const allSiteCategories: Record<string, CategoryItem[]> = {
-  toy: toyCategories,
-  seric: sericCategories,
-};
-
-export function getSiteCategories(siteId?: string): CategoryItem[] {
-  if (!siteId) return toyCategories;
-  return allSiteCategories[siteId] || toyCategories;
+function resolveSiteId(siteId?: string): string {
+  if (siteId) return siteId;
+  // 公共前台站点由部署配置决定（NEXT_PUBLIC_SITE_ID）
+  return process.env.NEXT_PUBLIC_SITE_ID || '';
 }
 
-// 辅助函数：获取父分类
-export const getParentCategory = (childSlug: string): CategoryItem | undefined => {
-  for (const category of toyCategories) {
+/**
+ * 拉取站点分类树：GET /api/v1/categories/tree（公开接口，仅返回启用中的 CATEGORY）
+ * 服务端组件（SSR）与客户端组件均可调用；失败/空 → []
+ */
+export async function fetchSiteCategories(siteId?: string): Promise<CategoryItem[]> {
+  const sid = resolveSiteId(siteId);
+  const cacheKey = sid || '__default__';
+
+  // 客户端复用短缓存，服务端每次都取（配合 Next fetch revalidate）
+  if (typeof window !== 'undefined') {
+    const cached = treeCache[cacheKey];
+    if (cached && Date.now() - cached.at < CACHE_TTL) {
+      return cached.tree;
+    }
+  }
+
+  try {
+    const headers: Record<string, string> = sid ? { 'X-Site-Id': sid } : {};
+    const res = await fetch(`${BACKEND_BASE_URL}/api/v1/categories/tree`, {
+      headers,
+      ...(typeof window === 'undefined' ? { next: { revalidate: 60 } } : {}),
+    });
+    if (!res.ok) return [];
+    const body = await res.json();
+    const tree: CategoryItem[] =
+      body?.code === 200 && Array.isArray(body?.data) ? body.data : [];
+    treeCache[cacheKey] = { tree, at: Date.now() };
+    return tree;
+  } catch (error) {
+    console.error('获取分类树失败:', error);
+    return [];
+  }
+}
+
+// 兼容旧调用方（内嵌 /admin 的 CategorySelector，后期随内嵌后台删除）
+export async function getSiteCategories(siteId?: string): Promise<CategoryItem[]> {
+  return fetchSiteCategories(siteId);
+}
+
+// 辅助函数：获取父分类（对传入树操作）
+export const getParentCategory = (childSlug: string, tree: CategoryItem[]): CategoryItem | undefined => {
+  for (const category of tree) {
     if (category.children?.some(child => child.slug === childSlug)) return category;
     for (const child of category.children || []) {
       if (child.children?.some(gc => gc.slug === childSlug)) return child;
@@ -165,13 +73,9 @@ export const getParentCategory = (childSlug: string): CategoryItem | undefined =
   return undefined;
 };
 
-// 兼容旧代码
-export const categories = toyCategories;
-
-// 辅助函数：根据 slug 查找分类
-export const findCategoryBySlug = (slug: string, siteId?: string): CategoryItem | undefined => {
-  const cats = getSiteCategories(siteId);
-  for (const category of cats) {
+// 辅助函数：根据 slug 查找分类（对传入树操作）
+export const findCategoryBySlug = (slug: string, tree: CategoryItem[]): CategoryItem | undefined => {
+  for (const category of tree) {
     if (category.slug === slug) return category;
     if (category.children) {
       for (const child of category.children) {
@@ -186,16 +90,15 @@ export const findCategoryBySlug = (slug: string, siteId?: string): CategoryItem 
   return undefined;
 };
 
-// 辅助函数：获取所有叶子节点
-export const getLeafCategories = (siteId?: string): CategoryItem[] => {
+// 辅助函数：获取所有叶子节点（对传入树操作）
+export const getLeafCategories = (tree: CategoryItem[]): CategoryItem[] => {
   const leaves: CategoryItem[] = [];
-  const cats = getSiteCategories(siteId);
   const collect = (items: CategoryItem[]) => {
     items.forEach(item => {
       if (!item.children || item.children.length === 0) leaves.push(item);
       else collect(item.children);
     });
   };
-  collect(cats);
+  collect(tree);
   return leaves;
 };

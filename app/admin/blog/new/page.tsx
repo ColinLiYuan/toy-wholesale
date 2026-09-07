@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { blogAdminService } from '@/services';
 import { formatImageUrl } from '@/lib/api-config';
+import { getSiteId } from '@/lib/api-client';
 
 export default function NewBlogPage() {
   const router = useRouter();
@@ -66,6 +67,7 @@ export default function NewBlogPage() {
 
       const response = await fetch('/api/v1/upload/blog', {
         method: 'POST',
+        headers: getSiteId() ? { 'X-Site-Id': getSiteId() } : {},
         body: formData,
       });
 

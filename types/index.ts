@@ -230,12 +230,16 @@ export interface Admin {
   updatedAt?: string;
 }
 
-// 管理员登录响应类型
+// 管理员登录响应类型（与后端 AdminService.login 返回对齐，含 RBAC 能力下发）
 export interface AdminLoginResponse {
   success: boolean;
   message?: string;
   token?: string;
+  refreshToken?: string;
   admin?: Admin;
+  permissions?: string[];  // RBAC 权限码列表，如 product:view（管理端侧边栏按此过滤菜单）
+  boundSiteIds?: string[];  // 绑定的站点编码（全局管理员为空/含全部）
+  hasGlobalBinding?: boolean;  // 是否全局绑定（不受站点限制）
 }
 
 // 认证响应类型

@@ -8,12 +8,14 @@ export async function GET() {
 
     let blogs: BlogPost[] = []
     try {
+        // 站点由部署配置决定（NEXT_PUBLIC_SITE_ID），不再硬编码
+        const siteId = process.env.NEXT_PUBLIC_SITE_ID || ''
         const blogUrl = `${apiBaseUrl}/api/v1/blog/posts?page=0&size=1000`
         const res = await fetch(blogUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Site-Id': 'toy',
+                ...(siteId ? { 'X-Site-Id': siteId } : {}),
             },
             cache: 'no-store'
         })

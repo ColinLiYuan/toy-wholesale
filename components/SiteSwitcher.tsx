@@ -9,18 +9,18 @@ interface SiteSwitcherProps {
 }
 
 export default function SiteSwitcher({ className = '', onSiteChange }: SiteSwitcherProps) {
-  const [currentSite, setCurrentSite] = useState<string>('toy');
+  const [currentSite, setCurrentSite] = useState<string>('');
   const [availableSites, setAvailableSites] = useState<SiteConfig[]>([]);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    // 获取当前站点和所有可用站点
-    const current = getCurrentSite();
-    const sites = getAllSites();
-    
-    setCurrentSite(current.id);
-    setAvailableSites(sites);
+    // 从后端获取所有可用站点（失败时站点服务自动回退兜底列表）
+    getAllSites().then((sites) => {
+      const current = getCurrentSite();
+      setCurrentSite(current.id);
+      setAvailableSites(sites);
+    });
   }, []);
 
   const handleSiteChange = (newSiteId: string) => {
@@ -37,7 +37,8 @@ export default function SiteSwitcher({ className = '', onSiteChange }: SiteSwitc
     }
   };
 
-  if (!isClient || availableSites.length === 0) {
+  // 站点数 ≤1 时隐藏切换器（对齐零售：只有一个站点的平台没必要切换）
+  if (!isClient || availableSites.length <= 1) {
     return null;
   }
 

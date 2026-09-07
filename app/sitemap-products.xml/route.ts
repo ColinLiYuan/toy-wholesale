@@ -7,12 +7,14 @@ export async function GET() {
 
     let products: Product[] = []
     try {
+        // 站点由部署配置决定（NEXT_PUBLIC_SITE_ID），不再硬编码
+        const siteId = process.env.NEXT_PUBLIC_SITE_ID || ''
         const productUrl = `${apiBaseUrl}/api/v1/products?page=0&size=100`
         const res = await fetch(productUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Site-Id': 'toy',
+                ...(siteId ? { 'X-Site-Id': siteId } : {}),
             },
             cache: 'no-store'
         })

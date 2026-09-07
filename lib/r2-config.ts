@@ -8,7 +8,10 @@ export const IMAGE_PATHS = {
   showcase: '/showcase',
 };
 
-// 获取完整图片 URL
+// 获取完整图片 URL（后端已返回完整 URL 时原样透传，防止双前缀）
 export const getImageUrl = (path: string): string => {
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
   return `${R2_BASE_URL}${path}`;
 };

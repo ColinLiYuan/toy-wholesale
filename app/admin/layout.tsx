@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { setSiteId } from '@/lib/api-client';
-import { getAllSites, getCurrentSite, switchToSite, SiteConfig } from '@/lib/site-service';
+import { getCurrentSite } from '@/lib/site-service';
+import { ADMIN_NAVIGATION, filterNavigation, NavItem } from '@/lib/admin-navigation';
 import SiteSwitcher from '@/components/SiteSwitcher';
 
 // 检查是否已登录
@@ -14,140 +15,6 @@ const checkAuth = () => {
     return !!token;
   }
   return false;
-};
-
-type MenuItem = {
-  name: string;
-  href: string;
-  icon: string;
-  children?: { name: string; href: string }[];
-};
-
-const siteConfig: Record<string, { label: string; adminName: string; menus: MenuItem[] }> = {
-  toy: {
-    label: 'SinTone',
-    adminName: 'SinTone Admin',
-    menus: [
-      { name: '产品管理', href: '/admin/products', icon: '📦' },
-      { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
-      { name: '潜客管理', href: '/admin/leads', icon: '👥' },
-      { name: '供应商管理', href: '/admin/suppliers', icon: '🏭' },
-      { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
-      { name: '订单管理', href: '/admin/orders', icon: '🛒' },
-      { name: '报价单管理', href: '/admin/quotation', icon: '📄' },
-      {
-        name: '支出管理',
-        href: '/admin/expenses',
-        icon: '💰',
-        children: [
-          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
-          { name: '销售费用', href: '/admin/expenses?type=SALES' },
-          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
-        ],
-      },
-      {
-        name: '收入管理',
-        href: '/admin/incomes',
-        icon: '💵',
-        children: [
-          { name: '订单收款', href: '/admin/incomes?type=ORDER' },
-        ],
-      },
-      { name: '博客管理', href: '/admin/blog', icon: '📝' },
-    ],
-  },
-  myth: {
-    label: 'Myth',
-    adminName: 'Myth Admin',
-    menus: [
-      {
-        name: '支出管理',
-        href: '/admin/expenses',
-        icon: '💰',
-        children: [
-          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
-          { name: '销售费用', href: '/admin/expenses?type=SALES' },
-          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
-        ],
-      },
-      { name: '收入管理', href: '/admin/incomes', icon: '💵' },
-    ],
-  },
-  general: {
-    label: '通用',
-    adminName: '通用 Admin',
-    menus: [
-      {
-        name: '支出管理',
-        href: '/admin/expenses',
-        icon: '💰',
-        children: [
-          { name: '管理费用', href: '/admin/expenses?type=ADMIN' },
-          { name: '其他杂费', href: '/admin/expenses?type=OTHER' },
-        ],
-      },
-      { name: '收入管理', href: '/admin/incomes', icon: '💵' },
-      { name: '运营账号', href: '/admin/operation-accounts', icon: '🌐' },
-      {
-        name: 'SEO 专题',
-        href: '/admin/seo-knowledge',
-        icon: '🔍',
-        children: [
-          { name: 'SEO 基础知识', href: '/admin/seo-knowledge/basics' },
-          { name: '技术 SEO', href: '/admin/seo-knowledge/technical' },
-          { name: '内容策略', href: '/admin/seo-knowledge/content' },
-          { name: '数据分析', href: '/admin/seo-knowledge/analytics' },
-          { name: '国际化 SEO', href: '/admin/seo-knowledge/international' },
-        ],
-      },
-      { name: 'SEO关键字管理', href: '/admin/seo-keywords', icon: '🏷️' },
-      {
-        name: '外贸专题',
-        href: '/admin/trade-knowledge',
-        icon: '📚',
-        children: [
-          { name: '基础知识', href: '/admin/trade-knowledge/basics' },
-          { name: '报价管理', href: '/admin/trade-knowledge/quotation' },
-          { name: '跟单流程', href: '/admin/trade-knowledge/order-followup' },
-          { name: '支付与风控', href: '/admin/trade-knowledge/payment-risk' },
-          { name: '物流与通关', href: '/admin/trade-knowledge/logistics-customs' },
-          { name: '产品认证', href: '/admin/trade-knowledge/certifications' },
-          { name: '报价计算器', href: '/admin/quotation-calculator' },
-        ],
-      },
-    ],
-  },
-  seric: {
-    label: 'Seric',
-    adminName: 'Seric Admin',
-    menus: [
-      { name: '产品管理', href: '/admin/products', icon: '📦' },
-      { name: '询盘管理', href: '/admin/inquiries', icon: '📋' },
-      { name: '潜客管理', href: '/admin/leads', icon: '👥' },
-      { name: '供应商管理', href: '/admin/suppliers', icon: '🏭' },
-      { name: '访问记录', href: '/admin/visit-records', icon: '📋' },
-      { name: '经销商管理', href: '/admin/distributors', icon: '🏢' },
-      { name: '订单管理', href: '/admin/orders', icon: '🛒' },
-      {
-        name: '支出管理',
-        href: '/admin/expenses',
-        icon: '💰',
-        children: [
-          { name: '采购成本', href: '/admin/expenses?type=PURCHASE' },
-          { name: '销售费用', href: '/admin/expenses?type=SALES' },
-          { name: '物流费用', href: '/admin/expenses?type=LOGISTICS' },
-        ],
-      },
-      {
-        name: '收入管理',
-        href: '/admin/incomes',
-        icon: '💵',
-        children: [
-          { name: '订单收款', href: '/admin/incomes?type=ORDER' },
-        ],
-      },
-    ],
-  },
 };
 
 export default function AdminLayout({
@@ -162,18 +29,28 @@ export default function AdminLayout({
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [currentSite, setCurrentSite] = useState('toy');
-  const navigation = siteConfig[currentSite]?.menus || siteConfig.toy.menus;
+  const [currentSite, setCurrentSite] = useState('');
+  // 导航为单一全局配置（lib/admin-navigation.ts），按登录下发的权限过滤，不再按站点硬编码
+  const [navigation, setNavigation] = useState<NavItem[]>(ADMIN_NAVIGATION);
 
   // 标记客户端渲染，初始化站点
   useEffect(() => {
     setIsClient(true);
 
-    // 从 localStorage 恢复站点选择
+    // 从 localStorage 恢复站点选择（合法性由 api-client 的站点集合校验）
     const savedSite = localStorage.getItem('admin_site_id');
-    if (savedSite && siteConfig[savedSite]) {
+    if (savedSite) {
       setCurrentSite(savedSite);
       setSiteId(savedSite);
+    }
+
+    // 按 admin_info 里的 permissions 过滤菜单（对齐零售侧边栏）。
+    // 旧会话没有该字段（undefined）→ 保持显示全部，避免升级期间菜单消失。
+    try {
+      const info = JSON.parse(localStorage.getItem('admin_info') || 'null');
+      setNavigation(filterNavigation(info?.permissions));
+    } catch {
+      // 解析失败保持默认全部
     }
 
     // 排除登录页面
@@ -190,27 +67,24 @@ export default function AdminLayout({
     }
   }, [pathname, router]);
 
-  // 获取所有可用站点配置用于下拉菜单
-  const availableSites = getAllSites();
-
   // 当路由变化时，自动展开包含当前页面的父菜单
   useEffect(() => {
     if (isClient && isAuthenticated && pathname !== '/admin/login') {
       const newExpandedMenus: Record<string, boolean> = {};
-      
-      navigation.forEach((item: any) => {
+
+      navigation.forEach((item: NavItem) => {
         if (item.children && item.children.length > 0) {
           // 检查当前路径是否匹配任何子菜单
-          const hasActiveChild = item.children.some((child: any) => 
+          const hasActiveChild = item.children.some((child: { name: string; href: string }) =>
             pathname === child.href || pathname?.startsWith(child.href.split('#')[0])
           );
-          
+
           if (hasActiveChild) {
             newExpandedMenus[item.name] = true;
           }
         }
       });
-      
+
       // 只有当有新的菜单需要展开时才更新状态
       if (Object.keys(newExpandedMenus).length > 0) {
         setExpandedMenus(prev => ({
@@ -219,7 +93,7 @@ export default function AdminLayout({
         }));
       }
     }
-  }, [pathname, isClient, isAuthenticated]);
+  }, [pathname, isClient, isAuthenticated, navigation]);
 
   // 服务端渲染或客户端初始化期间，显示加载中
   if (!isClient) {
@@ -252,6 +126,9 @@ export default function AdminLayout({
     }));
   };
 
+  // 站点名称来自站点服务（后端 /api/v1/sites，失败回退兜底列表）
+  const adminName = getCurrentSite().adminName || 'Admin';
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* 侧边栏 */}
@@ -262,7 +139,7 @@ export default function AdminLayout({
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
             <Link href={navigation[0]?.href || '/admin/dashboard'} className="text-xl font-bold text-brand">
-              {siteConfig[currentSite]?.adminName || 'Admin'}
+              {adminName}
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -274,7 +151,7 @@ export default function AdminLayout({
 
           {/* 导航菜单 */}
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {navigation.map((item: any) => {
+            {navigation.map((item: NavItem) => {
               const isActive = pathname === item.href || pathname?.startsWith(item.href.split('#')[0]);
               const hasChildren = item.children && item.children.length > 0;
               const isExpanded = expandedMenus[item.name] || isActive;
@@ -311,7 +188,7 @@ export default function AdminLayout({
                   {/* 子菜单 */}
                   {hasChildren && isExpanded && (
                     <div className="ml-8 mt-1 space-y-1">
-                      {item.children.map((child: any) => {
+                      {(item.children || []).map((child: { name: string; href: string }) => {
                         const isChildActive = pathname === child.href || pathname?.startsWith(child.href.split('#')[0]);
                         return (
                           <Link
@@ -370,15 +247,26 @@ export default function AdminLayout({
             <span className="text-sm text-gray-600">管理员</span>
             <button
               onClick={async () => {
+                // 服务端作废 refresh token（尽力而为，失败不阻塞登出）
+                const refreshToken = localStorage.getItem('admin_refresh_token');
+                if (refreshToken) {
+                  fetch('/api/v1/admin/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken }),
+                  }).catch(() => {});
+                }
+
                 // 清除 localStorage
                 localStorage.removeItem('admin_token');
+                localStorage.removeItem('admin_refresh_token');
                 localStorage.removeItem('admin_info');
-                
+
                 // 清除 cookie
                 await fetch('/api/admin/logout', {
                   method: 'POST',
                 });
-                
+
                 // 跳转到登录页
                 router.push('/admin/login');
               }}

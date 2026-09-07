@@ -1,21 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import { findCategoryBySlug, getParentCategory } from '@/lib/categories';
+import { findCategoryBySlug, CategoryItem } from '@/lib/categories';
 
 interface BreadcrumbsProps {
+  categories: CategoryItem[];
   parentSlug?: string;
   childSlug?: string;
 }
 
-export default function DynamicBreadcrumbs({ parentSlug, childSlug }: BreadcrumbsProps) {
+export default function DynamicBreadcrumbs({ categories, parentSlug, childSlug }: BreadcrumbsProps) {
   // 构建面包屑路径
   const breadcrumbs = [
     { label: 'Home', href: '/' },
   ];
 
   if (parentSlug) {
-    const parentCategory = findCategoryBySlug(parentSlug);
+    const parentCategory = findCategoryBySlug(parentSlug, categories);
     if (parentCategory) {
       breadcrumbs.push({
         label: parentCategory.name,
@@ -25,7 +26,7 @@ export default function DynamicBreadcrumbs({ parentSlug, childSlug }: Breadcrumb
   }
 
   if (childSlug && parentSlug) {
-    const childCategory = findCategoryBySlug(childSlug);
+    const childCategory = findCategoryBySlug(childSlug, categories);
     if (childCategory) {
       breadcrumbs.push({
         label: childCategory.name,

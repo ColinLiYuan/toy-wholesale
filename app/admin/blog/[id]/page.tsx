@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { blogAdminService } from '@/services';
 import { BlogPost } from '@/types';
 import { formatImageUrl } from '@/lib/api-config';
+import { getSiteId } from '@/lib/api-client';
 import MDEditor from '@uiw/react-md-editor';
 
 export default function EditBlogPage() {
@@ -121,6 +122,7 @@ export default function EditBlogPage() {
 
       const response = await fetch('/api/v1/upload/blog', {
         method: 'POST',
+        headers: getSiteId() ? { 'X-Site-Id': getSiteId() } : {},
         body: formData,
       });
 

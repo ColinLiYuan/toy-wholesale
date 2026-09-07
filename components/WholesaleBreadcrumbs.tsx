@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { categories, findCategoryBySlug, getParentCategory } from '@/lib/categories';
+import { findCategoryBySlug, getParentCategory, CategoryItem } from '@/lib/categories';
 
 interface WholesaleBreadcrumbsProps {
+  categories: CategoryItem[];
   currentCategory?: string;
 }
 
-export default function WholesaleBreadcrumbs({ currentCategory }: WholesaleBreadcrumbsProps) {
+export default function WholesaleBreadcrumbs({ categories, currentCategory }: WholesaleBreadcrumbsProps) {
   if (!currentCategory) {
     return (
       <nav className="flex items-center space-x-2 text-sm">
@@ -17,14 +18,14 @@ export default function WholesaleBreadcrumbs({ currentCategory }: WholesaleBread
   }
 
   // 查找当前分类
-  const category = findCategoryBySlug(currentCategory);
-  
+  const category = findCategoryBySlug(currentCategory, categories);
+
   if (!category) {
     return null;
   }
 
   // 查找父级分类
-  const parent = getParentCategory(currentCategory);
+  const parent = getParentCategory(currentCategory, categories);
 
   return (
     <nav className="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">

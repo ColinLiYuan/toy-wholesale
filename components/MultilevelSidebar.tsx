@@ -3,14 +3,15 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { categories, CategoryItem } from '@/lib/categories';
+import type { CategoryItem } from '@/lib/categories';
 
 interface MultilevelSidebarProps {
+  categories: CategoryItem[];
   selectedCategory?: string;
   onCategorySelect?: (slug: string) => void;
 }
 
-export default function MultilevelSidebar({ selectedCategory, onCategorySelect }: MultilevelSidebarProps) {
+export default function MultilevelSidebar({ categories, selectedCategory, onCategorySelect }: MultilevelSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   
@@ -66,7 +67,7 @@ export default function MultilevelSidebar({ selectedCategory, onCategorySelect }
     }
     
     setExpandedCategories(newExpanded);
-  }, [childSlug, parentFromUrl]);
+  }, [categories, childSlug, parentFromUrl]);
 
   // 切换分类展开/折叠状态
   const toggleExpand = (slug: string) => {

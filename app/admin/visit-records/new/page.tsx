@@ -5,12 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { visitRecordAdminService, supplierService, supplierAdminService, distributorAdminService } from '@/services';
 import type { VisitRecord, Supplier, Distributor } from '@/types';
-import { getSiteId } from '@/lib/api-client';
 
 export default function NewVisitRecordPage() {
   const router = useRouter();
-
-  const currentSite = typeof window !== 'undefined' ? getSiteId() : 'toy';
 
   const [formData, setFormData] = useState<Partial<VisitRecord>>({
     visitType: 'SUPPLIER_VISIT',

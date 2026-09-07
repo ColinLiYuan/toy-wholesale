@@ -1973,21 +1973,32 @@ export const distributorAdminService = {
 
 // 管理员服务
 export const adminService = {
-  // 管理员登录 - POST /api/v1/admin/login
-  async login(username: string, password: string): Promise<{ token: string; admin: Admin }> {
+  // 管理员登录 - POST /api/v1/admin/login（后端同时下发 RBAC 能力，供侧边栏过滤菜单）
+  async login(username: string, password: string): Promise<{
+    token: string;
+    refreshToken?: string;
+    admin: Admin;
+    permissions?: string[];
+    boundSiteIds?: string[];
+    hasGlobalBinding?: boolean;
+  }> {
     try {
       const apiResult: ApiResult<any> = await apiClient.post(
         '/v1/admin/login',
         { username, password }
       );
-      
+
       if (apiResult.code !== 200) {
         throw new Error(apiResult.message || 'Login failed');
       }
-      
+
       return {
         token: apiResult.data.token,
+        refreshToken: apiResult.data.refreshToken,
         admin: apiResult.data.admin,
+        permissions: apiResult.data.permissions,
+        boundSiteIds: apiResult.data.boundSiteIds,
+        hasGlobalBinding: apiResult.data.hasGlobalBinding,
       };
     } catch (error) {
       console.error('Login failed:', error);
@@ -2332,10 +2343,18 @@ export const attachmentService = {
     }
   },
 
-  // 下载附件 - GET /api/v1/attachments/{id}/download
-  async downloadAttachment(id: number): Promise<void> {
+  // 下载附件 - GET /api/v1/attachments/{id}/download（axios blob 带 token，window.open 无法携带 Authorization）
+  async downloadAttachment(id: number, fileName?: string): Promise<void> {
     try {
-      window.open(`/api/v1/attachments/${id}/download`, '_blank');
+      const blob = await apiClient.get(`/v1/attachments/${id}/download`, { responseType: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName || `attachment-${id}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Failed to download attachment:', error);
       throw error;

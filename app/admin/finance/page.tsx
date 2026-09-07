@@ -27,10 +27,11 @@ export default function FinancePage() {
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:1100';
-      const siteId = localStorage.getItem('admin_site_id') || 'toy';
+      const siteId = localStorage.getItem('admin_site_id') || '';
+      const headers: Record<string, string> = siteId ? { 'X-Site-Id': siteId } : {};
       const [expRes, incRes] = await Promise.all([
-        fetch(`${base}/api/v1/expenses?page=0&size=500`, { headers: { 'X-Site-Id': siteId } }),
-        fetch(`${base}/api/v1/incomes?page=0&size=500`, { headers: { 'X-Site-Id': siteId } }),
+        fetch(`${base}/api/v1/expenses?page=0&size=500`, { headers }),
+        fetch(`${base}/api/v1/incomes?page=0&size=500`, { headers }),
       ]);
       const expenses = expRes.ok ? (await expRes.json()).data?.content || [] : [];
       const incomes = incRes.ok ? (await incRes.json()).data?.content || [] : [];

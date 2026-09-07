@@ -6,6 +6,19 @@ import Link from 'next/link';
 import type { Product } from '@/types';
 import { inquiryCartUtils } from '@/lib/inquiry-cart';
 
+// 本地兜底颜色码映射（字典不可用时使用）
+const FALLBACK_COLOR_MAP: Record<string, string> = {
+  'BK': 'Black',
+  'WH': 'White',
+  'RD': 'Red',
+  'PK': 'Pink',
+  'PU': 'Purple',
+  'BL': 'Blue',
+  'GN': 'Green',
+  'SK': 'Skin',
+  'CL': 'Clear',
+};
+
 interface ProductDetailClientProps {
   initialProduct: Product | null;
   error: string | null;
@@ -23,6 +36,31 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
   const [isHovering, setIsHovering] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const mainImageRef = useRef<HTMLDivElement>(null);
+
+  // 颜色码 → 颜色名：优先取字典（商户在「字典管理」中配置），失败回退本地常量
+  const [colorMap, setColorMap] = useState<Record<string, string>>(FALLBACK_COLOR_MAP);
+
+  useEffect(() => {
+    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
+    const siteId = process.env.NEXT_PUBLIC_SITE_ID || '';
+    const headers: Record<string, string> = siteId ? { 'X-Site-Id': siteId } : {};
+    fetch(`${apiBaseUrl}/api/v1/dicts?type=COLOR`, { headers })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('dicts fetch failed'))))
+      .then((body) => {
+        if (body?.code === 200 && Array.isArray(body?.data) && body.data.length > 0) {
+          const map: Record<string, string> = {};
+          body.data.forEach((item: { label?: string; value?: string }) => {
+            if (item.value && item.label && !map[item.value]) {
+              map[item.value] = item.label;
+            }
+          });
+          setColorMap(map);
+        }
+      })
+      .catch(() => {
+        // 字典不可用时保持本地常量兜底
+      });
+  }, []);
 
   // 如果初始产品未加载，尝试重新获取
   useEffect(() => {
@@ -346,18 +384,7 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">Available Options</h3>
                   <div className="space-y-2">
                     {product.productSkus.map((sku, index) => {
-                      // 颜色代码映射到全称（与新建产品页面保持一致）
-                      const colorMap: Record<string, string> = {
-                        'BK': 'Black',
-                        'WH': 'White',
-                        'RD': 'Red',
-                        'PK': 'Pink',
-                        'PU': 'Purple',
-                        'BL': 'Blue',
-                        'GN': 'Green',
-                        'SK': 'Skin',
-                        'CL': 'Clear',
-                      };
+                      // 颜色码 → 颜色名（优先字典，见 colorMap 状态）
                       const fullColorName = sku.color ? (colorMap[sku.color] || sku.color) : '';
                       
                       return (

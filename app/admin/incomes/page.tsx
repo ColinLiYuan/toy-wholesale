@@ -18,8 +18,8 @@ export default function IncomesPage() {
 
   const fetchStats = async () => {
     try {
-      const siteId = localStorage.getItem('admin_site_id') || 'toy';
-      const res = await fetch('/api/v1/incomes/stats', { headers: { 'X-Site-Id': siteId } });
+      const siteId = localStorage.getItem('admin_site_id') || '';
+      const res = await fetch('/api/v1/incomes/stats', { headers: siteId ? { 'X-Site-Id': siteId } : {} });
       const json = await res.json();
       if (json.code === 200) setStats(json.data);
     } catch (e) { console.error(e); }

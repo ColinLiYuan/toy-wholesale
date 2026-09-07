@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { categories } from '@/lib/categories';
+import type { CategoryItem } from '@/lib/categories';
 
 interface WholesaleFilterProps {
+  categories: CategoryItem[];
   selectedCategory?: string;
   onFilterChange?: (filters: WholesaleFilters) => void;
 }
-
 export interface WholesaleFilters {
   materials?: string[];
   weightRange?: string;
@@ -26,7 +26,7 @@ const WEIGHT_RANGES = [
 
 const MATERIALS = ['TPE', 'Silicone', 'ABS', 'Glass', 'Metal', 'CyberSkin', 'PVC'];
 
-export default function WholesaleFilter({ selectedCategory, onFilterChange }: WholesaleFilterProps) {
+export default function WholesaleFilter({ categories, selectedCategory, onFilterChange }: WholesaleFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

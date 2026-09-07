@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { seoKeywordService } from '@/services';
+import { getSiteId } from '@/lib/api-client';
 
 export default function NewSeoKeywordPage() {
   const router = useRouter();
@@ -81,7 +82,8 @@ export default function NewSeoKeywordPage() {
     try {
       const keywordData: any = {
         keyword: formData.keyword.trim(),
-        siteId: 'toy', // 默认站点
+        // 取当前站点；未选择时交由后端按请求站点处理
+        siteId: getSiteId() || undefined,
       };
 
       // 可选字段

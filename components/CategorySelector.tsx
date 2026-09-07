@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getSiteCategories, CategoryItem } from '@/lib/categories';
 import { getSiteId } from '@/lib/api-client';
 
@@ -11,7 +11,16 @@ interface CategorySelectorProps {
 
 export default function CategorySelector({ selectedCategories, onChange }: CategorySelectorProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
-  const siteCategories = getSiteCategories(typeof window !== 'undefined' ? getSiteId() : 'toy');
+  // 分类树来自后端（商户在「分类管理」中配置）；未配置时为空
+  const [siteCategories, setSiteCategories] = useState<CategoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getSiteCategories(typeof window !== 'undefined' ? getSiteId() : '')
+      .then(setSiteCategories)
+      .catch(() => setSiteCategories([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const toggleExpand = (slug: string) => {
     const newExpanded = new Set(expandedCategories);
@@ -29,6 +38,14 @@ export default function CategorySelector({ selectedCategories, onChange }: Categ
       : [...selectedCategories, slug];
     onChange(newCategories);
   };
+
+  if (loading) {
+    return <p className="text-sm text-gray-400 py-4">分类加载中...</p>;
+  }
+
+  if (siteCategories.length === 0) {
+    return <p className="text-sm text-gray-400 py-4">暂无分类，请先在「分类管理」中配置</p>;
+  }
 
   return (
     <div className="border border-gray-300 rounded-lg p-4 max-h-96 overflow-y-auto">

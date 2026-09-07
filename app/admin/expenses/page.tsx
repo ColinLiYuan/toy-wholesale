@@ -25,8 +25,8 @@ export default function ExpensesPage() {
   const fetchStats = async () => {
     try {
       const url = expenseType ? `/api/v1/expenses/stats?type=${expenseType}` : '/api/v1/expenses/stats';
-      const siteId = localStorage.getItem('admin_site_id') || 'toy';
-      const res = await fetch(url, { headers: { 'X-Site-Id': siteId } });
+      const siteId = localStorage.getItem('admin_site_id') || '';
+      const res = await fetch(url, { headers: siteId ? { 'X-Site-Id': siteId } : {} });
       const json = await res.json();
       if (json.code === 200) setStats(json.data);
     } catch (e) { console.error(e); }

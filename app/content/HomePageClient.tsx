@@ -23,9 +23,12 @@ export default function HomePageClient({
       try {
         setLoading(true);
         const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356';
+        // 站点由部署配置决定（NEXT_PUBLIC_SITE_ID），不再硬编码
+        const siteId = process.env.NEXT_PUBLIC_SITE_ID || '';
+        const headers: Record<string, string> = siteId ? { 'X-Site-Id': siteId } : {};
         const [hotRes, newRes] = await Promise.all([
-          fetch(`${apiBaseUrl}/api/v1/products/featured?tag=首页推荐&limit=8`, { headers: { 'X-Site-Id': 'toy' } }),
-          fetch(`${apiBaseUrl}/api/v1/products/featured?tag=新品&limit=4`, { headers: { 'X-Site-Id': 'toy' } }),
+          fetch(`${apiBaseUrl}/api/v1/products/featured?tag=首页推荐&limit=8`, { headers }),
+          fetch(`${apiBaseUrl}/api/v1/products/featured?tag=新品&limit=4`, { headers }),
         ]);
         if (hotRes.ok) {
           const data = await hotRes.json();

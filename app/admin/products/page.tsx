@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { productAdminService, skuPurchasePriceService } from '@/services';
-import { siteCan } from '@/lib/site-permissions';
 import type { Product } from '@/types';
 
 export default function ProductsPage() {
@@ -83,14 +82,12 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-bold text-gray-900">产品管理</h1>
           <p className="text-gray-600 mt-1">管理所有产品信息</p>
         </div>
-        {siteCan('products', 'create') && (
-          <Link
-            href="/admin/products/new"
-            className="px-6 py-3 bg-[#00F2FE] text-[#050505] rounded-lg font-semibold hover:bg-[#00C4CC] transition-colors"
-          >
-            ➕ 添加新产品
-          </Link>
-        )}
+        <Link
+          href="/admin/products/new"
+          className="px-6 py-3 bg-[#00F2FE] text-[#050505] rounded-lg font-semibold hover:bg-[#00C4CC] transition-colors"
+        >
+          ➕ 添加新产品
+        </Link>
       </div>
 
       {/* 筛选和搜索 */}
@@ -182,14 +179,12 @@ export default function ProductsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
-                          {siteCan('products', 'toggle_status') && (
                             <button
                               onClick={() => handleToggleStatus(product.id, product.status)}
                               className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-colors"
                             >
                               {product.status === 'ACTIVE' ? '下架' : '上架'}
                             </button>
-                          )}
                           <button
                             onClick={() => openPricePanel(product.id, product.name || product.title || '')}
                             className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors"
@@ -208,14 +203,12 @@ export default function ProductsPage() {
                           >
                             编辑
                           </Link>
-                          {siteCan('products', 'delete') && (
                             <button
                               onClick={() => handleDelete(product.id)}
                               className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
                             >
                               删除
                             </button>
-                          )}
                         </div>
                       </td>
                     </tr>

@@ -5,13 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supplierAdminService } from '@/services';
 import type { Supplier } from '@/types';
-import { getSiteId } from '@/lib/api-client';
 import CountrySelect from '@/components/CountrySelect';
 
 export default function NewSupplierPage() {
   const router = useRouter();
-
-  const currentSite = typeof window !== 'undefined' ? getSiteId() : 'toy';
 
   const [formData, setFormData] = useState<Partial<Supplier>>({
     name: '',

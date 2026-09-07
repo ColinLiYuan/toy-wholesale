@@ -3,8 +3,9 @@ import { Income } from '@/types/income';
 const API = '/api/v1/incomes';
 
 function getHeaders(): Record<string, string> {
-  const siteId = typeof window !== 'undefined' ? localStorage.getItem('admin_site_id') || 'toy' : 'toy';
-  return { 'X-Site-Id': siteId, 'Content-Type': 'application/json' };
+  const siteId = typeof window !== 'undefined' ? (localStorage.getItem('admin_site_id') || '') : '';
+  // 未选择站点时不携带 X-Site-Id，由后端默认处理
+  return siteId ? { 'X-Site-Id': siteId, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
 }
 
 export const incomeService = {
