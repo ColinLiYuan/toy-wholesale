@@ -37,6 +37,16 @@ if (typeof window !== 'undefined') {
   }
 }
 
+// 服务端组件环境：无 localStorage，站点由部署配置决定（NEXT_PUBLIC_SITE_ID）
+// 否则公共页服务端渲染的请求不带 X-Site-Id，后端按站点过滤时返回空数据
+if (typeof window === 'undefined') {
+  const envSiteId = process.env.NEXT_PUBLIC_SITE_ID || '';
+  if (envSiteId) {
+    currentSiteId = envSiteId;
+    supportedSites.add(envSiteId);
+  }
+}
+
 // 获取后端 API 的绝对地址（用于 Server Component）
 const getAbsoluteBaseUrl = () => {
   if (typeof window === 'undefined') {
