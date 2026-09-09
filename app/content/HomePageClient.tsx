@@ -4,18 +4,26 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import InquiryModal from '@/components/InquiryModal';
 import { R2_BASE_URL } from '@/lib/r2-config';
-import type { Product } from '@/types';
+import type { Product, HomeBanner, HomeSection } from '@/types';
 
 export default function HomePageClient({
   initialFeaturedProducts = [],
   initialNewProducts = [],
+  initialBanners = [],
+  initialSections = [],
 }: {
   initialFeaturedProducts?: Product[];
   initialNewProducts?: Product[];
+  initialBanners?: HomeBanner[];
+  initialSections?: HomeSection[];
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>(initialFeaturedProducts);
   const [newProducts, setNewProducts] = useState<Product[]>(initialNewProducts);
+  // 站点级动态配置：轮播图（≥1 张显示，1 张静态 / 多张自动轮播）+ 首页区块（非空时替代标签查询区块）
+  const [banners, setBanners] = useState<HomeBanner[]>(initialBanners);
+  const [sections, setSections] = useState<HomeSection[]>(initialSections);
+  const [activeBannerIdx, setActiveBannerIdx] = useState(0);
   const [loading, setLoading] = useState(initialFeaturedProducts.length === 0);
 
   useEffect(() => {
@@ -26,9 +34,11 @@ export default function HomePageClient({
         // 站点由部署配置决定（NEXT_PUBLIC_SITE_ID），不再硬编码
         const siteId = process.env.NEXT_PUBLIC_SITE_ID || '';
         const headers: Record<string, string> = siteId ? { 'X-Site-Id': siteId } : {};
-        const [hotRes, newRes] = await Promise.all([
+        const [hotRes, newRes, bannersRes, sectionsRes] = await Promise.all([
           fetch(`${apiBaseUrl}/api/v1/products/featured?tag=首页推荐&limit=8`, { headers }),
           fetch(`${apiBaseUrl}/api/v1/products/featured?tag=新品&limit=4`, { headers }),
+          fetch(`${apiBaseUrl}/api/v1/home/banners`, { headers }),
+          fetch(`${apiBaseUrl}/api/v1/home/sections`, { headers }),
         ]);
         if (hotRes.ok) {
           const data = await hotRes.json();
@@ -38,6 +48,14 @@ export default function HomePageClient({
           const data = await newRes.json();
           if (data.code === 200 && data.data) setNewProducts(data.data);
         }
+        if (bannersRes.ok) {
+          const data = await bannersRes.json();
+          if (data.code === 200 && Array.isArray(data.data)) setBanners(data.data);
+        }
+        if (sectionsRes.ok) {
+          const data = await sectionsRes.json();
+          if (data.code === 200 && Array.isArray(data.data)) setSections(data.data);
+        }
       } catch (error) {
         console.error('获取产品失败:', error);
       } finally {
@@ -46,6 +64,15 @@ export default function HomePageClient({
     };
     fetchProducts();
   }, []);
+
+  // 轮播图自动切换：只有多张才轮播，单张保持静态展示
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveBannerIdx((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [banners.length]);
 
   const stats = [
     { value: '100+', label: 'Partner Factories', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
@@ -82,11 +109,20 @@ export default function HomePageClient({
     return product.image.startsWith('http') ? product.image : `${R2_BASE_URL}/${product.image}`;
   }
 
+  // 轮播图链接仅放行 '/' 或 http(s) 前缀，其余值整图不可点（对齐零售约定）
+  function bannerHref(link?: string): string | null {
+    if (!link) return null;
+    if (link.startsWith('/') || link.startsWith('http://') || link.startsWith('https://')) return link;
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-white">
 
       {/* ============================================
           1. Hero
+          （原布局与文案保留不动；配置了 home.banners 时，仅右侧
+          视觉位换成轮播图：1 张静态 / 多张自动轮播；未配置显示原静态图）
       ============================================ */}
       <section className="relative min-h-[90vh] flex items-center pt-16 bg-white overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -125,7 +161,73 @@ export default function HomePageClient({
             </div>
             <div className="relative hidden lg:block">
               <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-surface via-white to-gray-200 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-gray-100">
-                <img src={`${R2_BASE_URL}/toy/home_product.jpg`} alt="Medical-grade silicone product — wholesale supplier" className="w-full h-full object-contain p-6" />
+                {banners.length > 0 ? (
+                  <>
+                    {banners.map((banner, i) => {
+                      const href = bannerHref(banner.link);
+                      const bannerImg = (
+                        <img
+                          src={banner.image}
+                          alt={banner.title || `Home banner ${i + 1}`}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
+                        />
+                      );
+                      return (
+                        <div
+                          key={i}
+                          className={`absolute inset-0 transition-opacity duration-700 ${i === activeBannerIdx ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                        >
+                          {href ? (
+                            <Link href={href} className="block w-full h-full">
+                              {bannerImg}
+                            </Link>
+                          ) : bannerImg}
+                          {banner.title && (
+                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-6 pt-6 pb-9 pointer-events-none">
+                              <p className="text-white text-base font-bold">{banner.title}</p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {/* 多张才有轮播控件（单张静态展示，不轮播） */}
+                    {banners.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setActiveBannerIdx((activeBannerIdx - 1 + banners.length) % banners.length)}
+                          aria-label="Previous banner"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow transition-colors"
+                        >
+                          <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setActiveBannerIdx((activeBannerIdx + 1) % banners.length)}
+                          aria-label="Next banner"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow transition-colors"
+                        >
+                          <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                        <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-2">
+                          {banners.map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setActiveBannerIdx(i)}
+                              aria-label={`Go to banner ${i + 1}`}
+                              className={`w-2.5 h-2.5 rounded-full transition-colors ${i === activeBannerIdx ? 'bg-brand' : 'bg-white/60 hover:bg-white'}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <img src={`${R2_BASE_URL}/toy/home_product.jpg`} alt="Medical-grade silicone product — wholesale supplier" className="w-full h-full object-contain p-6" />
+                )}
               </div>
               <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg border border-gray-100 px-5 py-3 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
@@ -144,8 +246,69 @@ export default function HomePageClient({
       </section>
 
       {/* ============================================
-          2. Hot Products
+          2. Hot Products / 首页区块
+          （配置了 home.sections 则按配置渲染人工区块（选品+顺序），
+          否则回退下方标签查询的 Hot / New 区块）
       ============================================ */}
+      {sections.length > 0 ? (
+        sections.map((section, i) => (
+          <section key={i} className={`py-20 lg:py-28 ${i % 2 === 0 ? 'bg-white' : 'bg-surface'}`}>
+            <div className="max-w-7xl mx-auto px-6 lg:px-8">
+              <div className="text-center mb-14">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4 tracking-tight">
+                  {section.title}
+                </h2>
+                {section.subtitle && (
+                  <p className="text-lg text-text-secondary max-w-xl mx-auto">
+                    {section.subtitle}
+                  </p>
+                )}
+              </div>
+              {section.products.length > 0 ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {section.products.map((product) => (
+                    <Link key={product.id} href={`/products/${product.slug}`} className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                      <div className="relative h-56 bg-surface flex items-center justify-center overflow-hidden">
+                        <img
+                          src={productImageUrl(product)}
+                          alt={product.alt || product.title}
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => { e.currentTarget.src = '/placeholder-product.svg'; }}
+                        />
+                      </div>
+                      <div className="p-5">
+                        <h3 className="text-sm font-semibold text-text-primary mb-2 group-hover:text-brand transition-colors line-clamp-2 leading-snug">
+                          {product.title || product.name}
+                        </h3>
+                        <div className="flex items-center justify-between text-xs text-text-secondary mb-3">
+                          {product.material && <span>{product.material}</span>}
+                          {product.minOrder && product.minOrder > 0 && (
+                            <span className="text-brand font-semibold">MOQ: {product.minOrder} pcs</span>
+                          )}
+                        </div>
+                        <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                          <span className="text-xs text-text-muted">Wholesale</span>
+                          <span className="text-sm font-bold text-brand group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                            Get Quote
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <p className="text-text-secondary text-lg">No products in this section</p>
+                </div>
+              )}
+            </div>
+          </section>
+        ))
+      ) : (
+      <>
       <section className="py-20 lg:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -270,6 +433,8 @@ export default function HomePageClient({
             </div>
           </div>
         </section>
+      )}
+      </>
       )}
 
       {/* ============================================

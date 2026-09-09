@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import HomePageClient from '@/app/content/HomePageClient';
 import { productService } from '@/services';
-import type { Product } from '@/types';
+import type { Product, HomeBanner, HomeSection } from '@/types';
 
 export const metadata: Metadata = {
   title: 'Premium Adult Toys Wholesale | Medical-Grade Supplier',
@@ -35,14 +35,26 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   let featuredProducts: Product[] = [];
   let newProducts: Product[] = [];
+  // 站点级动态配置：轮播图 + 首页区块（未配置时后端返回空数组，前台回退静态 hero / 标签查询）
+  let banners: HomeBanner[] = [];
+  let sections: HomeSection[] = [];
   try {
-    [featuredProducts, newProducts] = await Promise.all([
+    [featuredProducts, newProducts, banners, sections] = await Promise.all([
       productService.getFeaturedProducts('首页推荐', 8),
       productService.getFeaturedProducts('新品', 4),
+      productService.getHomeBanners(),
+      productService.getHomeSections(),
     ]);
   } catch (error) {
-    console.error('Failed to fetch featured products for homepage:', error);
+    console.error('Failed to fetch homepage data:', error);
   }
 
-  return <HomePageClient initialFeaturedProducts={featuredProducts} initialNewProducts={newProducts} />;
+  return (
+    <HomePageClient
+      initialFeaturedProducts={featuredProducts}
+      initialNewProducts={newProducts}
+      initialBanners={banners}
+      initialSections={sections}
+    />
+  );
 }

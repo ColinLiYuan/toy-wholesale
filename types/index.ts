@@ -111,6 +111,21 @@ export interface ProductListResponse {
   last: boolean;
 }
 
+// 首页轮播图 - 对应后端 HomeBannerResponse（GET /v1/home/banners）
+export interface HomeBanner {
+  image: string;   // 图片完整 URL
+  title?: string;  // 轮播标题（可空）
+  link?: string;   // 跳转链接（可空：空 = 整图不可点）
+}
+
+// 首页区块 - 对应后端 HomeSectionResponse（GET /v1/home/sections）
+export interface HomeSection {
+  key?: string;         // 区块标识（如 hot / new）
+  title?: string;       // 区块标题
+  subtitle?: string;    // 区块副标题（可空）
+  products: Product[];  // 区块商品（人工配置序）
+}
+
 // API 通用响应 - 对应后端 ApiResponse<T>
 export interface ApiResult<T = any> {
   code: number;

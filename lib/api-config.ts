@@ -28,6 +28,10 @@ export const API_ENDPOINTS = {
   // 产品相关（前端公开接口）
   PRODUCTS: '/v1/products',                    // GET /v1/products?page=0&size=12
   PRODUCT_DETAIL: '/v1/products',              // GET /v1/products/{slug}
+
+  // 首页聚合（前端公开接口）
+  HOME_BANNERS: '/v1/home/banners',            // GET /v1/home/banners（未配置返回空数组）
+  HOME_SECTIONS: '/v1/home/sections',          // GET /v1/home/sections（未配置返回空数组）
   
   // 产品管理（后台管理接口）
   ADMIN_PRODUCTS: '/v1/products/admin/list',   // GET /v1/products/admin/list?page=0&size=20

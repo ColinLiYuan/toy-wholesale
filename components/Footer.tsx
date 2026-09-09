@@ -9,10 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center space-x-3 mb-6 group">
-              <div className="w-10 h-10 bg-brand rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">S</span>
-              </div>
+            <Link href="/" className="inline-flex items-center mb-6 group">
               <span className="text-lg font-semibold text-text-primary group-hover:text-brand transition-colors">
                 SinTone
               </span>

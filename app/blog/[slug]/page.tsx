@@ -7,6 +7,9 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 
+// 详情页 ISR 缓存 1 天（86400 秒）：按需首渲染后缓存，过期自动回源更新
+export const revalidate = 86400;
+
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.adult-toy-wholesale.com';
 
 interface BlogDetailPageProps {

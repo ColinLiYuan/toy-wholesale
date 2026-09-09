@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { Product } from '@/types';
 import { inquiryCartUtils } from '@/lib/inquiry-cart';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { formatImageUrl } from '@/lib/api-config';
 
 // 本地兜底颜色码映射（字典不可用时使用）
 const FALLBACK_COLOR_MAP: Record<string, string> = {
@@ -360,12 +363,44 @@ export default function ProductDetailClient({ initialProduct, error, productSlug
                 </div>
               )}
 
-              {/* Description */}
+              {/* Description（Markdown 渲染，支持管理端编辑器插入的图片/表格等） */}
               {product.description && (
                 <div className="mb-6">
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {product.description.replace(/###|\*\*/g, '')}
-                  </p>
+                  <div className="prose prose-sm prose-gray max-w-none text-gray-600">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        h1: ({ node, ...props }) => (
+                          <h1 className="text-lg font-bold text-gray-900 mt-4 mb-2" {...props} />
+                        ),
+                        h2: ({ node, ...props }) => (
+                          <h2 className="text-base font-bold text-gray-900 mt-4 mb-2" {...props} />
+                        ),
+                        h3: ({ node, ...props }) => (
+                          <h3 className="text-sm font-semibold text-gray-900 mt-3 mb-2" {...props} />
+                        ),
+                        a: ({ node, ...props }) => (
+                          <a className="text-blue-600 underline" target="_blank" rel="noopener noreferrer" {...props} />
+                        ),
+                        img: ({ node, ...props }) => {
+                          let src = props.src || '';
+                          if (src && typeof src === 'string' && !src.startsWith('http')) {
+                            src = formatImageUrl(src);
+                          }
+                          return (
+                            <img
+                              {...props}
+                              src={src}
+                              className="rounded-lg my-4 w-full"
+                              loading="lazy"
+                            />
+                          );
+                        },
+                      }}
+                    >
+                      {product.description}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               )}
 

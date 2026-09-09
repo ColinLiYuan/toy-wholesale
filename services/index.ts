@@ -1,6 +1,6 @@
 import apiClient, { UnwrappedAxiosResponse } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api-config';
-import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, OperationAccount, OperationAccountListResponse, Inquiry, InquiryItem, Admin, VisitRecord, VisitRecordListResponse } from '@/types';
+import type { VerifyRequest, VerifyResult, Product, ProductListResponse, ApiResult, Gallery, BlogPost, BlogListResponse, Supplier, Distributor, AuthResponse, Lead, FollowUpRecord, LeadListResponse, FollowUpRecordListResponse, OperationAccount, OperationAccountListResponse, Inquiry, InquiryItem, Admin, VisitRecord, VisitRecordListResponse, HomeBanner, HomeSection } from '@/types';
 
 // 防伪验证服务
 export const antiCounterfeitService = {
@@ -309,6 +309,38 @@ export const productService = {
     } catch (error) {
       console.error('Failed to fetch featured products:', error);
       throw error;
+    }
+  },
+
+  // 获取首页轮播图 - GET /v1/home/banners（未配置返回空数组，前台回退静态 hero）
+  async getHomeBanners(): Promise<HomeBanner[]> {
+    try {
+      const apiResult: ApiResult<HomeBanner[]> = await apiClient.get(API_ENDPOINTS.HOME_BANNERS);
+
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to fetch home banners');
+      }
+
+      return Array.isArray(apiResult.data) ? apiResult.data : [];
+    } catch (error) {
+      console.error('Failed to fetch home banners:', error);
+      return [];
+    }
+  },
+
+  // 获取首页区块 - GET /v1/home/sections（未配置返回空数组，前台回退标签查询）
+  async getHomeSections(): Promise<HomeSection[]> {
+    try {
+      const apiResult: ApiResult<HomeSection[]> = await apiClient.get(API_ENDPOINTS.HOME_SECTIONS);
+
+      if (apiResult.code !== 200) {
+        throw new Error(apiResult.message || 'Failed to fetch home sections');
+      }
+
+      return Array.isArray(apiResult.data) ? apiResult.data : [];
+    } catch (error) {
+      console.error('Failed to fetch home sections:', error);
+      return [];
     }
   },
 
