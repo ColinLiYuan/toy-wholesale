@@ -276,15 +276,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       {/* Content */}
       <section className="px-6 pb-20">
         <article className="max-w-4xl mx-auto bg-[#1a1a1a] rounded-xl p-8 md:p-12 border border-[#2a2a2a]">
-          {/* 正文内封面图 */}
-          {blog.coverImage && (
-            <img
-              src={formatImageUrl(blog.coverImage)}
-              alt={blog.title}
-              className="w-full rounded-lg mb-8"
-              loading="lazy"
-            />
-          )}
           <div className="prose prose-invert prose-lg max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
